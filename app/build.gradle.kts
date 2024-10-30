@@ -68,6 +68,13 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    //Test
+    testImplementation("io.mockk:mockk:1.13.13")
+    testImplementation(libs.junit)
+    testImplementation("com.google.truth:truth:1.4.2")
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
+    
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
