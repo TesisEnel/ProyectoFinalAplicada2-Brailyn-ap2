@@ -1,6 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.data.remote.dto
 
-class ClienteDto(
+data class ClienteDto(
     val cedula: String,
     val nombre: String,
     val apellidos: String,
