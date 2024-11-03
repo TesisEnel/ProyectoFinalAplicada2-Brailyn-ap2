@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "ucne.edu.proyectofinalaplicada2"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ucne.edu.proyectofinalaplicada2"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
