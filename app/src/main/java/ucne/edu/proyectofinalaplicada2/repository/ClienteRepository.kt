@@ -35,10 +35,10 @@ class ClienteRepository @Inject constructor(
         }
     }
 
-    fun updateCliente(clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow{
+    fun updateCliente(id:Int, clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow{
         try {
             emit(Resource.Loading())
-            val cliente = rentCarRemoteDataSource.updateCliente(clienteDto)
+            val cliente = rentCarRemoteDataSource.updateCliente(id,clienteDto)
             emit(Resource.Success(cliente))
             } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
