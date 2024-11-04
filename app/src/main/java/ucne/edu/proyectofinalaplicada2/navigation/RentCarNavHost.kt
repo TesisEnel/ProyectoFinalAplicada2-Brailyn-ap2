@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.components.Home
 import ucne.edu.proyectofinalaplicada2.components.ModalDrawerSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,13 +68,7 @@ fun RentCarNavHost(
                             .padding(16.dp)
                             .fillMaxWidth()
                     ) {
-                        Text(
-                            text = "HOME",
-                            modifier = Modifier
-                                .padding(innerpadding)
-                                .align(alignment = Alignment.Center),
-                            fontSize = 70.sp
-                        )
+                        Home()
                     }
 
                 }
