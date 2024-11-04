@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.navigation.Screen
+import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 
 @Composable
 fun ModalDrawerSheet(
