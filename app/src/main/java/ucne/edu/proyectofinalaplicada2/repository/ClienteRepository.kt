@@ -21,4 +21,30 @@ class ClienteRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
+
+    fun addCliente(clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow{
+        try {
+            emit(Resource.Loading())
+            val cliente = rentCarRemoteDataSource.addCliente(clienteDto)
+            emit(Resource.Success(cliente))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+
+        }
+    }
+
+    fun updateCliente(clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow{
+        try {
+            emit(Resource.Loading())
+            val cliente = rentCarRemoteDataSource.updateCliente(clienteDto)
+            emit(Resource.Success(cliente))
+            } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
 }
