@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.data.remote.repository
+package ucne.edu.proyectofinalaplicada2.repository
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.utils.Resource
