@@ -6,6 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +23,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -34,6 +36,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,19 +46,14 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable
 fun Home() {
-    Scaffold {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-        ) {
-            SearchBar()
-            VehiculesPresentation()
-
-        }
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        SearchBar()
+        VehiculosMasDestacados()
+        TiposDeVehiculos()
     }
-
 }
 
 @Composable
@@ -78,31 +77,96 @@ fun SearchBar() {
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 50.dp)
+            .padding(15.dp)
     )
 }
 
 @Composable
-fun VehiculesPresentation() {
+fun VehiculosMasDestacados() {
     val painter = painterResource(id = R.drawable.ferrari)
     val descripcion = "Un ferrari rojo"
     val title = "Ferrari posando duro duro"
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(vertical = 5.dp)
+
+    Column(
+        modifier = Modifier.padding(bottom = 5.dp, top = 20.dp)
     ) {
-        items(vehiculos){
-            Box(
-                modifier = Modifier
-                    .width(200.dp)
-
-            ) {
-                ImageCard(painter = painter, contentDescription = descripcion, title = title)
-
+        Text(
+            text = "Vehiculos destacados",
+            fontFamily = FontFamily.Serif,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.W700,
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(18.dp),
+            modifier = Modifier.padding(vertical = 5.dp),
+            contentPadding = PaddingValues(horizontal = 15.dp)
+        ) {
+            items(vehiculos) {
+                Box {
+                    ImageCard(
+                        painter = painter,
+                        contentDescription = descripcion,
+                        title = title,
+                        height = 180,
+                        width = 150
+                    )
+                }
             }
         }
     }
+}
 
+@Composable
+fun TiposDeVehiculos() {
+    val painter = painterResource(id = R.drawable.toyota)
+    val descripcion = "Vehiculo toyota"
+    val title = "Toyota"
 
+    Column(
+        modifier = Modifier
+            .padding(bottom = 5.dp, top = 20.dp)
+    ) {
+        Text(
+            text = "Tipos de vehiculos",
+            fontFamily = FontFamily.Serif,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.W700,
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(vertical = 5.dp)
+                .fillMaxWidth(),
+        ) {
+            vehiculos.chunked(2).forEach { rowItems ->
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    rowItems.forEach { vehiculo ->
+                        ImageCard(
+                            painter = painter,
+                            contentDescription = descripcion,
+                            title = title,
+                            height = 130,
+                            width = 180,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 5.dp)
+                        )
+                    }
+
+                    if (rowItems.size == 1) {
+                        Spacer(modifier = Modifier.width(180.dp))
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -110,12 +174,17 @@ fun ImageCard(
     painter: Painter,
     contentDescription: String,
     title: String,
+    height: Int,
+    width: Int,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .height(height.dp)
+            .width(width.dp),
         shape = RoundedCornerShape(15.dp)
     ) {
-        Box(modifier = Modifier.height(200.dp)) {
+        Box{
             Image(
                 painter = painter,
                 contentDescription = contentDescription,
@@ -130,7 +199,7 @@ fun ImageCard(
                                 Color.Transparent,
                                 Color.Black
                             ),
-                            startY = 300f
+                            startY = 170f
                         )
                     )
             )
@@ -146,11 +215,18 @@ fun ImageCard(
     }
 }
 
+
 private val vehiculos = listOf(
     R.drawable.ferrari,
     R.drawable.ferrari,
     R.drawable.ferrari,
-    R.drawable.ferrari
+    R.drawable.ferrari,
+    R.drawable.ferrari,
+    R.drawable.ferrari,
+    R.drawable.ferrari,
+    R.drawable.ferrari,
+    R.drawable.ferrari,
+    R.drawable.ferrari,
 )
 
 @Preview(showSystemUi = true)
