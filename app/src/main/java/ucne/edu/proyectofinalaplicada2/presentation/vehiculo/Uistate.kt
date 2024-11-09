@@ -10,6 +10,7 @@ data class Uistate(
     val modelo: String = "",
     val precio: Int = 0,
     val descripcion: String = "",
+    val imagePath: String = "",
     val vehiculos: List<VehiculoDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String = "",
@@ -23,5 +24,6 @@ fun Uistate.toEntity() = VehiculoDto(
     marca = marca,
     modelo = modelo,
     precio = precio,
-    descripcion = descripcion
+    descripcion = descripcion,
+    imagePath = imagePath
 )
