@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ucne.edu.proyectofinalaplicada2.navigation.RentCarNavHost
+import ucne.edu.proyectofinalaplicada2.presentation.navigation.RentCarNavHost
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.navigation
+package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import kotlinx.serialization.Serializable
 

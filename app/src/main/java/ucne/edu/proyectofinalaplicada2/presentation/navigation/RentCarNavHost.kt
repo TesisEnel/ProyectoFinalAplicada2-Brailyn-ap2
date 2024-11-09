@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.navigation
+package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
