@@ -27,32 +27,42 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
-fun Home() {
+fun Home(
+    viewModel: VehiculoViewModel = hiltViewModel()
+) {
+    val uistate by viewModel.uistate.collectAsStateWithLifecycle()
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         SearchBar()
-        VehiculosMasDestacados()
-        TiposDeVehiculos()
+        VehiculosMasDestacados(
+            uiState =uistate
+        )
+        TiposDeVehiculos(
+            uiState =uistate
+        )
     }
 }
 
@@ -82,11 +92,10 @@ fun SearchBar() {
 }
 
 @Composable
-fun VehiculosMasDestacados() {
-    val painter = painterResource(id = R.drawable.ferrari)
-    val descripcion = "Un ferrari rojo"
-    val title = "Ferrari posando duro duro"
-
+fun VehiculosMasDestacados(
+    uiState: Uistate
+) {
+    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 20.dp)
     ) {
@@ -102,12 +111,12 @@ fun VehiculosMasDestacados() {
             modifier = Modifier.padding(vertical = 5.dp),
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
-            items(vehiculos) {
+            items(uiState.vehiculos) { vehiculo ->
                 Box {
                     ImageCard(
-                        painter = painter,
-                        contentDescription = descripcion,
-                        title = title,
+                        painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
+                        contentDescription = vehiculo.descripcion?:"",
+                        title = vehiculo.modelo?:"",
                         height = 180,
                         width = 150
                     )
@@ -118,10 +127,10 @@ fun VehiculosMasDestacados() {
 }
 
 @Composable
-fun TiposDeVehiculos() {
-    val painter = painterResource(id = R.drawable.toyota)
-    val descripcion = "Vehiculo toyota"
-    val title = "Toyota"
+fun TiposDeVehiculos(
+    uiState: Uistate
+) {
+    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
 
     Column(
         modifier = Modifier
@@ -141,7 +150,7 @@ fun TiposDeVehiculos() {
                 .padding(vertical = 5.dp)
                 .fillMaxWidth(),
         ) {
-            vehiculos.chunked(2).forEach { rowItems ->
+            uiState.vehiculos.chunked(2).forEach { rowItems ->
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -149,15 +158,16 @@ fun TiposDeVehiculos() {
                 ) {
                     rowItems.forEach { vehiculo ->
                         ImageCard(
-                            painter = painter,
-                            contentDescription = descripcion,
-                            title = title,
+                            painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
+                            contentDescription = vehiculo.descripcion?:"",
+                            title = vehiculo.modelo?:"",
                             height = 130,
                             width = 180,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 5.dp)
                         )
+
                     }
 
                     if (rowItems.size == 1) {
@@ -215,24 +225,3 @@ fun ImageCard(
     }
 }
 
-
-private val vehiculos = listOf(
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-    R.drawable.ferrari,
-)
-
-@Preview(showSystemUi = true)
-@Composable
-private fun HomePreview() {
-    ProyectoFinalAplicada2Theme {
-        Home()
-    }
-}
