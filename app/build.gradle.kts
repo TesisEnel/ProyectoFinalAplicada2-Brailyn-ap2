@@ -74,6 +74,9 @@ dependencies {
     testImplementation("com.google.truth:truth:1.4.2")
     testImplementation("app.cash.turbine:turbine:1.1.0")
 
+    //Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.1")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.1")
     
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
