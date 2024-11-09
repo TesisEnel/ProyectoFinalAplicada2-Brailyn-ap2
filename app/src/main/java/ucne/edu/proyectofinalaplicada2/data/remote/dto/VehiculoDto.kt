@@ -7,5 +7,6 @@ data class VehiculoDto(
     val marca: String?,
     val modelo: String?,
     val precio: Int?,
-    val descripcion: String?
+    val descripcion: String?,
+    val imagePath: String?
 )
