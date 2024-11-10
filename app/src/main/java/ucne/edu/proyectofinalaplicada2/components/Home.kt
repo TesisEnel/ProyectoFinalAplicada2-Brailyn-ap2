@@ -8,19 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -58,10 +61,10 @@ fun Home(
     ) {
         SearchBar()
         VehiculosMasDestacados(
-            uiState =uistate
+            uiState = uistate
         )
         TiposDeVehiculos(
-            uiState =uistate
+            uiState = uistate
         )
     }
 }
@@ -115,8 +118,8 @@ fun VehiculosMasDestacados(
                 Box {
                     ImageCard(
                         painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
-                        contentDescription = vehiculo.descripcion?:"",
-                        title = vehiculo.modelo?:"",
+                        contentDescription = vehiculo.descripcion ?: "",
+                        title = vehiculo.modelo ?: "",
                         height = 180,
                         width = 150
                     )
@@ -131,7 +134,6 @@ fun TiposDeVehiculos(
     uiState: Uistate
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-
     Column(
         modifier = Modifier
             .padding(bottom = 5.dp, top = 20.dp)
@@ -150,29 +152,20 @@ fun TiposDeVehiculos(
                 .padding(vertical = 5.dp)
                 .fillMaxWidth(),
         ) {
-            uiState.vehiculos.chunked(2).forEach { rowItems ->
+            uiState.vehiculos.forEach { vehiculo ->
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    rowItems.forEach { vehiculo ->
-                        ImageCard(
-                            painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
-                            contentDescription = vehiculo.descripcion?:"",
-                            title = vehiculo.modelo?:"",
-                            height = 130,
-                            width = 180,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 5.dp)
-                        )
 
-                    }
+                    val painter = rememberAsyncImagePainter(url + vehiculo.imagePath)
 
-                    if (rowItems.size == 1) {
-                        Spacer(modifier = Modifier.width(180.dp))
-                    }
+                    TipoVehiculoList(
+                        painter = painter,
+                        vehiculo.marca ?: "",
+                        listaModeloEjemplo = "Camry, Highlander, Hilux"
+                    )
                 }
             }
         }
@@ -194,11 +187,12 @@ fun ImageCard(
             .width(width.dp),
         shape = RoundedCornerShape(15.dp)
     ) {
-        Box{
+        Box {
             Image(
                 painter = painter,
                 contentDescription = contentDescription,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
             )
             Box(
                 modifier = Modifier
@@ -225,3 +219,55 @@ fun ImageCard(
     }
 }
 
+
+@Composable
+fun TipoVehiculoList(
+    painter: Painter,
+    marca: String,
+    listaModeloEjemplo: String
+) {
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = RoundedCornerShape(corner = CornerSize(16.dp)),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp  // Adjust the dp to control the elevation level
+        )
+
+    ) {
+        Row {
+            VehiculeImage(
+                painter = painter
+            )
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(text = marca, style = MaterialTheme.typography.headlineSmall)
+                Text(text = listaModeloEjemplo, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun VehiculeImage(
+    painter: Painter
+) {
+    Image(
+        painter = painter,
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .padding(8.dp)
+            .size(84.dp)
+            .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
+    )
+}
