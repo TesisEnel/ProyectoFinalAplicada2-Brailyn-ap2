@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.navigation.Screen
+import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 
 @Composable
 fun ModalDrawerSheet(
@@ -30,13 +30,16 @@ fun ModalDrawerSheet(
     drawerState: DrawerState,
     navHostController: NavHostController
 ) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(
+        modifier = Modifier
+            .fillMaxWidth(0.60f)  // Reducir el ancho
+    ) {
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
                 .height(150.dp)
-
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Text(
                 "Menú",
@@ -50,7 +53,12 @@ fun ModalDrawerSheet(
         Spacer(modifier = Modifier.padding(20.dp))
 
         NavigationDrawerItem(
-            label = { Text(text = "Home") },
+            label = {
+                Text(
+                    text = "Home",
+                    fontSize = 18.sp
+                )
+            },
             selected = false,
             icon = {
                 Icon(
@@ -69,3 +77,4 @@ fun ModalDrawerSheet(
         )
     }
 }
+
