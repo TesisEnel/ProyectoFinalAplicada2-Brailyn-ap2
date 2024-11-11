@@ -1,11 +1,19 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.utils.Resource
+import java.io.File
 import javax.inject.Inject
 
 class VehiculoRepository @Inject constructor(
@@ -23,12 +31,19 @@ class VehiculoRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
-    fun addVehiculo(vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow{
+
+
+    fun addVehiculo(precio: Int, descripcion: String, image: String): Flow<Resource<VehiculoDto>> = flow{
         try {
             emit(Resource.Loading())
-            val vehiculo = rentCarRemoteDataSource.addVehiculo(vehiculoDto)
+            val requestoBodyPrecio = precio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val requestoBodyDescripcion = descripcion.toRequestBody("text/plain".toMediaTypeOrNull())
+            val imagen = File(image)
+            val requestBodyFile = imagen.asRequestBody("image/jpeg".toMediaTypeOrNull())
+            val bodyFoto = MultipartBody.Part.createFormData("image", imagen.name ,requestBodyFile)
+            val vehiculo = rentCarRemoteDataSource.addVehiculo(requestoBodyPrecio, requestoBodyDescripcion, bodyFoto)
             emit(Resource.Success(vehiculo))
-            } catch (e: HttpException) {
+        } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
             emit(Resource.Error("Error desconocido ${e.message}"))
