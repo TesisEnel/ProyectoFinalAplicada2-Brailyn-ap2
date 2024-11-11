@@ -1,6 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
+import java.io.File
 
 sealed interface VehiculoEvent {
     data object Save : VehiculoEvent
@@ -9,4 +9,6 @@ sealed interface VehiculoEvent {
     data class OnChangeTipoCombustibleId(val tipoCombustibleId: Int) : VehiculoEvent
     data class OnChangeTipoVehiculoId(val tipoVehiculoId: Int) : VehiculoEvent
     data class OnChangeMarcaId(val marcaId: Int): VehiculoEvent
+    data class OnChangeModeloId(val modeloId: Int): VehiculoEvent
+    data class OnChangeImagePath(val imagePath: File): VehiculoEvent
 }
