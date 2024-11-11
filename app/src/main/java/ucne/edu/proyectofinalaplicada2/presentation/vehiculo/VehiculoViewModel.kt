@@ -7,13 +7,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
 class VehiculoViewModel @Inject constructor(
-    private val vehiculoRepository: VehiculoRepository
+    private val vehiculoRepository: VehiculoRepository,
+    private val marcaRepository: MarcaRepository
 ): ViewModel() {
     private val _uistate = MutableStateFlow(Uistate())
     val uistate = _uistate.asStateFlow()
@@ -21,6 +23,7 @@ class VehiculoViewModel @Inject constructor(
 
     init {
         getVehiculos()
+        getMarcas()
     }
 
     private fun getVehiculos(){
@@ -55,6 +58,37 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
+    private fun getMarcas(){
+        viewModelScope.launch {
+            marcaRepository.getMarcas().collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                marcas = result.data ?: emptyList()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun save(){
         viewModelScope.launch {
             val vehiculo = vehiculoRepository.addVehiculo(uistate.value.toEntity())
@@ -117,6 +151,13 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+    private fun onChangeMarcaId(marcaId: Int) {
+        _uistate.update {
+            it.copy(
+                marcaId = marcaId
+            )
+        }
+    }
 
     fun nuevo() {
         _uistate.update {
@@ -134,10 +175,11 @@ class VehiculoViewModel @Inject constructor(
 
     fun onEvent(event: VehiculoEvent) {
         when (event) {
-            is VehiculoEvent.OnchangeDescripcion -> onChangeDescripcion(event.descripcion)
-            is VehiculoEvent.OnchangePrecio -> onChangePrecio(event.precio)
-            is VehiculoEvent.OnchangeTipoCombustibleId -> onChangeTipoCombustibleId(event.tipoCombustibleId)
-            is VehiculoEvent.OnchangeTipoVehiculoId -> onChangeTipoVehiculoId(event.tipoVehiculoId)
+            is VehiculoEvent.OnChangeDescripcion -> onChangeDescripcion(event.descripcion)
+            is VehiculoEvent.OnChangePrecio -> onChangePrecio(event.precio)
+            is VehiculoEvent.OnChangeTipoCombustibleId -> onChangeTipoCombustibleId(event.tipoCombustibleId)
+            is VehiculoEvent.OnChangeTipoVehiculoId -> onChangeTipoVehiculoId(event.tipoVehiculoId)
+            is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             VehiculoEvent.Save -> save()
         }
     }
