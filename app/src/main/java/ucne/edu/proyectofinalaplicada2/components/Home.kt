@@ -119,7 +119,7 @@ fun VehiculosMasDestacados(
                     ImageCard(
                         painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
                         contentDescription = vehiculo.descripcion ?: "",
-                        title = vehiculo.modelo ?: "",
+                        title = "Prueba",
                         height = 180,
                         width = 150
                     )
@@ -163,7 +163,7 @@ fun TiposDeVehiculos(
 
                     TipoVehiculoList(
                         painter = painter,
-                        vehiculo.marca ?: "",
+                        marca ="Prueba",
                         listaModeloEjemplo = "Camry, Highlander, Hilux"
                     )
                 }
