@@ -87,22 +87,6 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeMarca(marca: String){
-        _uistate.update {
-            it.copy(
-                marca = marca
-            )
-        }
-    }
-
-    private fun onChangeModelo(modelo: String){
-        _uistate.update {
-            it.copy(
-                modelo = modelo
-                )
-        }
-    }
-
     private fun onChangePrecio(precio: Int){
         _uistate.update {
             it.copy(
@@ -140,8 +124,6 @@ class VehiculoViewModel @Inject constructor(
                 vehiculoId = null,
                 tipoCombustibleId = null,
                 tipoVehiculoId = null,
-                marca = "",
-                modelo = "",
                 precio = 0,
                 descripcion = "",
                 success = "",
@@ -153,8 +135,6 @@ class VehiculoViewModel @Inject constructor(
     fun onEvent(event: VehiculoEvent) {
         when (event) {
             is VehiculoEvent.OnchangeDescripcion -> onChangeDescripcion(event.descripcion)
-            is VehiculoEvent.OnchangeMarca -> onChangeMarca(event.marca)
-            is VehiculoEvent.OnchangeModelo -> onChangeModelo(event.modelo)
             is VehiculoEvent.OnchangePrecio -> onChangePrecio(event.precio)
             is VehiculoEvent.OnchangeTipoCombustibleId -> onChangeTipoCombustibleId(event.tipoCombustibleId)
             is VehiculoEvent.OnchangeTipoVehiculoId -> onChangeTipoVehiculoId(event.tipoVehiculoId)
