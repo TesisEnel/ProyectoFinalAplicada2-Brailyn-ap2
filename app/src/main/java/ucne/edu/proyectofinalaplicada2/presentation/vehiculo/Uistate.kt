@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 data class Uistate(
@@ -12,6 +13,7 @@ data class Uistate(
     val descripcion: String = "",
     val imagePath: String = "",
     val vehiculos: List<VehiculoDto> = emptyList(),
+    val marcas: List<MarcaDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String = "",
     val success: String = ""
