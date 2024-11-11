@@ -1,7 +1,14 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoVehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import java.io.File
 
 data class Uistate(
     val vehiculoId: Int? = null,
@@ -12,20 +19,15 @@ data class Uistate(
     val precio: Int = 0,
     val descripcion: String = "",
     val imagePath: String = "",
-    val vehiculos: List<VehiculoDto> = emptyList(),
-    val marcas: List<MarcaDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String = "",
-    val success: String = ""
+    val success: String = "",
+    val marcas: List<MarcaDto> = emptyList(),
+    val tiposCombustibles: List<TipoCombustibleDto> = emptyList(),
+    val vehiculos: List<VehiculoDto> = emptyList(),
+    val tiposVehiculos: List<TipoVehiculoDto> = emptyList(),
+    val proveedores: List<ProveedorDto> = emptyList(),
+    val modelos: List<ModeloDto> = emptyList(),
+
 )
 
-fun Uistate.toEntity() = VehiculoDto(
-    vehiculoId = vehiculoId,
-    tipoCombustibleId = tipoCombustibleId,
-    tipoVehiculoId = tipoVehiculoId,
-    marcaId = marcaId,
-    modeloId = modeloId,
-    precio = precio,
-    descripcion = descripcion,
-    imagePath = imagePath
-)
