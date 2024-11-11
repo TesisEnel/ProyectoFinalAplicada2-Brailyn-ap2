@@ -1,10 +1,14 @@
 package ucne.edu.proyectofinalaplicada2.data.remote
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import ucne.edu.proyectofinalaplicada2.data.remote.api.RentCarApi
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import java.io.File
 import javax.inject.Inject
 
 class RentCarRemoteDataSource @Inject constructor(
@@ -22,12 +26,26 @@ class RentCarRemoteDataSource @Inject constructor(
 
     //vehiculo
     suspend fun getVehiculos() = rentCarApi.getVehiculos()
-    suspend fun addVehiculo(vehiculoDto: VehiculoDto) = rentCarApi.addVehiculo(vehiculoDto)
-    suspend fun updateVehiculo(id: Int ,vehiculoDto: VehiculoDto) = rentCarApi.updateVehiculo(id, vehiculoDto)
-
+    suspend fun addVehiculo( precio: RequestBody, descripcion: RequestBody, image: MultipartBody.Part) = rentCarApi.addVehiculo(precio, descripcion, image)
+    suspend fun updateVehiculo(id: Int, vehiculoDto: VehiculoDto) = rentCarApi.updateVehiculo(id, vehiculoDto)
 
     //Marca
     suspend fun getMarcas() = rentCarApi.getMarcas()
     suspend fun addMarca(marcaDto: MarcaDto) = rentCarApi.addMarca(marcaDto)
     suspend fun updateMarca(id: Int ,marcaDto: MarcaDto) = rentCarApi.updateMarca(id, marcaDto)
+
+    //TipoCombustible
+    suspend fun getTiposCombustibles() = rentCarApi.getTipoCombustibles()
+    suspend fun addTipoCombustible(tipoCombustibleDto: TipoCombustibleDto) = rentCarApi.addTipoCombustible(tipoCombustibleDto)
+    suspend fun updateTipoCombustible(id: Int ,tipoCombustibleDto: TipoCombustibleDto) = rentCarApi.updateTipoCombustible(id, tipoCombustibleDto)
+
+    //TipoVehiculo
+    suspend fun getTiposVehiculos() = rentCarApi.getTipoVehiculos()
+
+    //Proveedor
+    suspend fun getProveedores() = rentCarApi.getProveedores()
+
+    //Modelo
+    suspend fun getModelos(id: Int) = rentCarApi.getModelos(id)
+
 }
