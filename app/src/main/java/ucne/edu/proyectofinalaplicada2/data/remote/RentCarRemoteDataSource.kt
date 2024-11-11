@@ -2,6 +2,7 @@ package ucne.edu.proyectofinalaplicada2.data.remote
 
 import ucne.edu.proyectofinalaplicada2.data.remote.api.RentCarApi
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import javax.inject.Inject
@@ -25,4 +26,8 @@ class RentCarRemoteDataSource @Inject constructor(
     suspend fun updateVehiculo(id: Int ,vehiculoDto: VehiculoDto) = rentCarApi.updateVehiculo(id, vehiculoDto)
 
 
+    //Marca
+    suspend fun getMarcas() = rentCarApi.getMarcas()
+    suspend fun addMarca(marcaDto: MarcaDto) = rentCarApi.addMarca(marcaDto)
+    suspend fun updateMarca(id: Int ,marcaDto: MarcaDto) = rentCarApi.updateMarca(id, marcaDto)
 }
