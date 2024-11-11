@@ -6,6 +6,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
@@ -34,6 +35,13 @@ interface RentCarApi {
     @PUT("api/Vehiculos/{id}")
     suspend fun updateVehiculo(@Path ("id") id: Int ,@Body vehiculoDto: VehiculoDto): VehiculoDto
 
+    // Marca
+    @GET("api/Marcas")
+    suspend fun getMarcas(): List<MarcaDto>
+    @POST("api/Marcas")
+    suspend fun addMarca(@Body marcaDto: MarcaDto): MarcaDto
+    @PUT("api/Marcas/{id}")
+    suspend fun updateMarca(@Path ("id") id: Int ,@Body marcaDto: MarcaDto): MarcaDto
 
 
 }
