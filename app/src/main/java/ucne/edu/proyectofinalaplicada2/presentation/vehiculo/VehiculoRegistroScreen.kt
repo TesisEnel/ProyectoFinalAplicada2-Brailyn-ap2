@@ -8,9 +8,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,12 +22,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
 import java.io.File
@@ -35,11 +41,14 @@ fun VehiculoRegistroScreen(
     onBackHome: () -> Unit
 ) {
     val uistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+
     VehiculoBodyRegistroScreen(
         uistate = uistate,
         onBackHome = onBackHome,
         onEnvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) }
     )
+
+
 }
 
 
@@ -50,73 +59,85 @@ fun VehiculoBodyRegistroScreen(
     onBackHome: () -> Unit,
     onEnvent: (VehiculoEvent) -> Unit
 ) {
-
-    Column(
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.elevatedCardColors(MaterialTheme.colorScheme.surface),
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(horizontal = 45.dp, vertical = 30.dp),
     ) {
-        InputSelect(
-            label = "Marca",
-            options = uistate.marcas,
-            onOptionSelected = {
-                onEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
-            },
-            labelSelector = { it.nombreMarca }
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(vertical = 10.dp, horizontal = 25.dp)
+        ) {
+            AsyncImage(
+                model = "https://rentcarblobstorage.blob.core.windows.net/images/carlogo.png",
+                contentDescription = null
+            )
+            InputSelect(
+                label = "Marca",
+                options = uistate.marcas,
+                onOptionSelected = {
+                    onEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
+                },
+                labelSelector = { it.nombreMarca }
+            )
 
-        InputSelect(
-            label = "Tipo Combustible",
-            options = uistate.tiposCombustibles,
-            onOptionSelected = {
-                onEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
-            },
-            labelSelector = { it.nombreTipoCombustible }
-        )
+            InputSelect(
+                label = "Tipo Combustible",
+                options = uistate.tiposCombustibles,
+                onOptionSelected = {
+                    onEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
+                },
+                labelSelector = { it.nombreTipoCombustible }
+            )
 
-        InputSelect(
-            label = "Tipo Vehiculo",
-            options = uistate.tiposVehiculos,
-            onOptionSelected = { onEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId)) },
-            labelSelector = { it.nombreTipoVehiculo }
-        )
+            InputSelect(
+                label = "Tipo Vehiculo",
+                options = uistate.tiposVehiculos,
+                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId)) },
+                labelSelector = { it.nombreTipoVehiculo }
+            )
 
-        InputSelect(
-            label = "Modelo",
-            options = uistate.modelos,
-            onOptionSelected = { onEnvent(VehiculoEvent.OnChangeModeloId(it.modeloId)) },
-            labelSelector = { it.modeloVehiculo }
-        )
+            InputSelect(
+                label = "Modelo",
+                options = uistate.modelos,
+                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeModeloId(it.modeloId)) },
+                labelSelector = { it.modeloVehiculo }
+            )
 
-        InputSelect(
-            label = "Proveedor",
-            options = uistate.proveedores,
-            onOptionSelected = { onEnvent(VehiculoEvent.OnChangeMarcaId(it.proveedorId)) },
-            labelSelector = { it.nombre }
-        )
+            InputSelect(
+                label = "Proveedor",
+                options = uistate.proveedores,
+                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeMarcaId(it.proveedorId)) },
+                labelSelector = { it.nombre }
+            )
 
-        OutlinedTextField(
-            value = uistate.precio.toString(),
-            onValueChange = { onEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
-            label = { Text(text = "Precio") }
-        )
+            OutlinedTextField(
+                value = uistate.precio?.toString()?:"",
+                onValueChange = { onEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
+                label = { Text(text = "Precio") },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
 
 
-        OutlinedTextField(
-            value = uistate.descripcion.toString(),
-            onValueChange = { onEnvent(VehiculoEvent.OnChangeDescripcion(it)) },
-            label = { Text(text = "Descripcion") }
-        )
-        SelectSingleImage()
+            OutlinedTextField(
+                value = uistate.descripcion,
+                onValueChange = { onEnvent(VehiculoEvent.OnChangeDescripcion(it)) },
+                label = { Text(text = "Descripcion") },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            PermisoGallery()
+            OutlinedButton(onClick = { onEnvent(VehiculoEvent.Save) }) {
+                Text(text = "Guardar")
+            }
 
-        PermisoGallery()
-        OutlinedButton(onClick = { onEnvent(VehiculoEvent.Save) }) {
-            Text(text = "Guardar")
+            Text(text = uistate.error, color = androidx.compose.ui.graphics.Color.Red)
         }
-
-        uistate.error.let { error ->
-            Text(text = error, color = androidx.compose.ui.graphics.Color.Red)
-        }
-
     }
 }
 
@@ -144,13 +165,8 @@ fun SelectSingleImage() {
         }
     }
 
-    // Función para abrir la galería
-    fun openGallery() {
-        imagePickerLauncher.launch("image/*")  // Filtra solo imágenes
-    }
-
     OutlinedButton(onClick = {
-        openGallery()
+        imagePickerLauncher.launch("image/*")
     }) {
         Text(text = "Seleccionar Imagen")
     }
