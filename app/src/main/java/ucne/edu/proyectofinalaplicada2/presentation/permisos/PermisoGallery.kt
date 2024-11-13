@@ -36,7 +36,7 @@ fun PermisoGallery() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    var granted = remember { mutableStateOf(false) }
+    val granted = remember { mutableStateOf(false) }
     val viewModel = viewModel<MainViewModel>()
     val dialogQueue = viewModel.visiblePermissionDialogQueue
     val permissionsToRequest = arrayOf(
