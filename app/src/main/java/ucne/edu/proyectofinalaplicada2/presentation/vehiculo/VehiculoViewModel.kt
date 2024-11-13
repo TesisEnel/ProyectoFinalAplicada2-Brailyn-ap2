@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -241,7 +240,7 @@ class VehiculoViewModel @Inject constructor(
     private fun save() {
         viewModelScope.launch {
             val precio = uistate.value.precio
-            val descripcion = uistate.value.descripcion.toString()
+            val descripcion = uistate.value.descripcion
             val imagen= uistate.value.imagePath
             val vehiculo = vehiculoRepository.addVehiculo(
                 precio = precio?: 0,
