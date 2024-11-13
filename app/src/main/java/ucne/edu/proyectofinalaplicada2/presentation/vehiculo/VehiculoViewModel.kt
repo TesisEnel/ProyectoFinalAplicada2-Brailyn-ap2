@@ -244,7 +244,7 @@ class VehiculoViewModel @Inject constructor(
             val descripcion = uistate.value.descripcion.toString()
             val imagen= uistate.value.imagePath
             val vehiculo = vehiculoRepository.addVehiculo(
-                precio = precio,
+                precio = precio?: 0,
                 descripcion = descripcion,
                 image = imagen
             )
