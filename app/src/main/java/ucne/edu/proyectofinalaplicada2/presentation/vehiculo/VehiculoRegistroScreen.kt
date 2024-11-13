@@ -144,7 +144,6 @@ fun VehiculoBodyRegistroScreen(
 @Composable
 fun SelectSingleImage() {
     val viewModel: VehiculoViewModel = hiltViewModel()
-    val uistate by viewModel.uistate.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val selectedImage =
