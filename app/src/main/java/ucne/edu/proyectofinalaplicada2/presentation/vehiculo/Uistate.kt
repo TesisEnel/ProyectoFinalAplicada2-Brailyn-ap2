@@ -16,7 +16,7 @@ data class Uistate(
     val tipoVehiculoId: Int? = null,
     val marcaId: Int = 0,
     val modeloId: Int = 0,
-    val precio: Int = 0,
+    val precio: Int? = null,
     val descripcion: String = "",
     val imagePath: String = "",
     val isLoading: Boolean = false,
