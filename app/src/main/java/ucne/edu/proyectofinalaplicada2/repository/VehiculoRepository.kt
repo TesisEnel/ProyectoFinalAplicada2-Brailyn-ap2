@@ -18,31 +18,12 @@ import javax.inject.Inject
 
 class VehiculoRepository @Inject constructor(
     private val rentCarRemoteDataSource: RentCarRemoteDataSource
-)
-{
-    fun getVehiculos(): Flow<Resource<List<VehiculoDto>>> = flow{
+){
+    fun getVehiculos(): Flow<Resource<List<VehiculoDto>>> = flow {
         try {
             emit(Resource.Loading())
             val vehiculos = rentCarRemoteDataSource.getVehiculos()
             emit(Resource.Success(vehiculos))
-            } catch (e: HttpException) {
-            emit(Resource.Error("Error de internet ${e.message}"))
-        } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
-        }
-    }
-
-
-    fun addVehiculo(precio: Int, descripcion: String, image: String): Flow<Resource<VehiculoDto>> = flow{
-        try {
-            emit(Resource.Loading())
-            val requestoBodyPrecio = precio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val requestoBodyDescripcion = descripcion.toRequestBody("text/plain".toMediaTypeOrNull())
-            val imagen = File(image)
-            val requestBodyFile = imagen.asRequestBody("image/jpeg".toMediaTypeOrNull())
-            val bodyFoto = MultipartBody.Part.createFormData("image", imagen.name ,requestBodyFile)
-            val vehiculo = rentCarRemoteDataSource.addVehiculo(requestoBodyPrecio, requestoBodyDescripcion, bodyFoto)
-            emit(Resource.Success(vehiculo))
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
@@ -50,15 +31,66 @@ class VehiculoRepository @Inject constructor(
         }
     }
 
-    fun updateVehiculo(id:Int, vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow{
+
+    fun addVehiculo(
+        tipoCombustibleId: Int,
+        tipoVehiculoId: Int,
+        proveedorId: Int,
+        precio: Int,
+        descripcion: String,
+        image: String,
+        marcaId: Int,
+        modeloId: Int
+    ): Flow<Resource<VehiculoDto>> =
+        flow {
+            try {
+                emit(Resource.Loading())
+                val requestoBodyTipoCombustibleId =
+                    tipoCombustibleId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodyTipoVehiculoId =
+                    tipoVehiculoId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodyProveedorId =
+                    proveedorId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodyPrecio =
+                    precio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodyDescripcion =
+                    descripcion.toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodymarcaId =
+                    marcaId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodymodeloId =
+                    modeloId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val imagen = File(image)
+                val requestBodyFile = imagen.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                val bodyFoto =
+                    MultipartBody.Part.createFormData("image", imagen.name, requestBodyFile)
+
+                val vehiculo = rentCarRemoteDataSource.addVehiculo(
+                    requestoBodyTipoCombustibleId,
+                    requestoBodyTipoVehiculoId,
+                    requestoBodyProveedorId,
+                    requestoBodyPrecio,
+                    requestoBodyDescripcion,
+                    requestoBodymarcaId,
+                    requestoBodymodeloId,
+                    bodyFoto,
+                )
+                emit(Resource.Success(vehiculo))
+
+            } catch (e: HttpException) {
+                emit(Resource.Error("Error de internet ${e.message}"))
+            } catch (e: Exception) {
+                emit(Resource.Error("Error desconocido ${e.message}"))
+            }
+        }
+
+    fun updateVehiculo(id: Int, vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow {
         try {
             emit(Resource.Loading())
-            val vehiculo = rentCarRemoteDataSource.updateVehiculo(id,vehiculoDto)
+            val vehiculo = rentCarRemoteDataSource.updateVehiculo(id, vehiculoDto)
             emit(Resource.Success(vehiculo))
-            } catch (e: HttpException) {
+        } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
