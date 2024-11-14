@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.permisos
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ucne.edu.proyectofinalaplicada2.mainViewModel.MainViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.SelectSingleImage
@@ -36,7 +38,10 @@ fun PermisoGallery() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val granted = remember { mutableStateOf(false) }
+    // Estado para almacenar si el permiso ha sido concedido
+    val granted = remember { mutableStateOf(
+        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+    )}
     val viewModel = viewModel<MainViewModel>()
     val dialogQueue = viewModel.visiblePermissionDialogQueue
     val permissionsToRequest = arrayOf(
@@ -78,7 +83,7 @@ fun PermisoGallery() {
             OutlinedButton(onClick = {
                 cameraPermissionResultLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
             }) {
-                Text(text = "Seleccionar imagem")
+                Text(text = "Seleccionar imagen")
             }
             Spacer(modifier = Modifier.height(16.dp))
         } else {
