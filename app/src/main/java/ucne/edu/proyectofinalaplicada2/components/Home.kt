@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,17 +56,27 @@ fun Home(
     viewModel: VehiculoViewModel = hiltViewModel()
 ) {
     val uistate by viewModel.uistate.collectAsStateWithLifecycle()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        SearchBar()
-        VehiculosMasDestacados(
-            uiState = uistate
-        )
-        TiposDeVehiculos(
-            uiState = uistate
-        )
+    if (uistate.isLoading == true) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(), // Esto llena la pantalla
+            contentAlignment = Alignment.Center // Alinea el contenido al centro
+        ) {
+            CircularProgressIndicator() // Este estará en el centro de la pantalla
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            SearchBar()
+            VehiculosMasDestacados(
+                uiState = uistate
+            )
+            TiposDeVehiculos(
+                uiState = uistate
+            )
+        }
     }
 }
 
@@ -116,10 +127,12 @@ fun VehiculosMasDestacados(
         ) {
             items(uiState.vehiculos) { vehiculo ->
                 Box {
+                    val marca =
+                        uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     ImageCard(
                         painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
                         contentDescription = vehiculo.descripcion ?: "",
-                        title = "Prueba",
+                        title = marca?.nombreMarca?:"",
                         height = 180,
                         width = 150
                     )
@@ -158,12 +171,12 @@ fun TiposDeVehiculos(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-
                     val painter = rememberAsyncImagePainter(url + vehiculo.imagePath)
-
+                    val marca =
+                        uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     TipoVehiculoList(
                         painter = painter,
-                        marca ="Prueba",
+                        marca = marca?.nombreMarca ?: "",
                         listaModeloEjemplo = "Camry, Highlander, Hilux"
                     )
                 }
