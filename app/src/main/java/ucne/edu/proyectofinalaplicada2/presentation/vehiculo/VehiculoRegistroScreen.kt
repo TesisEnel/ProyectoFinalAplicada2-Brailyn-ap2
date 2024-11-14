@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -111,17 +112,18 @@ fun VehiculoBodyRegistroScreen(
             InputSelect(
                 label = "Proveedor",
                 options = uistate.proveedores,
-                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeMarcaId(it.proveedorId)) },
+                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId)) },
                 labelSelector = { it.nombre }
             )
 
             OutlinedTextField(
-                value = uistate.precio?.toString()?:"",
+                value = uistate.precio?.toString() ?: "",
                 onValueChange = { onEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
                 label = { Text(text = "Precio") },
                 modifier = Modifier
-                    .fillMaxWidth()
-            )
+                    .fillMaxWidth(),
+
+                )
 
 
             OutlinedTextField(
@@ -135,6 +137,10 @@ fun VehiculoBodyRegistroScreen(
             OutlinedButton(onClick = { onEnvent(VehiculoEvent.Save) }) {
                 Text(text = "Guardar")
             }
+            if(uistate.isLoadingData == true){
+                CircularProgressIndicator()
+            }
+
 
             Text(text = uistate.error, color = androidx.compose.ui.graphics.Color.Red)
         }
