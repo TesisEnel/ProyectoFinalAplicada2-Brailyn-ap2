@@ -3,7 +3,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -45,6 +46,8 @@ fun RentCarNavHost(
         mutableIntStateOf(0)
     }
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("BravquezRentcar") },
@@ -110,22 +113,23 @@ fun RentCarNavHost(
         NavHost(
             navController = navHostController,
             startDestination = Screen.Home,
-            modifier = Modifier.padding(innerpadding)
+            modifier = Modifier
+                .padding(innerpadding)
         ) {
             composable<Screen.Home> {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    contentAlignment = Alignment.Center
                 ) {
                     Home()
                 }
-
             }
             composable<Screen.VehiculoRegistroScreen> {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
                     VehiculoRegistroScreen(
@@ -136,6 +140,4 @@ fun RentCarNavHost(
             }
         }
     }
-
-
 }
