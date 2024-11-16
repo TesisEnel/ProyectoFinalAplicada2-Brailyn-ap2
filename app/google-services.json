@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1088784955890",
+    "project_id": "rentcarauth",
+    "storage_bucket": "rentcarauth.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1088784955890:android:7d4273cdc5829b6e73936b",
+        "android_client_info": {
+          "package_name": "ucne.edu.proyectofinalaplicada2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1088784955890-qsq697aud70ljn1nasbmdd5lriuk2v8q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ucne.edu.proyectofinalaplicada2",
+            "certificate_hash": "71a8e2366a4023caefbd1842ebc6fbe591860561"
+          }
+        },
+        {
+          "client_id": "1088784955890-816qorvhtc1tdnt0sijrmnpo2an4felm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPmdxENNPc8DsRtwVlIFp_wwZVH3_P81E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1088784955890-816qorvhtc1tdnt0sijrmnpo2an4felm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
