@@ -44,9 +44,14 @@ interface RentCarApi {
     @Multipart
     @POST("api/Vehiculos")
     suspend fun addVehiculo(
+        @Part("tipoCombustibleId") tipoCombustibleId: RequestBody,
+        @Part("tipoVehiculoId") tipoVehiculoId: RequestBody,
+        @Part("proveedorId") proveedorId: RequestBody,
         @Part("precio") precio: RequestBody,
         @Part("descripcion") descripcion: RequestBody,
-        @Part image: MultipartBody.Part
+        @Part("marcaId") marcaId: RequestBody,
+        @Part("modeloId") modeloId: RequestBody,
+        @Part image: MultipartBody.Part,
     ): VehiculoDto
 
     @PUT("api/Vehiculos/{id}")

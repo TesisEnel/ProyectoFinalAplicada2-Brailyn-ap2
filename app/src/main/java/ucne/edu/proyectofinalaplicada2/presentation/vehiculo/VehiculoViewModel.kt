@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,11 +46,11 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoading = false
                             )
                         }
                     }
-
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -59,11 +58,11 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
-
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                vehiculos = result.data ?: emptyList()
+                                vehiculos = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                     }
@@ -80,23 +79,20 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoading = false
                             )
                         }
                     }
 
                     is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
                     }
 
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                marcas = result.data ?: emptyList()
+                                marcas = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                     }
@@ -120,7 +116,6 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
                             )
                         }
                     }
@@ -152,7 +147,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
+
                             )
                         }
                     }
@@ -186,7 +181,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
+
                             )
                         }
                     }
@@ -241,12 +236,23 @@ class VehiculoViewModel @Inject constructor(
     private fun save() {
         viewModelScope.launch {
             val precio = uistate.value.precio
-            val descripcion = uistate.value.descripcion.toString()
-            val imagen= uistate.value.imagePath
+            val descripcion = uistate.value.descripcion
+            val imagen = uistate.value.imagePath
+            val tipoCombustibleId =uistate.value.tipoCombustibleId ?: 0
+            val tipoVehiculoId =uistate.value.tipoVehiculoId ?: 0
+            val proveedorId =uistate.value.proveedorId ?: 0
+            val marcaId =uistate.value.marcaId
+            val modeloId =uistate.value.modeloId
+
             val vehiculo = vehiculoRepository.addVehiculo(
-                precio = precio,
+                tipoCombustibleId = tipoCombustibleId ,
+                tipoVehiculoId = tipoVehiculoId,
+                proveedorId = proveedorId,
+                precio = precio ?: 0,
                 descripcion = descripcion,
-                image = imagen
+                marcaId = marcaId,
+                modeloId = modeloId,
+                image = imagen,
             )
 
             vehiculo.collect { result ->
@@ -262,7 +268,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
+                                isLoadingData = true
                             )
                         }
                     }
@@ -270,7 +276,8 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                success = "Vehiculo agregado"
+                                success = "Vehiculo agregado",
+                                isLoadingData = false
                             )
                         }
                     }
@@ -280,8 +287,6 @@ class VehiculoViewModel @Inject constructor(
     }
 
     private fun onChangePrecio(precio: Int) {
-
-
         _uistate.update {
             it.copy(
                 precio = precio
@@ -331,6 +336,13 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+    private fun onChangeProveedorId(proveedorId: Int) {
+        _uistate.update {
+            it.copy(
+                proveedorId = proveedorId
+            )
+        }
+    }
 
     private fun onChangeImagePath(imagePath: File) {
         _uistate.update {
@@ -361,6 +373,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             is VehiculoEvent.OnChangeModeloId -> onChangeModeloId(event.modeloId)
             is VehiculoEvent.OnChangeImagePath -> onChangeImagePath(event.imagePath)
+            is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
         }
     }
