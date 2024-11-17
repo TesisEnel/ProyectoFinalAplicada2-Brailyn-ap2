@@ -1,8 +1,9 @@
-package ucne.edu.proyectofinalaplicada2.presentation.home
+package ucne.edu.proyectofinalaplicada2.presentation.view
 
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,21 +49,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
 fun Home(
-    viewModel: VehiculoViewModel = hiltViewModel()
+    viewModel: VehiculoViewModel = hiltViewModel(),
+    onGoVehiculePresentation:(Int)-> Unit
 ) {
     val uistate by viewModel.uistate.collectAsStateWithLifecycle()
     if (uistate.isLoading == true) {
         Box(
             modifier = Modifier
-                .fillMaxSize(), // Esto llena la pantalla
-            contentAlignment = Alignment.Center // Alinea el contenido al centro
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator() // Este estará en el centro de la pantalla
+            CircularProgressIndicator()
         }
     } else {
         Column(
@@ -74,7 +77,8 @@ fun Home(
                 uiState = uistate
             )
             TiposDeVehiculos(
-                uiState = uistate
+                uiState = uistate,
+                onGoVehiculePresentation
             )
         }
     }
@@ -144,7 +148,8 @@ fun VehiculosMasDestacados(
 
 @Composable
 fun TiposDeVehiculos(
-    uiState: Uistate
+    uiState: Uistate,
+    onGoVehiculePresentation:(Int)-> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
     Column(
@@ -177,7 +182,9 @@ fun TiposDeVehiculos(
                     TipoVehiculoList(
                         painter = painter,
                         marca = marca?.nombreMarca ?: "",
-                        listaModeloEjemplo = "Camry, Highlander, Hilux"
+                        listaModeloEjemplo = "Camry, Highlander, Hilux",
+                        onGoVehiculePresentation = onGoVehiculePresentation,
+                        vehiculoDto = vehiculo
                     )
                 }
             }
@@ -237,18 +244,22 @@ fun ImageCard(
 fun TipoVehiculoList(
     painter: Painter,
     marca: String,
-    listaModeloEjemplo: String
+    listaModeloEjemplo: String,
+    onGoVehiculePresentation:(Int)-> Unit,
+    vehiculoDto: VehiculoDto
 ) {
     Card(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = { onGoVehiculePresentation(vehiculoDto.vehiculoId?:0) })
+        ,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(corner = CornerSize(16.dp)),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp  // Adjust the dp to control the elevation level
+            defaultElevation = 2.dp
         )
 
     ) {
