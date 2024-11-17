@@ -6,17 +6,19 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.20-1.0.25"
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.kotlinx.serialization)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.gms.google.services)
 }
 
 android {
     namespace = "ucne.edu.proyectofinalaplicada2"
-    compileSdk = 34
+    compileSdk = 35
+
 
     defaultConfig {
         applicationId = "ucne.edu.proyectofinalaplicada2"
         minSdk = 24
-        targetSdk = 34
+        //noinspection EditedTargetSdkVersion
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -36,6 +38,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.9"
+    }
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -52,6 +57,7 @@ dependencies {
 
     //room
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation(libs.firebase.common.ktx)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
@@ -84,9 +90,18 @@ dependencies {
     implementation(libs.firebase.bom)
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation(libs.firebase.auth)
+    implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
 
     // Also add the dependency for the Google Play services library and specify its version
     implementation(libs.play.services.auth)
+
+    //Credential Manager
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -103,5 +118,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
 
 }
