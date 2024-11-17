@@ -33,8 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ucne.edu.proyectofinalaplicada2.presentation.home.Home
+import ucne.edu.proyectofinalaplicada2.presentation.view.Home
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
+import ucne.edu.proyectofinalaplicada2.presentation.view.VehiculePresentation
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -123,7 +124,9 @@ fun RentCarNavHost(
                         .verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
-                    Home()
+                    Home(
+                        onGoVehiculePresentation = {navHostController.navigate(Screen.VehiculePresentation(it))}
+                    )
                 }
             }
             composable<Screen.VehiculoRegistroScreen> {
@@ -134,6 +137,37 @@ fun RentCarNavHost(
                 ) {
                     VehiculoRegistroScreen(
                         onBackHome = {}
+                    )
+                }
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            composable<Screen.VehiculePresentation> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    VehiculePresentation(
+                        onBack = {},
+                        onCreateRenta = {}
                     )
                 }
 
