@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ucne.edu.proyectofinalaplicada2.presentation.view.Home
+import ucne.edu.proyectofinalaplicada2.components.AuthClient
+import ucne.edu.proyectofinalaplicada2.components.Home
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
-import ucne.edu.proyectofinalaplicada2.presentation.view.VehiculePresentation
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,7 +113,7 @@ fun RentCarNavHost(
     ) { innerpadding ->
         NavHost(
             navController = navHostController,
-            startDestination = Screen.Home,
+            startDestination = Screen.AuthScreen,
             modifier = Modifier
                 .padding(innerpadding)
         ) {
@@ -124,9 +124,7 @@ fun RentCarNavHost(
                         .verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
-                    Home(
-                        onGoVehiculePresentation = {navHostController.navigate(Screen.VehiculePresentation(it))}
-                    )
+                    Home()
                 }
             }
             composable<Screen.VehiculoRegistroScreen> {
@@ -141,34 +139,13 @@ fun RentCarNavHost(
                 }
 
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            composable<Screen.VehiculePresentation> {
+            composable<Screen.AuthScreen> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    VehiculePresentation(
-                        onBack = {},
-                        onCreateRenta = {}
-                    )
+                    AuthClient(navHostController.context)
                 }
 
             }

@@ -7,12 +7,8 @@ sealed class Screen {
     data object Home : Screen()
     @Serializable
     data object VehiculoRegistroScreen: Screen()
-
-
-
-
-
-
+    @Serializable
+    data object AuthScreen: Screen()
     @Serializable
     data class VehiculePresentation(val id: Int): Screen()
 }
