@@ -1,20 +1,20 @@
 {
   "project_info": {
-    "project_number": "1088784955890",
-    "project_id": "rentcarauth",
-    "storage_bucket": "rentcarauth.firebasestorage.app"
+    "project_number": "138527275305",
+    "project_id": "authrentcar",
+    "storage_bucket": "authrentcar.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1088784955890:android:7d4273cdc5829b6e73936b",
+        "mobilesdk_app_id": "1:138527275305:android:0d3238578bb00f8a5fdf38",
         "android_client_info": {
           "package_name": "ucne.edu.proyectofinalaplicada2"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1088784955890-qsq697aud70ljn1nasbmdd5lriuk2v8q.apps.googleusercontent.com",
+          "client_id": "138527275305-loui72284ssbsk4aufu2l17r242aich8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ucne.edu.proyectofinalaplicada2",
@@ -22,20 +22,20 @@
           }
         },
         {
-          "client_id": "1088784955890-816qorvhtc1tdnt0sijrmnpo2an4felm.apps.googleusercontent.com",
+          "client_id": "138527275305-glcjm6vrapkqeqc83fpd1qdvdmjv6lb6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCPmdxENNPc8DsRtwVlIFp_wwZVH3_P81E"
+          "current_key": "AIzaSyCETz5Q887OLCB2D9tsDe9jgRNnD9XtSs4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1088784955890-816qorvhtc1tdnt0sijrmnpo2an4felm.apps.googleusercontent.com",
+              "client_id": "138527275305-glcjm6vrapkqeqc83fpd1qdvdmjv6lb6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
