@@ -8,7 +8,6 @@ import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
-import java.io.File
 import javax.inject.Inject
 
 class RentCarRemoteDataSource @Inject constructor(
