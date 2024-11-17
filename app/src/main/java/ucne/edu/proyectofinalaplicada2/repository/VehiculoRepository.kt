@@ -38,7 +38,7 @@ class VehiculoRepository @Inject constructor(
         proveedorId: Int,
         precio: Int,
         descripcion: String,
-        image: String,
+        images: List<String>,
         marcaId: Int,
         modeloId: Int
     ): Flow<Resource<VehiculoDto>> =
@@ -59,10 +59,13 @@ class VehiculoRepository @Inject constructor(
                     marcaId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                 val requestoBodymodeloId =
                     modeloId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-                val imagen = File(image)
-                val requestBodyFile = imagen.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                val bodyFoto =
-                    MultipartBody.Part.createFormData("image", imagen.name, requestBodyFile)
+
+                val updatedImages=images.map {imagen ->
+                    val img = File(imagen)
+                    val requestBodyFile = img.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("images", img.name, requestBodyFile)
+                }
+
 
                 val vehiculo = rentCarRemoteDataSource.addVehiculo(
                     requestoBodyTipoCombustibleId,
@@ -72,7 +75,7 @@ class VehiculoRepository @Inject constructor(
                     requestoBodyDescripcion,
                     requestoBodymarcaId,
                     requestoBodymodeloId,
-                    bodyFoto,
+                    updatedImages,
                 )
                 emit(Resource.Success(vehiculo))
 
