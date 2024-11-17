@@ -7,13 +7,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -149,24 +151,29 @@ fun VehiculoBodyRegistroScreen(
 }
 
 @Composable
-fun SelectSingleImage() {
+fun SelectMultipleImages() {
     val viewModel: VehiculoViewModel = hiltViewModel()
-
     val context = LocalContext.current
-    val selectedImage =
-        remember { mutableStateOf<Uri?>(null) }  // Variable para guardar la imagen seleccionada
 
-    // Lanzador para seleccionar una sola imagen
+    // Lista mutable para guardar las imágenes seleccionadas
+    val selectedImages = remember { mutableStateListOf<Uri>() }
+
+    // Lanzador para seleccionar múltiples imágenes
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            selectedImage.value = it  // Guardar el URI de la imagen seleccionada
+        ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            selectedImages.clear()
+            selectedImages.addAll(uris) // Guardar las URIs de las imágenes seleccionadas
 
-            // Convertir el URI en un archivo y enviarlo al ViewModel
-            val file = uriToFile(it, context)
-            file?.let { imageFile ->
-                viewModel.onEvent(VehiculoEvent.OnChangeImagePath(imageFile))
+            // Convertir las URIs en archivos y enviarlos al ViewModel como una lista
+            val imageFiles = uris.mapNotNull { uri ->
+                uriToFile(uri, context)
+            }
+
+            // Enviar la lista de archivos al ViewModel
+            if (imageFiles.isNotEmpty()) {
+                viewModel.onEvent(VehiculoEvent.OnChangeImagePath(imageFiles)) // Asumiendo que el evento recibe una lista de archivos
             }
         }
     }
@@ -174,19 +181,31 @@ fun SelectSingleImage() {
     OutlinedButton(onClick = {
         imagePickerLauncher.launch("image/*")
     }) {
-        Text(text = "Seleccionar Imagen")
+        Text(text = "Seleccionar Imágenes")
     }
-    // Mostrar la imagen seleccionada
-    selectedImage.value?.let { uri ->
-        Image(
-            painter = rememberAsyncImagePainter(uri),
-            contentDescription = null,
+
+    // Mostrar las imágenes seleccionadas en un LazyRow
+    if (selectedImages.isNotEmpty()) {
+        LazyRow(
             modifier = Modifier
-                .size(150.dp)
-                .padding(8.dp)
-        )
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(selectedImages) { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(uri),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(8.dp)
+                )
+            }
+        }
     }
 }
+
+
 
 // Función para convertir el URI en un archivo
 fun uriToFile(uri: Uri, context: Context): File? {

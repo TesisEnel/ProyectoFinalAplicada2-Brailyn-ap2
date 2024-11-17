@@ -28,7 +28,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ucne.edu.proyectofinalaplicada2.mainViewModel.MainViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.SelectSingleImage
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.SelectMultipleImages
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -87,7 +87,7 @@ fun PermisoGallery() {
             }
             Spacer(modifier = Modifier.height(16.dp))
         } else {
-            SelectSingleImage()
+            SelectMultipleImages()
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
