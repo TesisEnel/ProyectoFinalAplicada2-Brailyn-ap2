@@ -30,12 +30,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import ucne.edu.proyectofinalaplicada2.components.AuthClient
-import ucne.edu.proyectofinalaplicada2.components.Home
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
+import ucne.edu.proyectofinalaplicada2.presentation.view.Home
+import ucne.edu.proyectofinalaplicada2.presentation.view.VehiculePresentation
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,7 +127,9 @@ fun RentCarNavHost(
                         .verticalScroll(rememberScrollState()),
                     contentAlignment = Alignment.Center
                 ) {
-                    Home()
+                    Home(
+                        onGoVehiculePresentation = {navHostController.navigate(Screen.VehiculePresentation(it))}
+                    )
                 }
             }
             composable<Screen.VehiculoRegistroScreen> {
@@ -146,6 +151,22 @@ fun RentCarNavHost(
                         .verticalScroll(rememberScrollState())
                 ) {
                     AuthClient(navHostController.context)
+                }
+
+
+            }
+            composable<Screen.VehiculePresentation> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    val id = it.toRoute<Screen.VehiculePresentation>().id
+                    VehiculePresentation(
+                        onBack = {},
+                        onCreateRenta = {},
+                        vehiculoId = id
+                    )
                 }
 
             }
