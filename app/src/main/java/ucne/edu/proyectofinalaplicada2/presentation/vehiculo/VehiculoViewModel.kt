@@ -252,7 +252,7 @@ class VehiculoViewModel @Inject constructor(
                 descripcion = descripcion,
                 marcaId = marcaId,
                 modeloId = modeloId,
-                image = imagen,
+                images = imagen,
             )
 
             vehiculo.collect { result ->
@@ -344,10 +344,13 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeImagePath(imagePath: File) {
+    private fun onChangeImagePath(imagesPath: List<File>) {
+        val updatedImage = imagesPath.map { image->
+            image.absolutePath
+        }
         _uistate.update {
             it.copy(
-                imagePath = imagePath.absolutePath
+                imagePath = updatedImage
             )
         }
     }
