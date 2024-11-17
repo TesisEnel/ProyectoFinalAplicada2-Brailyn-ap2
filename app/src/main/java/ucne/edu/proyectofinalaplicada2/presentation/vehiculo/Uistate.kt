@@ -16,7 +16,7 @@ data class Uistate(
     val modeloId: Int = 0,
     val precio: Int? = null,
     val descripcion: String = "",
-    val imagePath: String = "",
+    val imagePath: List<String> = emptyList(),
     var isLoading: Boolean? = null,
     var isLoadingData: Boolean? = null,
     val error: String = "",
@@ -28,5 +28,5 @@ data class Uistate(
     val proveedores: List<ProveedorDto> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
 
-)
+    )
 
