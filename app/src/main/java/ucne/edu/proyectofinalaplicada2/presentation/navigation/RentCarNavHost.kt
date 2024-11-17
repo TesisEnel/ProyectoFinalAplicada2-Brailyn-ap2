@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ucne.edu.proyectofinalaplicada2.components.Home
+import ucne.edu.proyectofinalaplicada2.presentation.home.Home
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
