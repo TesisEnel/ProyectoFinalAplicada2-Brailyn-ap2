@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import ucne.edu.proyectofinalaplicada2.components.AuthClient
 import ucne.edu.proyectofinalaplicada2.components.Home
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 
@@ -112,7 +113,7 @@ fun RentCarNavHost(
     ) { innerpadding ->
         NavHost(
             navController = navHostController,
-            startDestination = Screen.Home,
+            startDestination = Screen.AuthScreen,
             modifier = Modifier
                 .padding(innerpadding)
         ) {
@@ -135,6 +136,16 @@ fun RentCarNavHost(
                     VehiculoRegistroScreen(
                         onBackHome = {}
                     )
+                }
+
+            }
+            composable<Screen.AuthScreen> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    AuthClient(navHostController.context)
                 }
 
             }
