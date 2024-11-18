@@ -158,23 +158,28 @@ fun TiposDeVehiculos(
                 .padding(vertical = 5.dp)
                 .fillMaxWidth(),
         ) {
+            val shownMarcas = mutableSetOf<Int>()
             uiState.vehiculos.forEach { vehiculo ->
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
-                    val marca =
-                        uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
-                    TipoVehiculoList(
-                        painter = painter,
-                        marca = marca?.nombreMarca ?: "",
-                        listaModeloEjemplo = "Camry, Highlander, Hilux",
-                        onGoVehiculePresentation = onGoVehiculePresentation,
-                        vehiculoDto = vehiculo,
-                        onEvent = onEvent
-                    )
+                val marca =
+                    uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+
+                if (marca != null && marca.marcaId !in shownMarcas) {
+                    shownMarcas.add(marca.marcaId)
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
+                        TipoVehiculoList(
+                            painter = painter,
+                            marca = marca.nombreMarca,
+                            listaModeloEjemplo = "Camry, Highlander, Hilux",
+                            onGoVehiculePresentation = onGoVehiculePresentation,
+                            vehiculoDto = vehiculo,
+                            onEvent = onEvent
+                        )
+                    }
                 }
             }
         }
