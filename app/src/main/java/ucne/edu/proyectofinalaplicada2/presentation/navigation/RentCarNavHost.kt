@@ -30,7 +30,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.Home
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +37,7 @@ import androidx.navigation.toRoute
 import ucne.edu.proyectofinalaplicada2.components.AuthClient
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
+import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.VehiculePresentation
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -128,7 +128,7 @@ fun RentCarNavHost(
                     contentAlignment = Alignment.Center
                 ) {
                     Home(
-                        onGoVehiculePresentation = {navHostController.navigate(Screen.VehiculePresentation(it))}
+                        onGoVehiculePresentation = {navHostController.navigate(Screen.TipoVehiculoListScreen(it))}
                     )
                 }
             }
@@ -163,6 +163,21 @@ fun RentCarNavHost(
                 ) {
                     val id = it.toRoute<Screen.VehiculePresentation>().id
                     VehiculePresentation(
+                        onBack = {},
+                        onCreateRenta = {},
+                        vehiculoId = id
+                    )
+                }
+
+            }
+            composable<Screen.TipoVehiculoListScreen> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    val id = it.toRoute<Screen.VehiculePresentation>().id
+                    TipoVehiculeListScreen(
                         onBack = {},
                         onCreateRenta = {},
                         vehiculoId = id
