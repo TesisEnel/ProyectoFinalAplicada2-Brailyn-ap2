@@ -121,7 +121,7 @@ fun VehiculosMasDestacados(
                     val marca =
                         uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     ImageCard(
-                        painter = rememberAsyncImagePainter(url + vehiculo.imagePath),
+                        painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull()),
                         contentDescription = vehiculo.descripcion ?: "",
                         title = marca?.nombreMarca?:"",
                         height = 180,
@@ -164,7 +164,7 @@ fun TiposDeVehiculos(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    val painter = rememberAsyncImagePainter(url + vehiculo.imagePath)
+                    val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
                     val marca =
                         uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     TipoVehiculoList(
