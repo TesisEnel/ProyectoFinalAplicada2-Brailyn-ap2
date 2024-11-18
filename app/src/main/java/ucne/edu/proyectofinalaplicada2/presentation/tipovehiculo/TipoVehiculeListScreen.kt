@@ -2,11 +2,12 @@ package ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,8 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
-
+import coil3.compose.rememberAsyncImagePainter
+import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
@@ -48,8 +50,9 @@ fun TipoVehiculeBodyListScreen(
     onCreateRenta: () -> Unit,
     onEvent: (VehiculoEvent) -> Unit = {}
 ) {
-    val url = "https://rentcar.azurewebsites.net/images/"
-    val vehiculo = uiState.vehiculos.find { it.vehiculoId == marcaId }
+    LaunchedEffect(marcaId) {
+        onEvent(VehiculoEvent.OnChangeMarcaId(marcaId))
+    }
     Column(
         modifier = Modifier
             .padding(bottom = 5.dp, top = 20.dp)
@@ -61,9 +64,15 @@ fun TipoVehiculeBodyListScreen(
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
         )
-        TipoVehiculeColumn(
-            modelos = uiState.modelos
-        )
+        if (uiState.isLoading == true) {
+            CircularProgressIndicator()
+        } else {
+            val newVehiculos = uiState.vehiculos.filter { it.marcaId == marcaId }
+            TipoVehiculeColumn(
+                newVehiculos = newVehiculos,
+                uiState = uiState,
+            )
+        }
     }
 
 }
@@ -71,8 +80,10 @@ fun TipoVehiculeBodyListScreen(
 
 @Composable
 fun TipoVehiculeColumn(
-    modelos: List<ModeloDto>
+    newVehiculos: List<VehiculoDto>,
+    uiState: Uistate,
 ) {
+    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
 
     Column(
         verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -81,10 +92,18 @@ fun TipoVehiculeColumn(
             .padding(vertical = 5.dp)
             .fillMaxWidth(),
     ) {
-
-
-        modelos.forEach{
-            Text("Holaaa ${it.modeloVehiculo}")
+        newVehiculos.forEach{ vehiculoDto ->
+            val image = vehiculoDto.imagePath.firstOrNull()
+            val painter = rememberAsyncImagePainter(url + image)
+            val marca = uiState.marcas.find { it.marcaId == vehiculoDto.marcaId }
+            TipoVehiculoList(
+                painter = painter,
+                marca = marca?.nombreMarca ?:  "",
+                listaModeloEjemplo = vehiculoDto.descripcion ?: "",
+                onGoVehiculePresentation = {},
+                vehiculoDto = vehiculoDto,
+                onEvent = {}
+            )
         }
     }
 }
