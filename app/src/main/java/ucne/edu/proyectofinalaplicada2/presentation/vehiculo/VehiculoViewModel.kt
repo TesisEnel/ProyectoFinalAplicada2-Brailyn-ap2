@@ -86,6 +86,11 @@ class VehiculoViewModel @Inject constructor(
                     }
 
                     is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is Resource.Success -> {
@@ -108,7 +113,8 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoading = false
                             )
                         }
                     }
@@ -116,6 +122,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
+                                isLoading = true
                             )
                         }
                     }
@@ -123,7 +130,8 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                tiposCombustibles = result.data ?: emptyList()
+                                tiposCombustibles = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                     }
@@ -199,7 +207,7 @@ class VehiculoViewModel @Inject constructor(
 
     }
 
-    private fun getModelos(id: Int): List<ModeloDto> {
+    private fun getModelos(id: Int) {
         viewModelScope.launch {
             modeloRepository.getModelos(id).collect { result ->
                 when (result) {
@@ -230,7 +238,6 @@ class VehiculoViewModel @Inject constructor(
                 }
             }
         }
-        return uistate.value.modelos
 
     }
 
@@ -322,6 +329,8 @@ class VehiculoViewModel @Inject constructor(
 
     private fun onChangeMarcaId(marcaId: Int) {
         getModelos(marcaId)
+        getVehiculos()
+        getMarcas()
         _uistate.update {
             it.copy(
                 marcaId = marcaId,
