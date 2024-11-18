@@ -222,7 +222,8 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                modelos = result.data ?: emptyList()
+                                modelos = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                     }
@@ -320,13 +321,13 @@ class VehiculoViewModel @Inject constructor(
     }
 
     private fun onChangeMarcaId(marcaId: Int) {
-
+        getModelos(marcaId)
         _uistate.update {
             it.copy(
                 marcaId = marcaId,
-                modelos = getModelos(marcaId)
             )
         }
+
     }
 
     private fun onChangeModeloId(modeloId: Int) {
@@ -378,6 +379,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeImagePath -> onChangeImagePath(event.imagePath)
             is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
+            is VehiculoEvent.GetModelos -> getModelos(event.marcaId)
         }
     }
 
