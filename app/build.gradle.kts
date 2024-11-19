@@ -95,6 +95,11 @@ dependencies {
     // Also add the dependency for the Google Play services library and specify its version
     implementation(libs.play.services.auth)
 
+
+
+
+        implementation(libs.androidx.material.icons.extended)
+
     //Credential Manager
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
