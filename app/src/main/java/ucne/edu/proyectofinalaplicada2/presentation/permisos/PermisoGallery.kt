@@ -38,16 +38,13 @@ fun PermisoGallery() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    // Estado para almacenar si el permiso ha sido concedido
+
     val granted = remember { mutableStateOf(
         ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
     )}
     val viewModel = viewModel<MainViewModel>()
     val dialogQueue = viewModel.visiblePermissionDialogQueue
-    val permissionsToRequest = arrayOf(
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.CALL_PHONE,
-    )
+
 
     // Launchers for requesting permissions
     val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
@@ -61,17 +58,6 @@ fun PermisoGallery() {
         }
     )
 
-    val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { perms ->
-            permissionsToRequest.forEach { permission ->
-                viewModel.onPermissionResult(
-                    permission = permission,
-                    isGranted = perms[permission] == true
-                )
-            }
-        }
-    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -107,7 +93,7 @@ fun PermisoGallery() {
                 onDismiss = viewModel::dismissDialog,
                 onOkClick = {
                     viewModel.dismissDialog()
-                    multiplePermissionResultLauncher.launch(arrayOf(permission))
+
                 },
                 onGoToAppSettingsClick = { activity?.openAppSettings() }
             )
