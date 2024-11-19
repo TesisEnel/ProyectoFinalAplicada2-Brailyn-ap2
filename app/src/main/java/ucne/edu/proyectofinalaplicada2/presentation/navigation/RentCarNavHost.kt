@@ -2,7 +2,10 @@ package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -145,14 +148,21 @@ fun RentCarNavHost(
 
             }
             composable<Screen.AuthScreen> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    AuthClient(navHostController.context)
-                }
+                composable<Screen.AuthScreen> {
 
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Spacer(modifier = Modifier.weight(.2f))
+
+                        AuthClient(navHostController.context)
+
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
 
             }
             composable<Screen.VehiculePresentation> {
