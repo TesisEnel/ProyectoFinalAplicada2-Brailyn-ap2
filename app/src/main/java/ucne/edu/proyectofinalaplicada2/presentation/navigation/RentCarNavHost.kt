@@ -147,7 +147,7 @@ fun RentCarNavHost(
                 }
 
             }
-            composable<Screen.AuthScreen> {
+
                 composable<Screen.AuthScreen> {
 
                     Column(
@@ -164,7 +164,6 @@ fun RentCarNavHost(
                     }
                 }
 
-            }
             composable<Screen.VehiculePresentation> {
                 Box(
                     modifier = Modifier
