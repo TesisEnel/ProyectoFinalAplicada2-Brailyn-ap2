@@ -27,7 +27,8 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 fun TipoVehiculoList(
     painter: Painter,
     marca: String,
-    onGoVehiculePresentation:(Int)-> Unit,
+    onGoVehiculeList: ((Int) -> Unit)? = null, // Hacer funciones opcionales
+    onGoVehiculePresentation: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     vehiculoDto: VehiculoDto,
     onEvent: (VehiculoEvent) -> Unit
 ) {
@@ -36,11 +37,16 @@ fun TipoVehiculoList(
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .fillMaxWidth()
             .clickable(onClick = {
-                onEvent(VehiculoEvent.OnChangeMarcaId(vehiculoDto.marcaId?:0))
-                onGoVehiculePresentation(vehiculoDto.marcaId?:0)
+                onEvent(VehiculoEvent.OnChangeMarcaId(vehiculoDto.marcaId ?: 0))
+                vehiculoDto.marcaId?.let { marcaId ->
+                    if (onGoVehiculeList != null) {
+                        onGoVehiculeList(marcaId)
+                    } else {
+                        onGoVehiculePresentation?.invoke(vehiculoDto.vehiculoId ?: 0)
+                    }
+                }
             }
-            )
-        ,
+            ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
