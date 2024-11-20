@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.components
+package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -32,19 +32,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.auth.GoogleAuthClient
-import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 
 
 @Composable
 fun AuthClient(
     applicationContext: Context,
+
+    onNavigationLogin: () -> Unit
 ) {
     val googleAuthClient = GoogleAuthClient(applicationContext.applicationContext)
-    val navHostController = rememberNavController()
     val scope = rememberCoroutineScope()
     var isSignedIn by rememberSaveable {
         mutableStateOf(googleAuthClient.isSignedIn())
@@ -68,6 +66,9 @@ fun AuthClient(
                     onClick = {
                         scope.launch {
                             googleAuthClient.signOut()
+                            isSignedIn = false
+                            onNavigationLogin()
+
                         }
                     },
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -88,7 +89,7 @@ fun AuthClient(
                 )
 
                 OutlinedTextField(
-                    value = "uistate.email",
+                    value = "",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
@@ -99,10 +100,11 @@ fun AuthClient(
                             contentDescription = "Email Icon"
                         )
                     },
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
+                    label = { Text("Usuario") }
                 )
                 OutlinedTextField(
-                    value = "uistate.contraseña",
+                    value = "",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
@@ -113,7 +115,8 @@ fun AuthClient(
                             contentDescription = "Password Icon"
                         )
                     },
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
+                    label = { Text("Contraseña") }
                 )
                 OutlinedButton(
                     onClick = {
@@ -160,7 +163,7 @@ fun AuthClient(
                             googleAuthClient.signIn()
 
                         }
-                        navHostController.navigate(Screen.Home)
+
                     },
                     modifier = Modifier.padding(vertical = 8.dp),
                 ) {
