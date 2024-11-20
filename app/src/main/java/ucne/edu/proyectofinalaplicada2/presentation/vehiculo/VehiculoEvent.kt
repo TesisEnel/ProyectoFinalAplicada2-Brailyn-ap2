@@ -4,6 +4,7 @@ import java.io.File
 
 sealed interface VehiculoEvent {
     data object Save : VehiculoEvent
+    data object GetVehiculos : VehiculoEvent
     data class OnChangePrecio(val precio: Int) : VehiculoEvent
     data class GetModelos(val marcaId: Int) : VehiculoEvent
     data class OnChangeDescripcion(val descripcion: String) : VehiculoEvent
