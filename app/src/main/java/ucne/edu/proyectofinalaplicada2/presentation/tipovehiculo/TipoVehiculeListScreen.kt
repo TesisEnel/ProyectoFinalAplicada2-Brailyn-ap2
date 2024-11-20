@@ -58,7 +58,7 @@ fun TipoVehiculeBodyListScreen(
             .padding(bottom = 5.dp, top = 20.dp)
     ) {
         Text(
-            text = "Tipos de vehiculos",
+            text = "Tipos de modelos",
             fontFamily = FontFamily.Serif,
             fontSize = 20.sp,
             fontWeight = FontWeight.W700,
@@ -99,7 +99,6 @@ fun TipoVehiculeColumn(
             TipoVehiculoList(
                 painter = painter,
                 marca = marca?.nombreMarca ?:  "",
-                listaModeloEjemplo = vehiculoDto.descripcion ?: "",
                 onGoVehiculePresentation = {},
                 vehiculoDto = vehiculoDto,
                 onEvent = {}
