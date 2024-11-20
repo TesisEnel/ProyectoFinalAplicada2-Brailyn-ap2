@@ -2,12 +2,13 @@ package ucne.edu.proyectofinalaplicada2.presentation.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.ImageCard
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 
@@ -23,7 +24,8 @@ fun VehiculePresentation(
         uiState = uiState.value,
         onBack = onBack,
         onCreateRenta = onCreateRenta,
-        vehiculoId = vehiculoId
+        vehiculoId = vehiculoId,
+        onEvent = { event -> viewModel.onEvent(event) }
     )
 }
 
@@ -32,10 +34,14 @@ fun VehiculeBodyPresentation(
     uiState: Uistate,
     onBack: () -> Unit,
     onCreateRenta: () -> Unit,
-    vehiculoId: Int
+    vehiculoId: Int,
+    onEvent: (VehiculoEvent) -> Unit
 ) {
+    LaunchedEffect(vehiculoId) {
+        onEvent(VehiculoEvent.GetVehiculos)
+    }
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-    val vehiculo = uiState.vehiculos.find { it.vehiculoId == vehiculoId }
+    val vehiculo = uiState.vehiculos.find {vehiculo -> vehiculo.vehiculoId == vehiculoId }
     Column {
         vehiculo?.imagePath?.forEach{ nombre ->
             val painter = rememberAsyncImagePainter(url + nombre)
