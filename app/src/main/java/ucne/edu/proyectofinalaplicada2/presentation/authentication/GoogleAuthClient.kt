@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.auth
+package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
 import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest
@@ -8,14 +8,12 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 
 
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
-import ucne.edu.proyectofinalaplicada2.R
 import kotlin.coroutines.cancellation.CancellationException
 
 
@@ -26,7 +24,6 @@ class GoogleAuthClient(
 
     private val credentialManager = CredentialManager.create(context)
     private val firebaseAuth = FirebaseAuth.getInstance()
-
     fun isSignedIn():Boolean{
         return firebaseAuth.currentUser != null
     }
