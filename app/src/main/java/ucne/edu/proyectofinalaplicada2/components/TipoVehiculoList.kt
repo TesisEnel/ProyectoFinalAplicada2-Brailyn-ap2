@@ -27,7 +27,6 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 fun TipoVehiculoList(
     painter: Painter,
     marca: String,
-    listaModeloEjemplo: String,
     onGoVehiculePresentation:(Int)-> Unit,
     vehiculoDto: VehiculoDto,
     onEvent: (VehiculoEvent) -> Unit
@@ -62,7 +61,6 @@ fun TipoVehiculoList(
                     .align(Alignment.CenterVertically)
             ) {
                 Text(text = marca, style = MaterialTheme.typography.headlineSmall)
-                Text(text = listaModeloEjemplo, style = MaterialTheme.typography.labelLarge)
             }
         }
     }
