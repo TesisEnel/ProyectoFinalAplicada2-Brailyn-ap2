@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,15 +29,17 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 fun TipoVehiculeListScreen(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onCreateRenta: () -> Unit,
-    vehiculoId: Int
+    onGoVehiculePresentation: (Int) -> Unit,
+    marcaId: Int,
 ) {
     val uiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
     TipoVehiculeBodyListScreen(
         uiState = uiState,
-        marcaId = vehiculoId,
+        marcaId = marcaId,
         onBack = onBack,
-        onCreateRenta = onCreateRenta,
+        onGoVehiculePresentation =
+            onGoVehiculePresentation
+        ,
         onEvent = { event -> vehiculoViewModel.onEvent(event) }
     )
 
@@ -47,8 +50,8 @@ fun TipoVehiculeBodyListScreen(
     uiState: Uistate,
     marcaId: Int,
     onBack: () -> Unit,
-    onCreateRenta: () -> Unit,
-    onEvent: (VehiculoEvent) -> Unit = {}
+    onGoVehiculePresentation: (Int) -> Unit,
+    onEvent: (VehiculoEvent) -> Unit
 ) {
     LaunchedEffect(marcaId) {
         onEvent(VehiculoEvent.OnChangeMarcaId(marcaId))
@@ -71,6 +74,8 @@ fun TipoVehiculeBodyListScreen(
             TipoVehiculeColumn(
                 newVehiculos = newVehiculos,
                 uiState = uiState,
+                onGoVehiculePresentation = onGoVehiculePresentation,
+                onEvent = onEvent
             )
         }
     }
@@ -82,6 +87,8 @@ fun TipoVehiculeBodyListScreen(
 fun TipoVehiculeColumn(
     newVehiculos: List<VehiculoDto>,
     uiState: Uistate,
+    onGoVehiculePresentation: (Int) -> Unit,
+    onEvent: (VehiculoEvent) -> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
 
@@ -92,17 +99,30 @@ fun TipoVehiculeColumn(
             .padding(vertical = 5.dp)
             .fillMaxWidth(),
     ) {
-        newVehiculos.forEach{ vehiculoDto ->
+        newVehiculos.forEach { vehiculoDto ->
             val image = vehiculoDto.imagePath.firstOrNull()
             val painter = rememberAsyncImagePainter(url + image)
             val marca = uiState.marcas.find { it.marcaId == vehiculoDto.marcaId }
-            TipoVehiculoList(
-                painter = painter,
-                marca = marca?.nombreMarca ?:  "",
-                onGoVehiculePresentation = {},
-                vehiculoDto = vehiculoDto,
-                onEvent = {}
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        onClick = {
+
+                        }
+                    )
+                ,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TipoVehiculoList(
+                    painter = painter,
+                    marca = marca?.nombreMarca ?: "",
+                    onGoVehiculePresentation = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
+                    vehiculoDto = vehiculoDto,
+                    onEvent = onEvent
+                )
+            }
+
         }
     }
 }
