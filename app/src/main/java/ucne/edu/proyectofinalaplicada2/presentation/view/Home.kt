@@ -42,7 +42,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 @Composable
 fun Home(
     viewModel: VehiculoViewModel = hiltViewModel(),
-    onGoVehiculePresentation:(Int)-> Unit
+    onGoVehiculeList:(Int)-> Unit
 ) {
     val uistate by viewModel.uistate.collectAsStateWithLifecycle()
     if (uistate.isLoading == true) {
@@ -65,7 +65,7 @@ fun Home(
             )
             TiposDeVehiculos(
                 uiState = uistate,
-                onGoVehiculePresentation,
+                onGoVehiculeList,
                 onEvent = { vehiculoEvent -> viewModel.onEvent(vehiculoEvent) }
             )
         }
@@ -137,7 +137,7 @@ fun VehiculosMasDestacados(
 @Composable
 fun TiposDeVehiculos(
     uiState: Uistate,
-    onGoVehiculePresentation:(Int)-> Unit,
+    onGoVehiculeList:(Int)-> Unit,
     onEvent: (VehiculoEvent) -> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
@@ -175,7 +175,7 @@ fun TiposDeVehiculos(
                         TipoVehiculoList(
                             painter = painter,
                             marca = marca.nombreMarca,
-                            onGoVehiculePresentation = onGoVehiculePresentation,
+                            onGoVehiculeList = onGoVehiculeList,
                             vehiculoDto = vehiculo,
                             onEvent = onEvent
                         )
