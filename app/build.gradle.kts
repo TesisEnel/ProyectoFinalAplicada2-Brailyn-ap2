@@ -58,6 +58,7 @@ dependencies {
     //room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation(libs.firebase.common.ktx)
+    implementation(libs.androidx.runtime.livedata)
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
