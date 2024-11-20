@@ -338,7 +338,6 @@ class VehiculoViewModel @Inject constructor(
         }
 
     }
-
     private fun onChangeModeloId(modeloId: Int) {
         _uistate.update {
             it.copy(
@@ -389,6 +388,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
             is VehiculoEvent.GetModelos -> getModelos(event.marcaId)
+            VehiculoEvent.GetVehiculos -> getVehiculos()
         }
     }
 
