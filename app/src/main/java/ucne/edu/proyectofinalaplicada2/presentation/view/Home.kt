@@ -1,6 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.view
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ fun Home(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(vertical = 20.dp)
         ) {
             SearchBar()
             VehiculosMasDestacados(
