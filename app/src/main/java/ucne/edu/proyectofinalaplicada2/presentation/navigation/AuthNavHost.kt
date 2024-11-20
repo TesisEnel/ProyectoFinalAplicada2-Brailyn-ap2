@@ -11,7 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthClient
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.LoginScreen
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.RegistroClienteScreen
 
 @Composable
 fun AuthNavHost(navHostController: NavHostController) {
@@ -26,17 +27,33 @@ fun AuthNavHost(navHostController: NavHostController) {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(modifier = Modifier.weight(0.2f))
+                Spacer(modifier = Modifier.weight(0.5f))
 
-                AuthClient(
+                LoginScreen(
                     applicationContext = navHostController.context,
 
-                    onNavigationLogin = { navHostController.navigate(Screen.AuthScreen) }
+                    onNavigationLogin = { navHostController.navigate(Screen.RegistroClienteScreen) },
+
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
             }
 
+        }
+        composable<Screen.RegistroClienteScreen> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.SpaceBetween
+            ){
+                Spacer(modifier = Modifier.weight(0.5f))
+                RegistroClienteScreen(
+                    goToBack = { navHostController.popBackStack() }
+
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 }
