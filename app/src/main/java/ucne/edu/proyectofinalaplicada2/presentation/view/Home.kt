@@ -147,7 +147,7 @@ fun TiposDeVehiculos(
             .padding(bottom = 5.dp, top = 20.dp)
     ) {
         Text(
-            text = "Tipos de vehiculos",
+            text = "Tipos de marcas",
             fontFamily = FontFamily.Serif,
             fontSize = 20.sp,
             fontWeight = FontWeight.W700,
@@ -176,7 +176,6 @@ fun TiposDeVehiculos(
                         TipoVehiculoList(
                             painter = painter,
                             marca = marca.nombreMarca,
-                            listaModeloEjemplo = "Camry, Highlander, Hilux",
                             onGoVehiculePresentation = onGoVehiculePresentation,
                             vehiculoDto = vehiculo,
                             onEvent = onEvent
