@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.google.firebase.auth.FirebaseAuth
 import ucne.edu.proyectofinalaplicada2.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
@@ -61,7 +62,7 @@ fun MainNavHost(navHostController: NavHostController) {
                 ),
                 actions = {
                     IconButton(onClick = { showMenu = !showMenu }) {
-                        Icon(Icons.Filled.Logout, contentDescription = "Sign Out")
+                        Icon(Icons.Filled.Person, contentDescription = "Sign Out")
                     }
                     DropdownMenu(
                         expanded = showMenu,
@@ -91,8 +92,8 @@ fun MainNavHost(navHostController: NavHostController) {
             ) {
                 composable<Screen.Home> {
                     Home(
-                        onGoVehiculePresentation = {
-                            navHostController.navigate(Screen.TipoVehiculoListScreen)
+                        onGoVehiculeList = {
+                            navHostController.navigate(Screen.TipoVehiculoListScreen(it))
                         }
                     )
                 }
@@ -114,10 +115,13 @@ fun MainNavHost(navHostController: NavHostController) {
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
+                        val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
                         TipoVehiculeListScreen(
                             onBack = {},
-                            onCreateRenta = {},
-                            vehiculoId = 0 // Agregar lógica si hay parámetros
+                            onGoVehiculePresentation = {vehiculoId ->
+                                navHostController.navigate(Screen.VehiculePresentation(vehiculoId))
+                            },
+                            marcaId = id,
                         )
                     }
                 }
@@ -128,15 +132,14 @@ fun MainNavHost(navHostController: NavHostController) {
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
+                        val id = it.toRoute<Screen.VehiculePresentation>().id
                         VehiculePresentation(
                             onBack = {},
                             onCreateRenta = {},
-                            vehiculoId = 0 // Agregar lógica si hay parámetros
+                            vehiculoId = id // Agregar lógica si hay parámetros
                         )
                     }
                 }
-
-
             }
         }
     }
