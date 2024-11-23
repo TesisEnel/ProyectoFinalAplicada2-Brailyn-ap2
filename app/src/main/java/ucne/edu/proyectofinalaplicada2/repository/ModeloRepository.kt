@@ -5,18 +5,28 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 class ModeloRepository @Inject constructor(
     private val rentCarRemoteDataSource: RentCarRemoteDataSource
 ) {
-    fun getModelos(id: Int): Flow<Resource<List<ModeloDto>>> = flow {
+    fun getModelosById(id: Int): Flow<Resource<List<ModeloDto>>> = flow {
         try {
             emit(Resource.Loading())
-            val marcas = rentCarRemoteDataSource.getMarcas()
-            val modelos = rentCarRemoteDataSource.getModelos(id)
+            val modelos = rentCarRemoteDataSource.getModelosById(id)
+            emit(Resource.Success(modelos))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
+    fun getModelos(): Flow<Resource<List<ModeloDto>>> = flow {
+        try {
+            emit(Resource.Loading())
+            val modelos = rentCarRemoteDataSource.getModelos()
             emit(Resource.Success(modelos))
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
