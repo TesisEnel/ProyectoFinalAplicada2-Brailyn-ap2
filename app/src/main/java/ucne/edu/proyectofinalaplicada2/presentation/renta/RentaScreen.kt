@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
@@ -27,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,7 +84,7 @@ fun RentaBodyScreen(
     val vehiculo = uiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
-
+    var showModal by remember { mutableStateOf(false) }
     var showDatePickerRenta by remember { mutableStateOf(false) }
     val datePickerStateRenta = rememberDatePickerState()
 
@@ -277,17 +279,34 @@ fun RentaBodyScreen(
                         }
                     }
                 }
-
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = onCreateRenta,
+            onClick = {
+                onEvent(RentaEvent.CalculeTotal(uiState.fechaRenta,uiState.fechaEntrega?:"",vehiculo?.precio?:0))
+                showModal = true
+              },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
         ) {
             Text(text = "Rentar Ahora")
+        }
+        if (showModal) {
+            val marca = uiState.marcas.find { it.marcaId == vehiculo?.marcaId }
+            ConfirmRentaDialog(
+                vehiculoName = marca?.nombreMarca,
+                fechaRenta = uiState.fechaRenta,
+                fechaEntrega = uiState.fechaEntrega,
+                costoTotal = uiState.total?.toDouble(),
+                onConfirm = {
+                    showModal = false
+                },
+                onDismiss = {
+                    showModal = false
+                }
+            )
         }
     }
 }
@@ -314,4 +333,39 @@ fun ImageCard(
             )
         }
     }
+}
+
+@Composable
+fun ConfirmRentaDialog(
+    vehiculoName: String?,
+    fechaRenta: String?,
+    fechaEntrega: String?,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    costoTotal: Double?
+) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = {
+            Text(text = "Confirmar Renta")
+        },
+        text = {
+            Column {
+                Text("Vehículo: ${vehiculoName ?: "No disponible"}")
+                Text("Fecha de Salida: ${fechaRenta ?: "No seleccionada"}")
+                Text("Fecha de Entrada: ${fechaEntrega ?: "No seleccionada"}")
+                Text("El costo total es: ${costoTotal ?: ""}")
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm() }) {
+                Text("Confirmar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text("Cancelar")
+            }
+        }
+    )
 }
