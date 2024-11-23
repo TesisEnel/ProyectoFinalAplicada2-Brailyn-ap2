@@ -16,6 +16,7 @@ data class Uistate(
     val modeloId: Int = 0,
     val precio: Int? = null,
     val descripcion: String = "",
+    val anio: Int? = null,
     val imagePath: List<String> = emptyList(),
     var isLoading: Boolean? = null,
     var isLoadingData: Boolean? = null,
