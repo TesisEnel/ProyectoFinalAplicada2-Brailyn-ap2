@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.toEntity
 import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -23,6 +26,9 @@ class AuthViewModel @Inject constructor(
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
+
+    private val _uistateCliente = MutableStateFlow(Uistate())
+    val uistateCliente = _uistateCliente.asStateFlow()
 
     private val _uistate = MutableStateFlow(UiState())
     val uistate = _uistate.asStateFlow()
@@ -38,6 +44,7 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Authenticated
         }
     }
+    //Inicio de sesion
     private fun login() {
         viewModelScope.launch {
             authRepository.login(uistate.value.email, uistate.value.password)
@@ -62,58 +69,74 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
-    private fun signup() {
+    private fun signup(): Boolean {
+        var isSuccessful = false
+
+        if (!validar()) {
+            return isSuccessful
+        }
         viewModelScope.launch {
-            authRepository.signup(uistate.value.email, uistate.value.password, uistate.value.toEntity())
+            authRepository.signup(uistate.value.email, uistate.value.password)
                 .collect { result ->
                     when (result) {
                         is Resource.Loading -> {
                             _uistate.update { it.copy(isLoading = true, error = null) }
                         }
                         is Resource.Success -> {
+                            saveCliente(uistateCliente.value.toEntity())
                             _uistate.update { it.copy(isLoading = false, error = null) }
+                            isSuccessful = true // Marcar éxito en Firebase
                         }
                         is Resource.Error -> {
-                            _uistate.update { it.copy(isLoading = false, error = result.message) }
+                            _uistate.update { it.copy(isLoading = false, error = "Este email ya existe") }
                         }
                     }
                 }
+
         }
+        return isSuccessful
     }
+
     private fun signout(){
         auth.signOut()
         _authState.value = AuthState.Unauthenticated
     }
 
-    private fun onCedulaChanged(cedula : String){
-        _uistate.value = _uistate.value.copy(
-            cedula = cedula
-        )
+    private fun validar(): Boolean {
+        var error = false
 
+
+        _uistate.update {
+            it.copy(
+                errorEmail = if (it.email.isBlank() || !isValidEmail(it.email)) {
+                    error = true
+                    if (it.email.isBlank()) "El email no puede estar vacío"
+                    else if (!isValidEmail(it.email)) "El formato del email no es válido"
+                    else null
+                } else null,
+                errorPassword = if (uistate.value.password.isBlank()) {
+                    error = true
+                    "La contraseña es requerida"
+                } else if (uistate.value.password.length < 6) {
+                    error = true
+                    "La contraseña debe tener al menos 6 caracteres"
+                } else null,
+            )
+        }
+        return !error
     }
-    private fun onNombreChanged(nombre : String) {
-        _uistate.value = _uistate.value.copy(
-            nombre = nombre
-        )
+
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})$".toRegex()
+        return emailRegex.matches(email)
     }
-    private fun onApellidosChanged(apellidos : String) {
-        _uistate.value = _uistate.value.copy(
-            apellidos = apellidos
-        )
-    }
-    private fun onDireccionChanged(direccion : String) {
-        _uistate.value = _uistate.value.copy(
-            direccion = direccion
-        )
-    }
-    private fun onCelularChanged(celular : String) {
-        _uistate.value = _uistate.value.copy(
-            celular = celular
-        )
-    }
+
+
     private fun onEmailChanged(email : String) {
         _uistate.value = _uistate.value.copy(
-            email = email
+            email = email,
+            error = null
         )
     }
     private fun onPasswordChanged(password : String) {
@@ -122,13 +145,16 @@ class AuthViewModel @Inject constructor(
         )
     }
 
-    fun onEvent(event: AuthEvent){
+    private fun saveCliente(cliente: ClienteDto) {
+        try {
+            clienteRepository.addCliente(cliente)
+        } catch (e: Exception) {
+            _uistate.update { it.copy(error = "Error al guardar los datos del cliente: ${e.message}") }
+        }
+    }
+
+     fun onEvent(event: AuthEvent){
         when(event){
-            is AuthEvent.OnChangeApellidos -> onApellidosChanged(event.apellidos)
-            is AuthEvent.OnChangeCedula -> onCedulaChanged(event.cedula)
-            is AuthEvent.OnChangeCelular -> onCelularChanged(event.celular)
-            is AuthEvent.OnChangeDireccion -> onDireccionChanged(event.direccion)
-            is AuthEvent.OnChangeNombre -> onNombreChanged(event.nombre)
             AuthEvent.Login -> login()
             AuthEvent.Signup -> signup()
             AuthEvent.Signout -> signout()
@@ -136,6 +162,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnChangePassword -> onPasswordChanged(event.password)
         }
     }
+
 
 }
 
