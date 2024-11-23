@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
@@ -14,7 +15,8 @@ data class Uistate(
     val error: String? = null,
     val success: String? = null,
     val rentas: List<RentaDto> = emptyList(),
-    val vehiculos: List<VehiculoDto> = emptyList()
+    val vehiculos: List<VehiculoDto> = emptyList(),
+    val marcas: List<MarcaDto> = emptyList(),
 )
 
 fun Uistate.toEntity() = RentaDto(
