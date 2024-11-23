@@ -8,5 +8,6 @@ data class VehiculoDto(
     val modeloId: Int?,
     val precio: Int?,
     val descripcion: String?,
+    val anio: Int?,
     val imagePath: List<String?>
 )
