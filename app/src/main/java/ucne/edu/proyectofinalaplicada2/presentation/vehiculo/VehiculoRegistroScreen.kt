@@ -37,6 +37,7 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
 import java.io.File
+import androidx.compose.ui.graphics.Color
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
@@ -125,7 +126,13 @@ fun VehiculoBodyRegistroScreen(
                 label = { Text(text = "Precio") },
                 modifier = Modifier
                     .fillMaxWidth(),
-
+                )
+            OutlinedTextField(
+                value = uistate.anio?.toString() ?: "",
+                onValueChange = { onEnvent(VehiculoEvent.OnChangeAnio(it.toInt())) },
+                label = { Text(text = "Año") },
+                modifier = Modifier
+                    .fillMaxWidth(),
                 )
 
 
@@ -145,7 +152,7 @@ fun VehiculoBodyRegistroScreen(
             }
 
 
-            Text(text = uistate.error, color = androidx.compose.ui.graphics.Color.Red)
+            Text(text = uistate.error, color = Color.Red)
         }
     }
 }
@@ -155,23 +162,18 @@ fun SelectMultipleImages() {
     val viewModel: VehiculoViewModel = hiltViewModel()
     val context = LocalContext.current
 
-    // Lista mutable para guardar las imágenes seleccionadas
     val selectedImages = remember { mutableStateListOf<Uri>() }
 
-    // Lanzador para seleccionar múltiples imágenes
     val imagePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetMultipleContents()
     ) { uris ->
         if (uris.isNotEmpty()) {
             selectedImages.clear()
-            selectedImages.addAll(uris) // Guardar las URIs de las imágenes seleccionadas
+            selectedImages.addAll(uris)
 
-            // Convertir las URIs en archivos y enviarlos al ViewModel como una lista
             val imageFiles = uris.mapNotNull { uri ->
                 uriToFile(uri, context)
             }
-
-            // Enviar la lista de archivos al ViewModel
             if (imageFiles.isNotEmpty()) {
                 viewModel.onEvent(VehiculoEvent.OnChangeImagePath(imageFiles)) // Asumiendo que el evento recibe una lista de archivos
             }
@@ -184,7 +186,6 @@ fun SelectMultipleImages() {
         Text(text = "Seleccionar Imágenes")
     }
 
-    // Mostrar las imágenes seleccionadas en un LazyRow
     if (selectedImages.isNotEmpty()) {
         LazyRow(
             modifier = Modifier
@@ -206,8 +207,6 @@ fun SelectMultipleImages() {
 }
 
 
-
-// Función para convertir el URI en un archivo
 fun uriToFile(uri: Uri, context: Context): File? {
     return try {
         val inputStream = context.contentResolver.openInputStream(uri)
