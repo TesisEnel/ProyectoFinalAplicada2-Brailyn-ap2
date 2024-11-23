@@ -21,40 +21,49 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
 fun TipoVehiculeListScreen(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
+    marcaViewModel: MarcaViewModel= hiltViewModel(),
     onBack: () -> Unit,
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
 ) {
     val uiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
     TipoVehiculeBodyListScreen(
-        uiState = uiState,
+        vehiculoUistate = uiState,
+        marcaUiState = marcaUiState,
         marcaId = marcaId,
         onBack = onBack,
         onGoVehiculePresentation =
             onGoVehiculePresentation
         ,
-        onEvent = { event -> vehiculoViewModel.onEvent(event) }
+        onVehiculoEvent = { event -> vehiculoViewModel.onEvent(event) },
+        onMarcaEvent = { event -> marcaViewModel.onEvent(event) }
     )
 
 }
 
 @Composable
 fun TipoVehiculeBodyListScreen(
-    uiState: Uistate,
+    vehiculoUistate: VehiculoUistate,
+    marcaUiState: MarcaUiState,
     marcaId: Int,
     onBack: () -> Unit,
     onGoVehiculePresentation: (Int) -> Unit,
-    onEvent: (VehiculoEvent) -> Unit
+    onVehiculoEvent: (VehiculoEvent) -> Unit,
+    onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     LaunchedEffect(marcaId) {
-        onEvent(VehiculoEvent.OnChangeMarcaId(marcaId))
+        onMarcaEvent(MarcaEvent.OnchangeMarcaId(marcaId))
     }
     Column(
         modifier = Modifier
@@ -67,15 +76,16 @@ fun TipoVehiculeBodyListScreen(
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
         )
-        if (uiState.isLoading == true) {
+        if (vehiculoUistate.isLoading == true) {
             CircularProgressIndicator()
         } else {
-            val newVehiculos = uiState.vehiculos.filter { it.marcaId == marcaId }
+            val newVehiculos = vehiculoUistate.vehiculos.filter { it.marcaId == marcaId }
             TipoVehiculeColumn(
                 newVehiculos = newVehiculos,
-                uiState = uiState,
                 onGoVehiculePresentation = onGoVehiculePresentation,
-                onEvent = onEvent
+                onEvent = onVehiculoEvent,
+                onMarcaEvent = onMarcaEvent,
+                marcaUiState = marcaUiState
             )
         }
     }
@@ -86,9 +96,10 @@ fun TipoVehiculeBodyListScreen(
 @Composable
 fun TipoVehiculeColumn(
     newVehiculos: List<VehiculoDto>,
-    uiState: Uistate,
+    marcaUiState: MarcaUiState,
     onGoVehiculePresentation: (Int) -> Unit,
-    onEvent: (VehiculoEvent) -> Unit
+    onEvent: (VehiculoEvent) -> Unit,
+    onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
 
@@ -102,7 +113,7 @@ fun TipoVehiculeColumn(
         newVehiculos.forEach { vehiculoDto ->
             val image = vehiculoDto.imagePath.firstOrNull()
             val painter = rememberAsyncImagePainter(url + image)
-            val marca = uiState.marcas.find { it.marcaId == vehiculoDto.marcaId }
+            val marca = marcaUiState.marcas.find { it.marcaId == vehiculoDto.marcaId }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,7 +130,8 @@ fun TipoVehiculeColumn(
                     marca = marca?.nombreMarca ?: "",
                     onGoVehiculePresentation = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
                     vehiculoDto = vehiculoDto,
-                    onEvent = onEvent
+                    onVehiculoEvent = onEvent,
+                    onMarcaEvent = onMarcaEvent
                 )
             }
 
