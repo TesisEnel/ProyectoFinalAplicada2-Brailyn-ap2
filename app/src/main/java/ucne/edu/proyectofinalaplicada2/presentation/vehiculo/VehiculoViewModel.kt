@@ -15,6 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VehiculoViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
+    private val modeloRepository: ModeloRepository
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(VehiculoUistate())
     val uistate = _uistate.asStateFlow()
@@ -47,6 +48,38 @@ class VehiculoViewModel @Inject constructor(
                         _uistate.update {
                             it.copy(
                                 vehiculos = result.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun getModelosById(id: Int) {
+        viewModelScope.launch {
+            modeloRepository.getModelosById(id).collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                modelos = result.data ?: emptyList(),
                                 isLoading = false
                             )
                         }
@@ -115,6 +148,14 @@ class VehiculoViewModel @Inject constructor(
         _uistate.update {
             it.copy(
                 precio = precio
+            )
+        }
+    }
+    private fun onChangeMarcaId(marcaId: Int) {
+        getModelosById(marcaId)
+        _uistate.update {
+            it.copy(
+                marcaId = marcaId
             )
         }
     }
@@ -201,6 +242,7 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.Save -> save()
             VehiculoEvent.GetVehiculos -> getVehiculos()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
+            is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
         }
     }
 }
