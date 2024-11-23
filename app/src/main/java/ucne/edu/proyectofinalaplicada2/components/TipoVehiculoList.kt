@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 
 @Composable
@@ -30,14 +31,15 @@ fun TipoVehiculoList(
     onGoVehiculeList: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     onGoVehiculePresentation: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     vehiculoDto: VehiculoDto,
-    onEvent: (VehiculoEvent) -> Unit
+    onVehiculoEvent: (VehiculoEvent) -> Unit ={},
+    onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Card(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .fillMaxWidth()
             .clickable(onClick = {
-                onEvent(VehiculoEvent.OnChangeMarcaId(vehiculoDto.marcaId ?: 0))
+                onMarcaEvent(MarcaEvent.OnchangeMarcaId(vehiculoDto.marcaId ?: 0))
                 vehiculoDto.marcaId?.let { marcaId ->
                     if (onGoVehiculeList != null) {
                         onGoVehiculeList(marcaId)
