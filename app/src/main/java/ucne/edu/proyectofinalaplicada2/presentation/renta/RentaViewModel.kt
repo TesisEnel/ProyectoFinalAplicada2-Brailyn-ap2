@@ -8,18 +8,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
+import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
 class RentaViewModel @Inject constructor(
-    private val rentaRepository: RentaRepository
+    private val rentaRepository: RentaRepository,
+    private val vehiculoRepository: VehiculoRepository
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(Uistate())
     val uistate = _uistate.asStateFlow()
 
     init {
-
+        getVehiculos()
     }
 
     private fun getRentas() {
@@ -47,6 +49,38 @@ class RentaViewModel @Inject constructor(
                         _uistate.update {
                             it.copy(
                                 rentas = result.data ?: emptyList()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun getVehiculos() {
+        viewModelScope.launch {
+            vehiculoRepository.getVehiculos().collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error",
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                vehiculos = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                     }
@@ -94,7 +128,7 @@ class RentaViewModel @Inject constructor(
                 rentaId = null,
                 clienteId = null,
                 vehiculoId = null,
-                fechaRenta = null,
+                fechaRenta = "",
                 fechaEntrega = null,
                 total = null,
                 success = "",
@@ -142,7 +176,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     fun onEvent(event: RentaEvent) {
         when (event) {
             is RentaEvent.OnchangeClienteId -> onChangeClienteId(event.clienteId)
