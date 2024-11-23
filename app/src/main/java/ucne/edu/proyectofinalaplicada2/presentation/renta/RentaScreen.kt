@@ -53,35 +53,48 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
 fun RentaScreen(
-    viewModel: RentaViewModel = hiltViewModel(),
+    rentaViewModel: RentaViewModel = hiltViewModel(),
+    vehicoViewModel: VehiculoViewModel = hiltViewModel(),
+    marcaViewModel: MarcaViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onCreateRenta: () -> Unit,
     vehiculoId: Int,
 ) {
-    val uiState by viewModel.uistate.collectAsStateWithLifecycle()
+    val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
+    val vehiculoUiState by vehicoViewModel.uistate.collectAsStateWithLifecycle()
+    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
+
     RentaBodyScreen(
-        uiState = uiState,
+        rentaUiState = rentaUiState,
+        vehiculoUiState = vehiculoUiState,
+        marcaUiState = marcaUiState,
         onBack = onBack,
         onCreateRenta = onCreateRenta,
         vehiculoId = vehiculoId,
-        onEvent = { rentaEvent -> viewModel.onEvent(rentaEvent) }
+        onEvent = { rentaEvent -> rentaViewModel.onEvent(rentaEvent) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RentaBodyScreen(
-    uiState: Uistate,
+    rentaUiState: RentaUistate,
+    vehiculoUiState: VehiculoUistate,
+    marcaUiState: MarcaUiState,
     onBack: () -> Unit,
     onCreateRenta: () -> Unit,
     vehiculoId: Int,
     onEvent: (RentaEvent) -> Unit = {}
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-    val vehiculo = uiState.vehiculos.find { it.vehiculoId == vehiculoId }
+    val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
     var showModal by remember { mutableStateOf(false) }
@@ -200,12 +213,11 @@ fun RentaBodyScreen(
         Column(
             modifier = Modifier
                 .padding(15.dp)
-                .padding(8.dp)
                 .fillMaxWidth(),
         ) {
             Row {
                 OutlinedTextField(
-                    value = uiState.fechaRenta,
+                    value = rentaUiState.fechaRenta,
                     onValueChange = {},
                     label = { Text("Renta") },
                     trailingIcon = {
@@ -225,25 +237,25 @@ fun RentaBodyScreen(
                 if (showDatePickerRenta) {
                     Popup(
                         onDismissRequest = { showDatePickerRenta = false },
-                        alignment = Alignment.TopStart
+                        alignment = Alignment.Center
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y = 80.dp)
+                                .offset(y = 10.dp)
                                 .shadow(elevation = 4.dp)
                                 .background(MaterialTheme.colorScheme.surface)
                                 .padding(16.dp)
                         ) {
                             DatePicker(
                                 state = datePickerStateRenta,
-                                showModeToggle = false
+                                showModeToggle = false,
                             )
                         }
                     }
                 }
                 OutlinedTextField(
-                    value = uiState.fechaEntrega?:"",
+                    value = rentaUiState.fechaEntrega?:"",
                     onValueChange = {},
                     label = { Text("Entrega") },
                     trailingIcon = {
@@ -262,12 +274,12 @@ fun RentaBodyScreen(
                 if (showDatePickerEntrega) {
                     Popup(
                         onDismissRequest = { showDatePickerEntrega = false },
-                        alignment = Alignment.TopStart
+                        alignment = Alignment.Center,
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y = 80.dp)
+                                .offset(y = 10.dp)
                                 .shadow(elevation = 4.dp)
                                 .background(MaterialTheme.colorScheme.surface)
                                 .padding(16.dp)
@@ -284,7 +296,7 @@ fun RentaBodyScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                onEvent(RentaEvent.CalculeTotal(uiState.fechaRenta,uiState.fechaEntrega?:"",vehiculo?.precio?:0))
+                onEvent(RentaEvent.CalculeTotal(rentaUiState.fechaRenta,rentaUiState.fechaEntrega?:"",vehiculo?.precio?:0))
                 showModal = true
               },
             modifier = Modifier
@@ -294,12 +306,12 @@ fun RentaBodyScreen(
             Text(text = "Rentar Ahora")
         }
         if (showModal) {
-            val marca = uiState.marcas.find { it.marcaId == vehiculo?.marcaId }
+            val marca = marcaUiState.marcas.find { it.marcaId == vehiculo?.marcaId }
             ConfirmRentaDialog(
                 vehiculoName = marca?.nombreMarca,
-                fechaRenta = uiState.fechaRenta,
-                fechaEntrega = uiState.fechaEntrega,
-                costoTotal = uiState.total?.toDouble(),
+                fechaRenta = rentaUiState.fechaRenta,
+                fechaEntrega = rentaUiState.fechaEntrega,
+                costoTotal = rentaUiState.total?.toDouble(),
                 onConfirm = {
                     showModal = false
                 },
