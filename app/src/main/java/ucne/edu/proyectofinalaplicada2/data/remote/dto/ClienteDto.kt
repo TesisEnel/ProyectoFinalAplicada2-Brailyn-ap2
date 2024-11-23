@@ -6,5 +6,6 @@ data class ClienteDto(
     val nombre: String?,
     val apellido: String?,
     val direccion: String?,
-    val celular: String?
+    val celular: String?,
+    val email: String?
 )
