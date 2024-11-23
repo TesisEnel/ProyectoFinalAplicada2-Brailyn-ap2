@@ -4,7 +4,7 @@ import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
-data class Uistate(
+data class RentaUistate(
     val rentaId: Int? = null,
     val clienteId: Int? = null,
     val vehiculoId: Int? = null,
@@ -15,11 +15,9 @@ data class Uistate(
     val error: String? = null,
     val success: String? = null,
     val rentas: List<RentaDto> = emptyList(),
-    val vehiculos: List<VehiculoDto> = emptyList(),
-    val marcas: List<MarcaDto> = emptyList(),
 )
 
-fun Uistate.toEntity() = RentaDto(
+fun RentaUistate.toEntity() = RentaDto(
     rentaId = rentaId,
     clienteId = clienteId,
     vehiculoId = vehiculoId,
