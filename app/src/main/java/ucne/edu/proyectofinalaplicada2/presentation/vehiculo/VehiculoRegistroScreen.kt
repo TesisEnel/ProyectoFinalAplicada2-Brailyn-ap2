@@ -38,19 +38,39 @@ import ucne.edu.proyectofinalaplicada2.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
 import java.io.File
 import androidx.compose.ui.graphics.Color
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorUistate
+import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleUistate
+import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoUistate
+import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun VehiculoRegistroScreen(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
+    marcaViewModel: MarcaViewModel = hiltViewModel(),
+    proveedorViewModel: ProveedorViewModel = hiltViewModel(),
+    tipoVehiculoViewModel: TipoVehiculoViewModel = hiltViewModel(),
+    tipoCombustibleViewModel: TipoCombustibleViewModel = hiltViewModel(),
     onBackHome: () -> Unit
 ) {
-    val uistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
+    val proveedorUiState by proveedorViewModel.uistate.collectAsStateWithLifecycle()
+    val tipoVehiculoUiState by tipoVehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val tipoCombustibleUiState by tipoCombustibleViewModel.uistate.collectAsStateWithLifecycle()
 
     VehiculoBodyRegistroScreen(
-        uistate = uistate,
+        vehiculoUiState = vehiculoUiState,
+        marcaUiState = marcaUiState,
+        tipoVehiculoUiState = tipoVehiculoUiState,
+        proveedorUiState = proveedorUiState,
+        tipoCombustibleUiState = tipoCombustibleUiState,
         onBackHome = onBackHome,
-        onEnvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) }
+        onVehiculoEnvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) },
     )
 
 
@@ -60,10 +80,17 @@ fun VehiculoRegistroScreen(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun VehiculoBodyRegistroScreen(
-    uistate: Uistate,
+    vehiculoUiState: VehiculoUistate,
+    marcaUiState: MarcaUiState,
+    proveedorUiState: ProveedorUistate,
+    tipoVehiculoUiState: TipoVehiculoUistate,
+    tipoCombustibleUiState: TipoCombustibleUistate,
     onBackHome: () -> Unit,
-    onEnvent: (VehiculoEvent) -> Unit
-) {
+    onVehiculoEnvent: (VehiculoEvent) -> Unit,
+
+    ) {
+
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(20.dp),
@@ -83,76 +110,79 @@ fun VehiculoBodyRegistroScreen(
             )
             InputSelect(
                 label = "Marca",
-                options = uistate.marcas,
+                options = marcaUiState.marcas,
                 onOptionSelected = {
-                    onEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
+                    onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
                 },
                 labelSelector = { it.nombreMarca }
             )
 
             InputSelect(
                 label = "Tipo Combustible",
-                options = uistate.tiposCombustibles,
+                options = tipoCombustibleUiState.tipoCombustibles,
                 onOptionSelected = {
-                    onEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
+                    onVehiculoEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
                 },
                 labelSelector = { it.nombreTipoCombustible }
             )
 
+
             InputSelect(
                 label = "Tipo Vehiculo",
-                options = uistate.tiposVehiculos,
-                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId)) },
+                options = tipoVehiculoUiState.tipoVehiculos,
+                onOptionSelected = { onVehiculoEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId)) },
                 labelSelector = { it.nombreTipoVehiculo }
             )
 
             InputSelect(
                 label = "Modelo",
-                options = uistate.modelos,
-                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeModeloId(it.modeloId)) },
+                options = vehiculoUiState.modelos,
+                onOptionSelected = {
+                    onVehiculoEnvent(VehiculoEvent.OnChangeModeloId(it.modeloId))
+                },
                 labelSelector = { it.modeloVehiculo }
             )
 
             InputSelect(
                 label = "Proveedor",
-                options = uistate.proveedores,
-                onOptionSelected = { onEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId)) },
+                options = proveedorUiState.proveedores,
+                onOptionSelected = { onVehiculoEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId)) },
                 labelSelector = { it.nombre }
             )
 
             OutlinedTextField(
-                value = uistate.precio?.toString() ?: "",
-                onValueChange = { onEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
+                value = vehiculoUiState.precio?.toString() ?: "",
+                onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
                 label = { Text(text = "Precio") },
                 modifier = Modifier
                     .fillMaxWidth(),
-                )
+            )
             OutlinedTextField(
-                value = uistate.anio?.toString() ?: "",
-                onValueChange = { onEnvent(VehiculoEvent.OnChangeAnio(it.toInt())) },
+                value = vehiculoUiState.anio?.toString() ?: "",
+                onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangeAnio(it.toInt())) },
                 label = { Text(text = "Año") },
                 modifier = Modifier
                     .fillMaxWidth(),
-                )
+            )
 
 
             OutlinedTextField(
-                value = uistate.descripcion,
-                onValueChange = { onEnvent(VehiculoEvent.OnChangeDescripcion(it)) },
+                value = vehiculoUiState.descripcion,
+                onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangeDescripcion(it)) },
                 label = { Text(text = "Descripcion") },
                 modifier = Modifier
                     .fillMaxWidth()
             )
             PermisoGallery()
-            OutlinedButton(onClick = { onEnvent(VehiculoEvent.Save) }) {
+            OutlinedButton(onClick = { onVehiculoEnvent(VehiculoEvent.Save) }) {
                 Text(text = "Guardar")
             }
-            if(uistate.isLoadingData == true){
+            if (vehiculoUiState.isLoadingData == true) {
                 LinearProgressIndicator()
             }
 
 
-            Text(text = uistate.error, color = Color.Red)
+            Text(text = vehiculoUiState.error, color = Color.Red)
         }
     }
 }
