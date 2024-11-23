@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.cliente
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class ClienteViewModel @Inject constructor(
     private val clienteRepository: ClienteRepository
 ) : ViewModel() {
+
     private val _uistate = MutableStateFlow(Uistate())
     val uistate = _uistate.asStateFlow()
 
@@ -233,6 +235,15 @@ class ClienteViewModel @Inject constructor(
         }
     }
 
+    private fun onChangeEmail(email: String) {
+        _uistate.update {
+            it.copy(
+                email = email,
+                errorEmail = ""
+            )
+        }
+    }
+
     fun onEvent(event: ClienteEvent) {
         when (event) {
             is ClienteEvent.OnchangeApellidos -> onChangeApellidos(event.apellidos)
@@ -242,6 +253,7 @@ class ClienteViewModel @Inject constructor(
             is ClienteEvent.OnchangeNombre -> onChangeNombre(event.nombre)
             ClienteEvent.Save -> save()
             ClienteEvent.Update -> TODO()
+            is ClienteEvent.OnChangeEmail -> onChangeEmail(event.email)
         }
     }
 }

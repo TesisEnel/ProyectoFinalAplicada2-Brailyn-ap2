@@ -25,7 +25,6 @@ class AuthViewModel @Inject constructor(
 ):ViewModel() {
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
-    val authState: LiveData<AuthState> = _authState
 
     private val _uistateCliente = MutableStateFlow(Uistate())
     val uistateCliente = _uistateCliente.asStateFlow()
@@ -69,33 +68,26 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
-    private fun signup(): Boolean {
-        var isSuccessful = false
+    private fun signup() {
+        if (!validar()) return
 
-        if (!validar()) {
-            return isSuccessful
-        }
         viewModelScope.launch {
             authRepository.signup(uistate.value.email, uistate.value.password)
                 .collect { result ->
                     when (result) {
-                        is Resource.Loading -> {
-                            _uistate.update { it.copy(isLoading = true, error = null) }
-                        }
+                        is Resource.Loading -> _uistate.update { it.copy(isLoading = true, error = null) }
                         is Resource.Success -> {
                             saveCliente(uistateCliente.value.toEntity())
                             _uistate.update { it.copy(isLoading = false, error = null) }
-                            isSuccessful = true // Marcar éxito en Firebase
                         }
                         is Resource.Error -> {
                             _uistate.update { it.copy(isLoading = false, error = "Este email ya existe") }
                         }
                     }
                 }
-
         }
-        return isSuccessful
     }
+
 
     private fun signout(){
         auth.signOut()

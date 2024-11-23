@@ -10,6 +10,7 @@ data class Uistate(
     val direccion: String = "",
     val celular: String = "",
     val clientes: List<ClienteDto> = emptyList(),
+    val email: String = "",
     val isLoading: Boolean = false,
     val error: String = "",
     val success: String = "",
@@ -17,7 +18,8 @@ data class Uistate(
     val errorCedula: String = "",
     val errorApellidos: String = "",
     val errorDireccion: String = "",
-    val errorCelular: String = ""
+    val errorCelular: String = "",
+    val errorEmail: String = "",
 
 )
 
@@ -27,5 +29,6 @@ fun Uistate.toEntity() = ClienteDto(
     nombre = nombre,
     apellido = apellidos,
     direccion = direccion,
-    celular = celular
+    celular = celular,
+    email = email
 )
