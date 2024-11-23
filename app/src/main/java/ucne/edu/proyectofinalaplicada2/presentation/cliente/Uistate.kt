@@ -1,7 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.cliente
 
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 
 data class Uistate(
     val clienteId: Int? = null,
@@ -13,7 +12,12 @@ data class Uistate(
     val clientes: List<ClienteDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String = "",
-    val success: String = ""
+    val success: String = "",
+    val errorNombre: String = "",
+    val errorCedula: String = "",
+    val errorApellidos: String = "",
+    val errorDireccion: String = "",
+    val errorCelular: String = ""
 
 )
 
@@ -21,7 +25,7 @@ fun Uistate.toEntity() = ClienteDto(
     clienteId = clienteId,
     cedula = cedula,
     nombre = nombre,
-    apellidos = apellidos,
+    apellido = apellidos,
     direccion = direccion,
     celular = celular
 )
