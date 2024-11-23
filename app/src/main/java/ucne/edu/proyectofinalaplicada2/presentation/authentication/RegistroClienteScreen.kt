@@ -197,6 +197,14 @@ fun RegistroClienteBodyScreen(
                 )
             }
 
+            uiStateCliente.error?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -204,6 +212,10 @@ fun RegistroClienteBodyScreen(
             // Botón para registrar
             OutlinedButton(
                 onClick = {
+                    scope.launch {
+                        onEventCliente(ClienteEvent.OnChangeEmail(uiState.email))
+                        onEventCliente(ClienteEvent.Save)
+                    }
                     onEvent(AuthEvent.Signup) // Intentar registro en Firebase
                     },
                 modifier = Modifier.fillMaxWidth()
