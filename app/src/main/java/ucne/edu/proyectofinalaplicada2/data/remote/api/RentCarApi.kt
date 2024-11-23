@@ -51,6 +51,7 @@ interface RentCarApi {
         @Part("marcaId") marcaId: RequestBody,
         @Part("modeloId") modeloId: RequestBody,
         @Part images: List<MultipartBody.Part>,
+        @Part("anio") anio: RequestBody,
     ): VehiculoDto
 
     @PUT("api/Vehiculos/{id}")

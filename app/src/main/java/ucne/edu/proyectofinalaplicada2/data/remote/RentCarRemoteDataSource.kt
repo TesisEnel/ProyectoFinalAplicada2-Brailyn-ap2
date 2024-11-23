@@ -36,6 +36,7 @@ class RentCarRemoteDataSource @Inject constructor(
         marcaId: RequestBody,
         modeloId: RequestBody,
         images: List<MultipartBody.Part>,
+        anio: RequestBody,
 
     ) = rentCarApi.addVehiculo(
 
@@ -46,7 +47,8 @@ class RentCarRemoteDataSource @Inject constructor(
         descripcion,
         marcaId,
         modeloId,
-        images
+        images,
+        anio
     )
 
     suspend fun updateVehiculo(id: Int, vehiculoDto: VehiculoDto) =

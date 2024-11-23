@@ -37,7 +37,8 @@ class VehiculoRepository @Inject constructor(
         descripcion: String,
         images: List<String>,
         marcaId: Int,
-        modeloId: Int
+        modeloId: Int,
+        anio: Int
     ): Flow<Resource<VehiculoDto>> =
         flow {
             try {
@@ -56,6 +57,8 @@ class VehiculoRepository @Inject constructor(
                     marcaId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                 val requestoBodymodeloId =
                     modeloId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val requestoBodyanio =
+                    anio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
                 val updatedImages=images.map {imagen ->
                     val img = File(imagen)
@@ -73,6 +76,7 @@ class VehiculoRepository @Inject constructor(
                     requestoBodymarcaId,
                     requestoBodymodeloId,
                     updatedImages,
+                    requestoBodyanio
                 )
                 emit(Resource.Success(vehiculo))
 
