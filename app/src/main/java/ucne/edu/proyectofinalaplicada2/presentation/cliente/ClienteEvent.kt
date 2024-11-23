@@ -8,4 +8,5 @@ sealed interface ClienteEvent {
     data class OnchangeApellidos(val apellidos: String) : ClienteEvent
     data class OnchangeDireccion(val direccion: String) : ClienteEvent
     data class OnchangeCelular(val celular: String) : ClienteEvent
+    data class OnChangeEmail(val email: String) : ClienteEvent
 }
