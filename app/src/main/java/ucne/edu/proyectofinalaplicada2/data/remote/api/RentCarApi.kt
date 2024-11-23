@@ -83,6 +83,9 @@ interface RentCarApi {
 
     //Modelos
     @GET("api/Modelos/{id}")
-    suspend fun getModelos(@Path("id") id: Int): List<ModeloDto>
+    suspend fun getModelosById(@Path("id") id: Int): List<ModeloDto>
+    @GET("api/Modelos")
+    suspend fun getModelos(): List<ModeloDto>
+
 
 }
