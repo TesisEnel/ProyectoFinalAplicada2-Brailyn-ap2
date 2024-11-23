@@ -36,17 +36,22 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.components.ImageCard
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
+import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
 fun Home(
-    viewModel: VehiculoViewModel = hiltViewModel(),
+    vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
+    marcaViewModel: MarcaViewModel = hiltViewModel(),
     onGoVehiculeList:(Int)-> Unit
 ) {
-    val uistate by viewModel.uistate.collectAsStateWithLifecycle()
-    if (uistate.isLoading == true) {
+    val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val marcaUistate by marcaViewModel.uistate.collectAsStateWithLifecycle()
+    if (vehiculoUistate.isLoading == true) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -65,13 +70,18 @@ fun Home(
                 SearchBar()
             }
             item {
-                VehiculosMasDestacados(uiState = uistate)
+                VehiculosMasDestacados(
+                    vehiculoUistate = vehiculoUistate,
+                    marcaUiState = marcaUistate
+                )
             }
             item {
                 TiposDeVehiculos(
-                    uiState = uistate,
-                    onGoVehiculeList,
-                    onEvent = { vehiculoEvent -> viewModel.onEvent(vehiculoEvent) }
+                    uiVehiculoState = vehiculoUistate,
+                    marcaUiState = marcaUistate,
+                    onGoVehiculeList = onGoVehiculeList,
+                    onVehiculoEvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) },
+                    onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
                 )
             }
         }
@@ -105,7 +115,8 @@ fun SearchBar() {
 
 @Composable
 fun VehiculosMasDestacados(
-    uiState: Uistate
+    vehiculoUistate: VehiculoUistate,
+    marcaUiState: MarcaUiState
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
     Column(
@@ -123,10 +134,10 @@ fun VehiculosMasDestacados(
             modifier = Modifier.padding(vertical = 5.dp),
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
-            items(uiState.vehiculos) { vehiculo ->
+            items(vehiculoUistate.vehiculos) { vehiculo ->
                 Box {
                     val marca =
-                        uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+                        marcaUiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     ImageCard(
                         painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull()),
                         contentDescription = vehiculo.descripcion ?: "",
@@ -142,9 +153,12 @@ fun VehiculosMasDestacados(
 
 @Composable
 fun TiposDeVehiculos(
-    uiState: Uistate,
+    uiVehiculoState: VehiculoUistate,
+    marcaUiState: MarcaUiState,
     onGoVehiculeList:(Int)-> Unit,
-    onEvent: (VehiculoEvent) -> Unit
+    onVehiculoEvent: (VehiculoEvent) -> Unit,
+    onMarcaEvent: (MarcaEvent) -> Unit
+
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
     val shownMarcas = mutableSetOf<Int>()
@@ -159,9 +173,9 @@ fun TiposDeVehiculos(
     )
 
     // Contenido de la Sección
-    uiState.vehiculos.forEach { vehiculo ->
+    uiVehiculoState.vehiculos.forEach { vehiculo ->
         val marca =
-            uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+            marcaUiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
 
         if (marca != null && marca.marcaId !in shownMarcas) {
             shownMarcas.add(marca.marcaId)
@@ -175,7 +189,8 @@ fun TiposDeVehiculos(
                     marca = marca.nombreMarca,
                     onGoVehiculeList = onGoVehiculeList,
                     vehiculoDto = vehiculo,
-                    onEvent = onEvent
+                    onVehiculoEvent = onVehiculoEvent,
+                    onMarcaEvent = onMarcaEvent
                 )
             }
         }
