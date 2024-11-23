@@ -17,15 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class RentaViewModel @Inject constructor(
     private val rentaRepository: RentaRepository,
-    private val vehiculoRepository: VehiculoRepository,
-    private val marcaRepository: MarcaRepository
 ) : ViewModel() {
-    private val _uistate = MutableStateFlow(Uistate())
+    private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
 
     init {
-        getVehiculos()
-        getMarcas()
+        getRentas()
     }
 
     private fun getRentas() {
@@ -60,71 +57,6 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
-    private fun getVehiculos() {
-        viewModelScope.launch {
-            vehiculoRepository.getVehiculos().collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error",
-                                isLoading = false
-                            )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                vehiculos = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-    private fun getMarcas() {
-        viewModelScope.launch {
-            marcaRepository.getMarcas().collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error",
-                                isLoading = false
-                            )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marcas = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 
     private fun save() {
         viewModelScope.launch {
@@ -223,20 +155,17 @@ class RentaViewModel @Inject constructor(
         }
 
         try {
-            // Asegúrate de que el formato de la fecha coincida con lo esperado
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
-            // Verificar y parsear las fechas
             println("Parsing fechaRenta: $fechaRenta")
             val rentaDate: Date? = fechaRenta.let { dateFormat.parse(it) }
 
             println("Parsing fechaEntrega: $fechaEntrega")
             val entregaDate: Date? = fechaEntrega.let { dateFormat.parse(it) }
 
-            // Validar y calcular el total
             if (rentaDate != null && entregaDate != null && !entregaDate.before(rentaDate)) {
                 val diffInMillis = entregaDate.time - rentaDate.time
-                val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1 // Incluye el último día
+                val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
 
                 val total = diffInDays * costoDiario
                 println("Total calculado: $total")
