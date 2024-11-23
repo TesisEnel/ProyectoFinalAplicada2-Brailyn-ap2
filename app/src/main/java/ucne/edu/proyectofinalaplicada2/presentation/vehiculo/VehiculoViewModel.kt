@@ -250,6 +250,7 @@ class VehiculoViewModel @Inject constructor(
             val proveedorId =uistate.value.proveedorId ?: 0
             val marcaId =uistate.value.marcaId
             val modeloId =uistate.value.modeloId
+            val anio = uistate.value.anio
 
             val vehiculo = vehiculoRepository.addVehiculo(
                 tipoCombustibleId = tipoCombustibleId ,
@@ -260,6 +261,7 @@ class VehiculoViewModel @Inject constructor(
                 marcaId = marcaId,
                 modeloId = modeloId,
                 images = imagen,
+                anio = anio ?: 0
             )
 
             vehiculo.collect { result ->
@@ -362,6 +364,13 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+    private fun onChangeAnio(anio: Int) {
+        _uistate.update {
+            it.copy(
+                anio = anio
+            )
+        }
+    }
 
     fun nuevo() {
         _uistate.update {
@@ -388,7 +397,7 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.Save -> save()
             is VehiculoEvent.GetModelos -> getModelos(event.marcaId)
             VehiculoEvent.GetVehiculos -> getVehiculos()
+            is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
         }
     }
-
 }
