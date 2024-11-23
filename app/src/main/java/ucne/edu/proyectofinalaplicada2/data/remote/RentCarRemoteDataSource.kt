@@ -74,6 +74,7 @@ class RentCarRemoteDataSource @Inject constructor(
     suspend fun getProveedores() = rentCarApi.getProveedores()
 
     //Modelo
-    suspend fun getModelos(id: Int) = rentCarApi.getModelos(id)
+    suspend fun getModelosById(id: Int) = rentCarApi.getModelosById(id)
+    suspend fun getModelos() = rentCarApi.getModelos()
 
 }
