@@ -13,5 +13,6 @@ sealed interface VehiculoEvent {
     data class OnChangeMarcaId(val marcaId: Int): VehiculoEvent
     data class OnChangeProveedorId(val proveedorId: Int): VehiculoEvent
     data class OnChangeModeloId(val modeloId: Int): VehiculoEvent
+    data class OnChangeAnio(val anio: Int): VehiculoEvent
     data class OnChangeImagePath(val imagePath: List<File>): VehiculoEvent
 }
