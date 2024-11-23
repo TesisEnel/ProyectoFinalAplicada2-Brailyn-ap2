@@ -15,21 +15,12 @@ import javax.inject.Inject
 @HiltViewModel
 class VehiculoViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
-    private val marcaRepository: MarcaRepository,
-    private val tipoCombustibleRepository: TipoCombustibleRepository,
-    private val tipoVehiculoRepository: TipoVehiculoRepository,
-    private val proveedorRepository: ProveedorRepository,
-    private val modeloRepository: ModeloRepository
 ) : ViewModel() {
-    private val _uistate = MutableStateFlow(Uistate())
+    private val _uistate = MutableStateFlow(VehiculoUistate())
     val uistate = _uistate.asStateFlow()
 
     init {
         getVehiculos()
-        getMarcas()
-        getTiposCombustibles()
-        getTiposVehiculos()
-        getProveedores()
     }
 
     private fun getVehiculos() {
@@ -63,176 +54,6 @@ class VehiculoViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun getMarcas() {
-        viewModelScope.launch {
-            marcaRepository.getMarcas().collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error",
-                                isLoading = false
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marcas = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getTiposCombustibles() {
-        viewModelScope.launch {
-            tipoCombustibleRepository.getTiposCombustibles().collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error",
-                                isLoading = false
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                tiposCombustibles = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getTiposVehiculos() {
-        viewModelScope.launch {
-            tipoVehiculoRepository.getTiposVehiculos().collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                tiposVehiculos = result.data ?: emptyList()
-                            )
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    private fun getProveedores() {
-        viewModelScope.launch {
-            proveedorRepository.getProveedores().collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                proveedores = result.data ?: emptyList()
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    private fun getModelos(id: Int) {
-        viewModelScope.launch {
-            modeloRepository.getModelos(id).collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                modelos = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     private fun save() {
@@ -323,17 +144,6 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeMarcaId(marcaId: Int) {
-        getModelos(marcaId)
-        getVehiculos()
-        getMarcas()
-        _uistate.update {
-            it.copy(
-                marcaId = marcaId,
-            )
-        }
-
-    }
     private fun onChangeModeloId(modeloId: Int) {
         _uistate.update {
             it.copy(
@@ -385,12 +195,10 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangePrecio -> onChangePrecio(event.precio)
             is VehiculoEvent.OnChangeTipoCombustibleId -> onChangeTipoCombustibleId(event.tipoCombustibleId)
             is VehiculoEvent.OnChangeTipoVehiculoId -> onChangeTipoVehiculoId(event.tipoVehiculoId)
-            is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             is VehiculoEvent.OnChangeModeloId -> onChangeModeloId(event.modeloId)
             is VehiculoEvent.OnChangeImagePath -> onChangeImagePath(event.imagePath)
             is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
-            is VehiculoEvent.GetModelos -> getModelos(event.marcaId)
             VehiculoEvent.GetVehiculos -> getVehiculos()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
         }
