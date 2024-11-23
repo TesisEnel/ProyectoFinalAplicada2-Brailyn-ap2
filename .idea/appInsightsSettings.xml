@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="ucne.edu.proyectofinalaplicada2" />
-                  <option name="mobileSdkAppId" value="1:1088784955890:android:7d4273cdc5829b6e73936b" />
-                  <option name="projectId" value="rentcarauth" />
-                  <option name="projectNumber" value="1088784955890" />
+                  <option name="mobileSdkAppId" value="1:138527275305:android:0d3238578bb00f8a5fdf38" />
+                  <option name="projectId" value="authrentcar" />
+                  <option name="projectNumber" value="138527275305" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
