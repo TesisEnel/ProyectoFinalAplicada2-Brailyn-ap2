@@ -12,7 +12,12 @@ data class Uistate(
     val clientes: List<ClienteDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String = "",
-    val success: String = ""
+    val success: String = "",
+    val errorNombre: String = "",
+    val errorCedula: String = "",
+    val errorApellidos: String = "",
+    val errorDireccion: String = "",
+    val errorCelular: String = ""
 
 )
 
