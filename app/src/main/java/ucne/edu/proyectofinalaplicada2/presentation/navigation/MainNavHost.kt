@@ -36,7 +36,7 @@ import ucne.edu.proyectofinalaplicada2.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
-import ucne.edu.proyectofinalaplicada2.presentation.view.VehiculePresentation
+import ucne.edu.proyectofinalaplicada2.presentation.renta.VehiculePresentation
 
 @SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,20 +119,20 @@ fun MainNavHost(navHostController: NavHostController) {
                         TipoVehiculeListScreen(
                             onBack = {},
                             onGoVehiculePresentation = {vehiculoId ->
-                                navHostController.navigate(Screen.VehiculePresentation(vehiculoId))
+                                navHostController.navigate(Screen.RentaScreen(vehiculoId))
                             },
                             marcaId = id,
                         )
                     }
                 }
 
-                composable<Screen.VehiculePresentation> {
+                composable<Screen.RentaScreen> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        val id = it.toRoute<Screen.VehiculePresentation>().id
+                        val id = it.toRoute<Screen.RentaScreen>().id
                         VehiculePresentation(
                             onBack = {},
                             onCreateRenta = {},

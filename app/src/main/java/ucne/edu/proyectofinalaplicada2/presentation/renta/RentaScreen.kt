@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.presentation.view
+package ucne.edu.proyectofinalaplicada2.presentation.renta
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
