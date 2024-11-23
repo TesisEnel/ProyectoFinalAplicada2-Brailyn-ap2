@@ -2,9 +2,6 @@ package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoVehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 data class VehiculoUistate(
@@ -24,5 +21,6 @@ data class VehiculoUistate(
     val success: String = "",
     val marcas: List<MarcaDto> = emptyList(),
     val vehiculos: List<VehiculoDto> = emptyList(),
+    val modelos: List<ModeloDto> = emptyList(),
     )
 
