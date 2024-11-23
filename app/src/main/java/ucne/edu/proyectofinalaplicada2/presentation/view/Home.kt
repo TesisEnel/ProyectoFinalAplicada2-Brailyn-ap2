@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -54,20 +55,25 @@ fun Home(
             CircularProgressIndicator()
         }
     } else {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 20.dp)
+                .padding(vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            SearchBar()
-            VehiculosMasDestacados(
-                uiState = uistate
-            )
-            TiposDeVehiculos(
-                uiState = uistate,
-                onGoVehiculeList,
-                onEvent = { vehiculoEvent -> viewModel.onEvent(vehiculoEvent) }
-            )
+            item {
+                SearchBar()
+            }
+            item {
+                VehiculosMasDestacados(uiState = uistate)
+            }
+            item {
+                TiposDeVehiculos(
+                    uiState = uistate,
+                    onGoVehiculeList,
+                    onEvent = { vehiculoEvent -> viewModel.onEvent(vehiculoEvent) }
+                )
+            }
         }
     }
 }
@@ -141,46 +147,36 @@ fun TiposDeVehiculos(
     onEvent: (VehiculoEvent) -> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-    Column(
-        modifier = Modifier
-            .padding(bottom = 5.dp, top = 20.dp)
-    ) {
-        Text(
-            text = "Tipos de marcas",
-            fontFamily = FontFamily.Serif,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.W700,
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(vertical = 5.dp)
-                .fillMaxWidth(),
-        ) {
-            val shownMarcas = mutableSetOf<Int>()
-            uiState.vehiculos.forEach { vehiculo ->
-                val marca =
-                    uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+    val shownMarcas = mutableSetOf<Int>()
 
-                if (marca != null && marca.marcaId !in shownMarcas) {
-                    shownMarcas.add(marca.marcaId)
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
-                        TipoVehiculoList(
-                            painter = painter,
-                            marca = marca.nombreMarca,
-                            onGoVehiculeList = onGoVehiculeList,
-                            vehiculoDto = vehiculo,
-                            onEvent = onEvent
-                        )
-                    }
-                }
+    // Título de la Sección
+    Text(
+        text = "Tipos de marcas",
+        fontFamily = FontFamily.Serif,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.W700,
+        modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+    )
+
+    // Contenido de la Sección
+    uiState.vehiculos.forEach { vehiculo ->
+        val marca =
+            uiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+
+        if (marca != null && marca.marcaId !in shownMarcas) {
+            shownMarcas.add(marca.marcaId)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
+                TipoVehiculoList(
+                    painter = painter,
+                    marca = marca.nombreMarca,
+                    onGoVehiculeList = onGoVehiculeList,
+                    vehiculoDto = vehiculo,
+                    onEvent = onEvent
+                )
             }
         }
     }
