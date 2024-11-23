@@ -36,7 +36,7 @@ import ucne.edu.proyectofinalaplicada2.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
-import ucne.edu.proyectofinalaplicada2.presentation.renta.VehiculePresentation
+import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 
 @SuppressLint("NewApi")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,10 +133,10 @@ fun MainNavHost(navHostController: NavHostController) {
                             .verticalScroll(rememberScrollState())
                     ) {
                         val id = it.toRoute<Screen.RentaScreen>().id
-                        VehiculePresentation(
+                        RentaScreen(
                             onBack = {},
                             onCreateRenta = {},
-                            vehiculoId = id // Agregar lógica si hay parámetros
+                            vehiculoId = id
                         )
                     }
                 }
