@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "138527275305-rumem49q75gpv51avv8ta4hvd7l3ep6s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ucne.edu.proyectofinalaplicada2",
+            "certificate_hash": "642044d8164d460b54c4817be6e9614634526b56"
+          }
+        },
+        {
           "client_id": "138527275305-glcjm6vrapkqeqc83fpd1qdvdmjv6lb6.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -43,5 +51,5 @@
       }
     }
   ],
-  "configuration_version": "1"
+  "configuration_version": "1"
 }
