@@ -43,7 +43,7 @@ class AuthRepository @Inject constructor(
     }
 
     // Signup con Flow
-    fun signup(email: String, password: String, cliente: ClienteDto): Flow<Resource<AuthState>> = flow {
+    fun signup(email: String, password: String): Flow<Resource<AuthState>> = flow {
         if (email.isBlank() || password.isBlank()) {
             emit(Resource.Error("Email or password can't be empty"))
             return@flow
@@ -58,7 +58,7 @@ class AuthRepository @Inject constructor(
 
             val user = authResult.user
             if (user != null) {
-                rentCarRemoteDataSource.addCliente(cliente) // Agrega cliente al repositorio
+
                 emit(Resource.Success(AuthState.Authenticated))
             } else {
                 emit(Resource.Error("User is null after successful registration"))
