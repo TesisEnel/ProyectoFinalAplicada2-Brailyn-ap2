@@ -1,7 +1,9 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+
 sealed interface RentaEvent {
-    data object Save : RentaEvent
+    data class Save(val renta: RentaDto) : RentaEvent
     data class OnchangeClienteId(val clienteId: Int) : RentaEvent
     data class OnchangeVehiculoId(val vehiculoId: Int) : RentaEvent
     data class OnchangeFechaRenta(val fechaRenta: String) : RentaEvent

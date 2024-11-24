@@ -16,12 +16,3 @@ data class RentaUistate(
     val success: String? = null,
     val rentas: List<RentaDto> = emptyList(),
 )
-
-fun RentaUistate.toEntity() = RentaDto(
-    rentaId = rentaId,
-    clienteId = clienteId,
-    vehiculoId = vehiculoId,
-    fechaRenta = fechaRenta,
-    fechaEntrega = fechaEntrega,
-    total = total
-)

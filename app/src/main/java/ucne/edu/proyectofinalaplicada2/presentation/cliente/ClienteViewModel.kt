@@ -3,7 +3,6 @@ package ucne.edu.proyectofinalaplicada2.presentation.cliente
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +17,7 @@ class ClienteViewModel @Inject constructor(
     private val clienteRepository: ClienteRepository
 ) : ViewModel() {
 
-    private val _uistate = MutableStateFlow(Uistate())
+    private val _uistate = MutableStateFlow(ClienteUistate())
     val uistate = _uistate.asStateFlow()
 
     init {

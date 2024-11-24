@@ -35,7 +35,7 @@ import ucne.edu.proyectofinalaplicada2.components.CedulaVisualTransformation
 import ucne.edu.proyectofinalaplicada2.components.PhoneNumberVisualTransformation
 import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteEvent
 import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
 
 @Composable
 fun RegistroClienteScreen(
@@ -62,7 +62,7 @@ fun RegistroClienteBodyScreen(
     goToBack: () -> Unit,
     onEvent: (AuthEvent) -> Unit,
     onEventCliente: (ClienteEvent) -> Unit,
-    uiStateCliente: Uistate
+    uiStateCliente: ClienteUistate
 ) {
     val scope = rememberCoroutineScope()
     Box(

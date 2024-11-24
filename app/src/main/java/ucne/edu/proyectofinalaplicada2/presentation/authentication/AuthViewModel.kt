@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.Uistate
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
 import ucne.edu.proyectofinalaplicada2.presentation.cliente.toEntity
 import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
@@ -26,8 +25,8 @@ class AuthViewModel @Inject constructor(
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
 
-    private val _uistateCliente = MutableStateFlow(Uistate())
-    val uistateCliente = _uistateCliente.asStateFlow()
+    private val _uistateCliente = MutableStateFlow(ClienteUistate())
+    private val uistateCliente = _uistateCliente.asStateFlow()
 
     private val _uistate = MutableStateFlow(UiState())
     val uistate = _uistate.asStateFlow()
@@ -43,7 +42,7 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Authenticated
         }
     }
-    //Inicio de sesion
+
     private fun login() {
         viewModelScope.launch {
             authRepository.login(uistate.value.email, uistate.value.password)

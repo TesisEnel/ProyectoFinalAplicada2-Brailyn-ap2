@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.repository.*
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
-import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -23,7 +25,7 @@ class RentaViewModel @Inject constructor(
 
     init {
         getRentas()
-    }
+        }
 
     private fun getRentas() {
         viewModelScope.launch {
@@ -58,9 +60,9 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun save() {
+    private fun save(rentaDto: RentaDto) {
         viewModelScope.launch {
-            val renta = rentaRepository.addRenta(uistate.value.toEntity())
+            val renta = rentaRepository.addRenta(rentaDto)
             renta.collect { result ->
                 when (result) {
                     is Resource.Error -> {
@@ -191,7 +193,7 @@ class RentaViewModel @Inject constructor(
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
-            RentaEvent.Save -> save()
+            is RentaEvent.Save -> save(event.renta)
             is RentaEvent.CalculeTotal -> calculateTotal(event.fechaRenta, event.fechaEntrega,event.costoDiario)
         }
     }

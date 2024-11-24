@@ -2,7 +2,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.cliente
 
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 
-data class Uistate(
+data class ClienteUistate(
     val clienteId: Int? = null,
     val cedula: String = "",
     val nombre: String = "",
@@ -23,7 +23,7 @@ data class Uistate(
 
 )
 
-fun Uistate.toEntity() = ClienteDto(
+fun ClienteUistate.toEntity() = ClienteDto(
     clienteId = clienteId,
     cedula = cedula,
     nombre = nombre,
