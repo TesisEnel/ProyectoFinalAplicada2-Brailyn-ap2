@@ -50,9 +50,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
+import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -63,6 +67,7 @@ fun RentaScreen(
     rentaViewModel: RentaViewModel = hiltViewModel(),
     vehicoViewModel: VehiculoViewModel = hiltViewModel(),
     marcaViewModel: MarcaViewModel = hiltViewModel(),
+    clienteViewModel: ClienteViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onCreateRenta: () -> Unit,
     vehiculoId: Int,
@@ -70,11 +75,13 @@ fun RentaScreen(
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehicoViewModel.uistate.collectAsStateWithLifecycle()
     val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
+    val clienteUiState by clienteViewModel.uistate.collectAsStateWithLifecycle()
 
     RentaBodyScreen(
         rentaUiState = rentaUiState,
         vehiculoUiState = vehiculoUiState,
         marcaUiState = marcaUiState,
+        clienteUiState = clienteUiState,
         onBack = onBack,
         onCreateRenta = onCreateRenta,
         vehiculoId = vehiculoId,
@@ -88,6 +95,7 @@ fun RentaBodyScreen(
     rentaUiState: RentaUistate,
     vehiculoUiState: VehiculoUistate,
     marcaUiState: MarcaUiState,
+    clienteUiState: ClienteUistate,
     onBack: () -> Unit,
     onCreateRenta: () -> Unit,
     vehiculoId: Int,
@@ -307,6 +315,15 @@ fun RentaBodyScreen(
         }
         if (showModal) {
             val marca = marcaUiState.marcas.find { it.marcaId == vehiculo?.marcaId }
+            val emailCliente = FirebaseAuth.getInstance().currentUser?.email
+            val cliente = clienteUiState.clientes.find { it.email == emailCliente }
+            val renta = RentaDto(
+                clienteId = cliente?.clienteId,
+                vehiculoId = vehiculo?.vehiculoId,
+                fechaRenta = rentaUiState.fechaRenta,
+                fechaEntrega = rentaUiState.fechaEntrega,
+                total = rentaUiState.total
+            )
             ConfirmRentaDialog(
                 vehiculoName = marca?.nombreMarca,
                 fechaRenta = rentaUiState.fechaRenta,
@@ -317,8 +334,12 @@ fun RentaBodyScreen(
                 },
                 onDismiss = {
                     showModal = false
-                }
+
+                },
+
+                createRenta = { onEvent(RentaEvent.Save(renta)) },
             )
+            Text(rentaUiState.error?:"", color = MaterialTheme.colorScheme.error)
         }
     }
 }
@@ -354,7 +375,8 @@ fun ConfirmRentaDialog(
     fechaEntrega: String?,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    costoTotal: Double?
+    costoTotal: Double?,
+    createRenta: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -370,7 +392,10 @@ fun ConfirmRentaDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm() }) {
+            Button(
+                onClick = { onConfirm()
+                    createRenta()
+                }) {
                 Text("Confirmar")
             }
         },
