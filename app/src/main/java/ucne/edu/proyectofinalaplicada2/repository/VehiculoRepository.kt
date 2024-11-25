@@ -9,6 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import ucne.edu.proyectofinalaplicada2.utils.Constant
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import java.io.File
 import javax.inject.Inject
@@ -44,21 +45,21 @@ class VehiculoRepository @Inject constructor(
             try {
                 emit(Resource.Loading())
                 val requestoBodyTipoCombustibleId =
-                    tipoCombustibleId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    tipoCombustibleId.toString().toRequestBody(Constant.TEXT_PLAIN .toMediaTypeOrNull())
                 val requestoBodyTipoVehiculoId =
-                    tipoVehiculoId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    tipoVehiculoId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodyProveedorId =
-                    proveedorId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    proveedorId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodyPrecio =
-                    precio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    precio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodyDescripcion =
-                    descripcion.toRequestBody("text/plain".toMediaTypeOrNull())
+                    descripcion.toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodymarcaId =
-                    marcaId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    marcaId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodymodeloId =
-                    modeloId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    modeloId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
                 val requestoBodyanio =
-                    anio.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    anio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
 
                 val updatedImages=images.map {imagen ->
                     val img = File(imagen)
