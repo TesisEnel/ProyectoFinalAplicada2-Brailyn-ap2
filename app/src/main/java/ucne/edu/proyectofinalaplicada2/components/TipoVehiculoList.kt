@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 
 @Composable
 fun TipoVehiculoList(

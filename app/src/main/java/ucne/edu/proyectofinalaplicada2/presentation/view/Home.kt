@@ -40,7 +40,6 @@ import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
@@ -80,7 +79,6 @@ fun Home(
                     uiVehiculoState = vehiculoUistate,
                     marcaUiState = marcaUistate,
                     onGoVehiculeList = onGoVehiculeList,
-                    onVehiculoEvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) },
                     onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
                 )
             }
@@ -156,7 +154,6 @@ fun TiposDeVehiculos(
     uiVehiculoState: VehiculoUistate,
     marcaUiState: MarcaUiState,
     onGoVehiculeList:(Int)-> Unit,
-    onVehiculoEvent: (VehiculoEvent) -> Unit,
     onMarcaEvent: (MarcaEvent) -> Unit
 
 ) {
