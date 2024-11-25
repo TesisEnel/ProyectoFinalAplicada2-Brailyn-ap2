@@ -1,14 +1,10 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-
 import kotlinx.coroutines.tasks.await
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthState
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject

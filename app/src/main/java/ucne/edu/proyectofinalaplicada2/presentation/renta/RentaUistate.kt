@@ -1,8 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 data class RentaUistate(
     val rentaId: Int? = null,

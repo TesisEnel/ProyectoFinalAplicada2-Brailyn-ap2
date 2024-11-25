@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
