@@ -135,7 +135,6 @@ fun MainNavHost(navHostController: NavHostController) {
                         val id = it.toRoute<Screen.RentaScreen>().id
                         RentaScreen(
                             onBack = {},
-                            onCreateRenta = {},
                             vehiculoId = id
                         )
                     }
