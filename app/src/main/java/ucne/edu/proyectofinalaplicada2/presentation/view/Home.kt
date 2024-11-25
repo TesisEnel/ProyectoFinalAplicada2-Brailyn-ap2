@@ -189,7 +189,6 @@ fun TiposDeVehiculos(
                     marca = marca.nombreMarca,
                     onGoVehiculeList = onGoVehiculeList,
                     vehiculoDto = vehiculo,
-                    onVehiculoEvent = onVehiculoEvent,
                     onMarcaEvent = onMarcaEvent
                 )
             }

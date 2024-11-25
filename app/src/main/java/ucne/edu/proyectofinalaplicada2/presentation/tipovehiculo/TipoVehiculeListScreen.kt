@@ -130,7 +130,6 @@ fun TipoVehiculeColumn(
                     marca = marca?.nombreMarca ?: "",
                     onGoVehiculePresentation = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
                     vehiculoDto = vehiculoDto,
-                    onVehiculoEvent = onEvent,
                     onMarcaEvent = onMarcaEvent
                 )
             }
