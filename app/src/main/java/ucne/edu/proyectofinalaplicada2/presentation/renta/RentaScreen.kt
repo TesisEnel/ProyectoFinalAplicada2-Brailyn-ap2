@@ -69,7 +69,6 @@ fun RentaScreen(
     marcaViewModel: MarcaViewModel = hiltViewModel(),
     clienteViewModel: ClienteViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onCreateRenta: () -> Unit,
     vehiculoId: Int,
 ) {
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
@@ -83,7 +82,6 @@ fun RentaScreen(
         marcaUiState = marcaUiState,
         clienteUiState = clienteUiState,
         onBack = onBack,
-        onCreateRenta = onCreateRenta,
         vehiculoId = vehiculoId,
         onEvent = { rentaEvent -> rentaViewModel.onEvent(rentaEvent) }
     )
@@ -97,7 +95,6 @@ fun RentaBodyScreen(
     marcaUiState: MarcaUiState,
     clienteUiState: ClienteUistate,
     onBack: () -> Unit,
-    onCreateRenta: () -> Unit,
     vehiculoId: Int,
     onEvent: (RentaEvent) -> Unit = {}
 ) {
