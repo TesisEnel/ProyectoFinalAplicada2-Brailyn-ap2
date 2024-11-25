@@ -55,8 +55,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
+
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -67,14 +68,14 @@ fun RentaScreen(
     rentaViewModel: RentaViewModel = hiltViewModel(),
     vehicoViewModel: VehiculoViewModel = hiltViewModel(),
     marcaViewModel: MarcaViewModel = hiltViewModel(),
-    clienteViewModel: ClienteViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     onBack: () -> Unit,
     vehiculoId: Int,
 ) {
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehicoViewModel.uistate.collectAsStateWithLifecycle()
     val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
-    val clienteUiState by clienteViewModel.uistate.collectAsStateWithLifecycle()
+    val clienteUiState by authViewModel.uistate.collectAsStateWithLifecycle()
 
     RentaBodyScreen(
         rentaUiState = rentaUiState,
@@ -93,7 +94,7 @@ fun RentaBodyScreen(
     rentaUiState: RentaUistate,
     vehiculoUiState: VehiculoUistate,
     marcaUiState: MarcaUiState,
-    clienteUiState: ClienteUistate,
+    clienteUiState: ClienteUiState,
     onBack: () -> Unit,
     vehiculoId: Int,
     onEvent: (RentaEvent) -> Unit = {}
