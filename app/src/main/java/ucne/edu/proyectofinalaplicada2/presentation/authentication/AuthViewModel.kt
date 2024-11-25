@@ -137,14 +137,39 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun saveCliente(cliente: ClienteDto) {
-        try {
-            clienteRepository.addCliente(cliente)
-        } catch (e: Exception) {
-            _uistate.update { it.copy(error = "Error al guardar los datos del cliente: ${e.message}") }
+        viewModelScope.launch {
+            clienteRepository.addCliente(cliente).collect{ result ->
+                when(result){
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = "No se pudo guardar",
+                                isLoading = false
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Se guardó correctamente",
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-     fun onEvent(event: AuthEvent){
+
+    fun onEvent(event: AuthEvent){
         when(event){
             AuthEvent.Login -> login()
             AuthEvent.Signup -> signup()
