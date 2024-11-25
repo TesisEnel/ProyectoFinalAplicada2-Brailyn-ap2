@@ -13,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MarcaViewModel @Inject constructor(
-    private val marcaRepository: MarcaRepository
-
+    private val marcaRepository: MarcaRepository,
 ):ViewModel() {
     private val _uistate = MutableStateFlow(MarcaUiState())
     val uistate = _uistate.asStateFlow()

@@ -87,7 +87,6 @@ class VehiculoRepository @Inject constructor(
                 emit(Resource.Error("Error desconocido ${e.message}"))
             }
         }
-
     fun updateVehiculo(id: Int, vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow {
         try {
             emit(Resource.Loading())

@@ -88,7 +88,6 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
-
     private fun save() {
         viewModelScope.launch {
             val precio = uistate.value.precio
