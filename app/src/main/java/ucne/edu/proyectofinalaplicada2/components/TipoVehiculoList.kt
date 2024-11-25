@@ -31,7 +31,6 @@ fun TipoVehiculoList(
     onGoVehiculeList: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     onGoVehiculePresentation: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     vehiculoDto: VehiculoDto,
-    onVehiculoEvent: (VehiculoEvent) -> Unit ={},
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Card(
