@@ -1,17 +1,22 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.toEntity
 import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -20,27 +25,168 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val clienteRepository: ClienteRepository,
-    private val authRepository: AuthRepository
-):ViewModel() {
-    private val auth : FirebaseAuth = FirebaseAuth.getInstance()
+    private val authRepository: AuthRepository,
+    private val googleAuthClient: GoogleAuthClient,
+) : ViewModel() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
 
-    private val _uistateCliente = MutableStateFlow(ClienteUistate())
-    private val uistateCliente = _uistateCliente.asStateFlow()
-
-    private val _uistate = MutableStateFlow(UiState())
+    private val _uistate = MutableStateFlow(ClienteUiState())
     val uistate = _uistate.asStateFlow()
 
 
     init {
         checkAuthStatus()
+        getClienteByEmail(uistate.value.email)
+        getClientes()
     }
-    private fun checkAuthStatus(){
-        if(auth.currentUser==null){
+
+    fun signInWithGoogle() {
+        viewModelScope.launch {
+            _uistate.update { it.copy(isLoading = true) }
+
+            try {
+                val user = googleAuthClient.signInAndGetUser()
+                if (user != null) {
+                    handleUserSignIn(user)
+                } else {
+                    _uistate.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "No se pudo iniciar sesión."
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uistate.update { it.copy(isLoading = false, error = "Error de autenticación.") }
+            }
+        }
+    }
+
+    fun getClientes() {
+        viewModelScope.launch {
+            clienteRepository.getClientes().collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update { it.copy(error = it.error) }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update { it.copy(isLoading = true) }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update { it.copy(clientes = it.clientes) }
+                    }
+                }
+            }
+        }
+    }
+
+     fun handleUserSignIn(user: FirebaseUser) {
+
+
+        viewModelScope.launch {
+            clienteRepository.clienteNotExist(user.email?: "", _uistate.value.clientes).collect{ result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update { it.copy(existCliente = true, isLoading = false) }
+
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update { it.copy(isLoading = true) }
+
+                    }
+                    is Resource.Success -> {
+                        _uistate.update { it.copy(existCliente = result.data?: false, isLoading = false) }
+
+                    }
+                }
+
+            }
+
+            // Esperar hasta que `existCliente` tenga un valor actualizado
+            val clienteExiste = _uistate.value.existCliente
+            if (clienteExiste) {
+                _uistate.update { it.copy(success = "Bienvenido de nuevo.") }
+                return@launch
+            }
+
+            // Verificar si el cliente ya existe en la API
+
+            // Crear nuevo cliente si no existe
+            val clienteDto = ClienteDto(
+                clienteId = null,
+                cedula = "",
+                nombre = user.displayName ?: "Usuario de Google",
+                apellido = "",
+                direccion = "",
+                celular = "",
+                email = user.email ?: ""
+            )
+
+            clienteRepository.addCliente(clienteDto).collect { resource ->
+                when (resource) {
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = false,
+                                success = "Cliente registrado exitosamente."
+                            )
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Error al registrar cliente: ${resource.message}"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update { it.copy(isLoading = true) }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkAuthStatus() {
+        if (auth.currentUser == null) {
             _authState.value = AuthState.Unauthenticated
-        }else{
+        } else {
             _authState.value = AuthState.Authenticated
         }
+    }
+
+    private fun doesClienteExist(email: String) {
+
+
+
+        viewModelScope.launch {
+            clienteRepository.clienteNotExist(email, _uistate.value.clientes).collect{ result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update { it.copy(existCliente = true, isLoading = false) }
+
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update { it.copy(isLoading = true) }
+
+                    }
+                    is Resource.Success -> {
+                        _uistate.update { it.copy(existCliente = result.data?: false, isLoading = false) }
+
+                    }
+                }
+
+            }
+
+        }
+
     }
 
     private fun login() {
@@ -53,11 +199,13 @@ class AuthViewModel @Inject constructor(
                                 it.copy(isLoading = true, error = null)
                             }
                         }
+
                         is Resource.Success -> {
                             _uistate.update {
                                 it.copy(isLoading = false, error = null)
                             }
                         }
+
                         is Resource.Error -> {
                             _uistate.update {
                                 it.copy(isLoading = false, error = result.message)
@@ -67,6 +215,7 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
+
     private fun signup() {
         if (!validar()) return
 
@@ -74,21 +223,44 @@ class AuthViewModel @Inject constructor(
             authRepository.signup(uistate.value.email, uistate.value.password)
                 .collect { result ->
                     when (result) {
-                        is Resource.Loading -> _uistate.update { it.copy(isLoading = true, error = null) }
-                        is Resource.Success -> {
-                            saveCliente(uistateCliente.value.toEntity())
-                            _uistate.update { it.copy(isLoading = false, error = null) }
+                        is Resource.Loading -> _uistate.update {
+                            it.copy(
+                                isLoading = true,
+                                error = null
+                            )
                         }
+
+                        is Resource.Success -> {
+                            saveCliente(uistate.value.toEntity())
+                            _uistate.update { it.copy(isLoading = false, error = null) }
+                            nuevo()
+                        }
+
                         is Resource.Error -> {
-                            _uistate.update { it.copy(isLoading = false, error = "Este email ya existe") }
+                            _uistate.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Este email ya existe"
+                                )
+                            }
                         }
                     }
                 }
         }
     }
 
+//    private fun signInWithGoogle() {
+//        viewModelScope.launch {
+//            _uistate.update { it.copy(isLoading = true) }
+//            val success = googleAuthClient.signIn(clienteRepository)
+//            if (success) {
+//                println("Usuario registrado correctamente con Google.")
+//            }
+//            _uistate.update { it.copy(isLoading = false, success = success.toString()) }
+//        }
+//    }
 
-    private fun signout(){
+    private fun signout() {
         auth.signOut()
         _authState.value = AuthState.Unauthenticated
     }
@@ -112,11 +284,46 @@ class AuthViewModel @Inject constructor(
                     error = true
                     "La contraseña debe tener al menos 6 caracteres"
                 } else null,
+                errorCelular = if (it.celular.isBlank() || !isValidPhone(it.celular)) {
+                    error = true
+                    if (it.celular.isBlank()) "El celular no puede estar vacio" else
+                        "El número de celular no es válido ej 8299440000"
+                } else "",
+                errorCedula = if (it.cedula.isBlank() || !isValidCedula(it.cedula)) {
+                    error = true
+                    if (it.cedula.isBlank()) "La cedula no puede estar vacia" else
+                        "La cedula no es valida"
+                } else "",
+                errorNombre = if (it.nombre.isBlank()) {
+                    error = true
+                    "El nombre no puede estar vacio"
+                } else "",
+                errorApellidos = if (it.apellidos.isBlank()) {
+                    error = true
+                    "El apellido no puede estar vacios"
+                } else "",
+                errorDireccion = if (it.direccion.isBlank()) {
+                    error = true
+                    "La direccion no puede estar vacia"
+                } else ""
+
             )
         }
         return !error
     }
 
+    private fun isValidPhone(phone: String): Boolean {
+        if (phone.length != 10 || !phone.all { it.isDigit() }) return false
+        val dominicanPrefixes = listOf("809", "829", "849")
+        val usPrefixes = (2..9).map { it.toString() }
+        val prefix = phone.substring(0, 3)
+
+        return prefix in dominicanPrefixes || prefix[0].toString() in usPrefixes
+    }
+
+    private fun isValidCedula(cedula: String): Boolean {
+        return !(cedula.length != 11 || !cedula.all { it.isDigit() })
+    }
 
     private fun isValidEmail(email: String): Boolean {
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})$".toRegex()
@@ -124,13 +331,14 @@ class AuthViewModel @Inject constructor(
     }
 
 
-    private fun onEmailChanged(email : String) {
+    private fun onEmailChanged(email: String) {
         _uistate.value = _uistate.value.copy(
             email = email,
             error = null
         )
     }
-    private fun onPasswordChanged(password : String) {
+
+    private fun onPasswordChanged(password: String) {
         _uistate.value = _uistate.value.copy(
             password = password
         )
@@ -138,8 +346,8 @@ class AuthViewModel @Inject constructor(
 
     private fun saveCliente(cliente: ClienteDto) {
         viewModelScope.launch {
-            clienteRepository.addCliente(cliente).collect{ result ->
-                when(result){
+            clienteRepository.addCliente(cliente).collect { result ->
+                when (result) {
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
@@ -148,6 +356,7 @@ class AuthViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -155,6 +364,7 @@ class AuthViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
@@ -168,14 +378,124 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    fun getClienteByEmail(email: String) {
+        viewModelScope.launch {
+            clienteRepository.getClienteByEmail(email).collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = "No se pudo obtener el cliente",
+                                isLoading = false
+                            )
+                        }
+                    }
 
-    fun onEvent(event: AuthEvent){
-        when(event){
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                clientebyEmail = result.data
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun onChangeCedula(cedula: String) {
+        _uistate.update {
+            it.copy(
+                cedula = cedula,
+                errorCedula = ""
+            )
+        }
+    }
+
+    private fun onChangeNombre(nombre: String) {
+        _uistate.update {
+            it.copy(
+                nombre = nombre,
+                errorNombre = ""
+            )
+        }
+    }
+
+    private fun onChangeApellidos(apellidos: String) {
+        _uistate.update {
+            it.copy(
+                apellidos = apellidos,
+                errorApellidos = ""
+            )
+        }
+    }
+
+    private fun onChangeDireccion(direccion: String) {
+        _uistate.update {
+            it.copy(
+                direccion = direccion, errorDireccion = ""
+            )
+        }
+    }
+
+    private fun onChangeCelular(celular: String) {
+        _uistate.update {
+            it.copy(
+                celular = celular,
+                errorCelular = ""
+            )
+        }
+    }
+
+    private fun nuevo() {
+        _uistate.update {
+            it.copy(
+                clienteId = null,
+                cedula = "",
+                nombre = "",
+                apellidos = "",
+                direccion = "",
+                celular = "",
+                success = "",
+                error = "",
+                isLoading = false,
+                email = "",
+                password = "", errorEmail = null,
+                errorPassword = null,
+                errorCelular = "",
+                errorCedula = "",
+                errorNombre = "",
+                errorApellidos = "",
+                errorDireccion = ""
+
+
+            )
+        }
+    }
+
+    fun onEvent(event: AuthEvent) {
+        when (event) {
             AuthEvent.Login -> login()
             AuthEvent.Signup -> signup()
             AuthEvent.Signout -> signout()
             is AuthEvent.OnChangeEmail -> onEmailChanged(event.email)
             is AuthEvent.OnChangePassword -> onPasswordChanged(event.password)
+
+            AuthEvent.SignInWithGoogle -> signInWithGoogle()
+            is AuthEvent.OnchangeApellidos -> onChangeApellidos(event.apellidos)
+            is AuthEvent.OnchangeCedula -> onChangeCedula(event.cedula)
+            is AuthEvent.OnchangeCelular -> onChangeCelular(event.celular)
+            is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
+            is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
         }
     }
 
@@ -183,10 +503,10 @@ class AuthViewModel @Inject constructor(
 }
 
 
-sealed class AuthState{
+sealed class AuthState {
     object Authenticated : AuthState()
     object Unauthenticated : AuthState()
     object Loading : AuthState()
-    data class Error(val message : String) : AuthState()
+    data class Error(val message: String) : AuthState()
 }
 

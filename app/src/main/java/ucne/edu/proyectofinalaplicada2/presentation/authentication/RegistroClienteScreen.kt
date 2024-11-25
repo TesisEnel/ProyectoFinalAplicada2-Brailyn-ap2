@@ -30,39 +30,34 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.components.CedulaVisualTransformation
 import ucne.edu.proyectofinalaplicada2.components.PhoneNumberVisualTransformation
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteEvent
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.cliente.ClienteUistate
+
+
 
 @Composable
 fun RegistroClienteScreen(
     goToBack: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
-    viewModelCliente: ClienteViewModel = hiltViewModel()
+
 ) {
-    val uiStateCliente by viewModelCliente.uistate.collectAsStateWithLifecycle()
+
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
 
     RegistroClienteBodyScreen(
         uiState = uiState,
         goToBack = goToBack,
         onEvent = { event -> viewModel.onEvent(event) },
-        uiStateCliente = uiStateCliente,
-        onEventCliente = { event -> viewModelCliente.onEvent(event) }
 
 
     )
 }
+
 @Composable
 fun RegistroClienteBodyScreen(
-    uiState: UiState,
+    uiState: ClienteUiState,
     goToBack: () -> Unit,
     onEvent: (AuthEvent) -> Unit,
-    onEventCliente: (ClienteEvent) -> Unit,
-    uiStateCliente: ClienteUistate
 ) {
     val scope = rememberCoroutineScope()
     Box(
@@ -83,79 +78,79 @@ fun RegistroClienteBodyScreen(
 
             // Campos de entrada
             OutlinedTextField(
-                value = uiStateCliente.nombre ?: "",
-                onValueChange = { onEventCliente(ClienteEvent.OnchangeNombre(it)) },
+                value = uiState.nombre ?: "",
+                onValueChange = { onEvent(AuthEvent.OnchangeNombre(it)) },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiStateCliente.errorNombre?.let {
+            uiState.errorNombre?.let {
                 Text(
                     text = it,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = uiStateCliente.apellidos ?: "",
-                onValueChange = { onEventCliente(ClienteEvent.OnchangeApellidos(it)) },
+                value = uiState.apellidos ?: "",
+                onValueChange = { onEvent(AuthEvent.OnchangeApellidos(it)) },
                 label = { Text("Apellidos") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiStateCliente.errorApellidos?.let {
+            uiState.errorApellidos?.let {
                 Text(
                     text = it,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
             PhoneInputField(
-                phone = uiStateCliente.celular,
-                onPhoneChange = { onEventCliente(ClienteEvent.OnchangeCelular(it)) }
+                phone = uiState.celular,
+                onPhoneChange = { onEvent(AuthEvent.OnchangeCelular(it)) }
             )
-            uiStateCliente.errorCelular?.let {
+            uiState.errorCelular?.let {
                 Text(
                     text = it,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = uiStateCliente.direccion ?: "",
-                onValueChange = { onEventCliente(ClienteEvent.OnchangeDireccion(it)) },
+                value = uiState.direccion ?: "",
+                onValueChange = { onEvent(AuthEvent.OnchangeDireccion(it)) },
                 label = { Text("Dirección") },
                 modifier = Modifier.fillMaxWidth()
-                        )
-            uiStateCliente.errorDireccion?.let {
+            )
+            uiState.errorDireccion?.let {
                 Text(
                     text = it,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
 
             CedulaInputField(
-                cedula = uiStateCliente.cedula,
-                onCedulaChange = { onEventCliente(ClienteEvent.OnchangeCedula(it)) }
+                cedula = uiState.cedula,
+                onCedulaChange = { onEvent(AuthEvent.OnchangeCedula(it)) }
             )
-            uiStateCliente.errorCedula?.let {
+            uiState.errorCedula?.let {
                 Text(
                     text = it,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodyMedium,
 
-                )
+                    )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -189,7 +184,7 @@ fun RegistroClienteBodyScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorPassword?.let{
+            uiState.errorPassword?.let {
                 Text(
                     text = it,
                     color = Color.Red,
@@ -197,7 +192,7 @@ fun RegistroClienteBodyScreen(
                 )
             }
 
-            uiStateCliente.error?.let {
+            uiState.error?.let {
                 Text(
                     text = it,
                     color = Color.Red,
@@ -212,12 +207,8 @@ fun RegistroClienteBodyScreen(
             // Botón para registrar
             OutlinedButton(
                 onClick = {
-                    scope.launch {
-                        onEventCliente(ClienteEvent.OnChangeEmail(uiState.email))
-                        onEventCliente(ClienteEvent.Save)
-                    }
-                    onEvent(AuthEvent.Signup) // Intentar registro en Firebase
-                    },
+                    onEvent(AuthEvent.Signup)
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Registrar")

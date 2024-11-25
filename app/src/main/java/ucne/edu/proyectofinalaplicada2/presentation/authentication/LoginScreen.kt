@@ -167,7 +167,7 @@ fun LoginScreen(
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                           googleAuthClient.signIn()
+                           onEvent(AuthEvent.SignInWithGoogle)
                         }
                     },
                     modifier = Modifier
