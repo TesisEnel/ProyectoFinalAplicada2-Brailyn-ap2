@@ -4,12 +4,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 
 
-class MainViewModel(): ViewModel() {
+class MainViewModel: ViewModel() {
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
     fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
+        visiblePermissionDialogQueue.removeAt(0)
     }
     fun onPermissionResult(
         permission: String,
