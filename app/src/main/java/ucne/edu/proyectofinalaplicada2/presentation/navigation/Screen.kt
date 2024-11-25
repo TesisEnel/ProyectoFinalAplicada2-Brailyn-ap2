@@ -7,6 +7,19 @@ import kotlin.reflect.full.primaryConstructor
 
 @Serializable
 sealed class Screen {
+    @Serializable
+    data object Home : Screen()
+    @Serializable
+    data object VehiculoRegistroScreen: Screen()
+    @Serializable
+    data object AuthScreen: Screen()
+    @Serializable
+    data class RentaScreen(val id: Int): Screen()
+    @Serializable
+    data class TipoVehiculoListScreen(val id: Int): Screen()
+    @Serializable
+    data object RegistroClienteScreen: Screen()
+
     companion object {
         fun fromRoute(route: String, args: Bundle?): Screen? {
             val subclass = Screen::class.sealedSubclasses.firstOrNull {
@@ -25,17 +38,5 @@ sealed class Screen {
             } ?: kClass.objectInstance
         }
     }
-    @Serializable
-    data object Home : Screen()
-    @Serializable
-    data object VehiculoRegistroScreen: Screen()
-    @Serializable
-    data object AuthScreen: Screen()
-    @Serializable
-    data class RentaScreen(val id: Int): Screen()
-    @Serializable
-    data class TipoVehiculoListScreen(val id: Int): Screen()
-    @Serializable
-    data object RegistroClienteScreen: Screen()
 
 }
