@@ -41,6 +41,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
+import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
 fun Home(
@@ -76,7 +77,6 @@ fun Home(
             }
             item {
                 TiposDeVehiculos(
-                    uiVehiculoState = vehiculoUistate,
                     marcaUiState = marcaUistate,
                     onGoVehiculeList = onGoVehiculeList,
                     onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
@@ -116,7 +116,7 @@ fun VehiculosMasDestacados(
     vehiculoUistate: VehiculoUistate,
     marcaUiState: MarcaUiState
 ) {
-    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
+
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 20.dp)
     ) {
@@ -137,7 +137,7 @@ fun VehiculosMasDestacados(
                     val marca =
                         marcaUiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
                     ImageCard(
-                        painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull()),
+                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculo.imagePath.firstOrNull()),
                         contentDescription = vehiculo.descripcion ?: "",
                         title = marca?.nombreMarca?:"",
                         height = 180,
@@ -151,41 +151,30 @@ fun VehiculosMasDestacados(
 
 @Composable
 fun TiposDeVehiculos(
-    uiVehiculoState: VehiculoUistate,
     marcaUiState: MarcaUiState,
     onGoVehiculeList:(Int)-> Unit,
     onMarcaEvent: (MarcaEvent) -> Unit
-
 ) {
-    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-    val shownMarcas = mutableSetOf<Int>()
+    Column {
+        Text(
+            text = "Tipos de marcas",
+            fontFamily = FontFamily.Serif,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.W700,
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+        )
 
-    // Título de la Sección
-    Text(
-        text = "Tipos de marcas",
-        fontFamily = FontFamily.Serif,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.W700,
-        modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
-    )
-
-    // Contenido de la Sección
-    uiVehiculoState.vehiculos.forEach { vehiculo ->
-        val marca =
-            marcaUiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
-
-        if (marca != null && marca.marcaId !in shownMarcas) {
-            shownMarcas.add(marca.marcaId)
+        marcaUiState.marcaVehiculos.forEach { marcaConVehiculos ->
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val painter = rememberAsyncImagePainter(url + vehiculo.imagePath.firstOrNull())
+                val painter = rememberAsyncImagePainter(marcaConVehiculos.imageUrl)
                 TipoVehiculoList(
                     painter = painter,
-                    marca = marca.nombreMarca,
-                    onGoVehiculeList = onGoVehiculeList,
-                    vehiculoDto = vehiculo,
+                    marca = marcaConVehiculos.nombreMarca?:"",
+                    onGoVehiculeList = { onGoVehiculeList(marcaConVehiculos.marcaId?:0) },
+                    vehiculoDto = marcaConVehiculos.vehiculos.first(),
                     onMarcaEvent = onMarcaEvent
                 )
             }
