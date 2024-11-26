@@ -87,28 +87,13 @@ fun LoginScreen(
                     },
                     label = { Text("Email") }
                 )
-                OutlinedTextField(
-                    value = uiState.password,
-                    onValueChange = { onEvent(AuthEvent.OnChangePassword(it)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    label = { Text("Password") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Lock,
-                            contentDescription = "Password Icon"
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                            Icon(
-                                imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (passwordVisibility) "Hide password" else "Show password"
-                            )
-                        }
-                    },
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+
+
+                PasswordTextField(
+                    password = uiState.password,
+                    onPasswordChange = { onEvent(AuthEvent.OnChangePassword(it)) },
+                    passwordVisibility = passwordVisibility,
+                    onTogglePasswordVisibility = { passwordVisibility = !passwordVisibility }
                 )
                 OutlinedButton(
                     onClick = { onEvent(AuthEvent.Login) },
@@ -116,17 +101,16 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
 
-                ) {
+                    ) {
                     Text("Login")
                 }
-                uiState.error?.let { error ->
-                    Text(
-                        text = error,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
+                Text(
+                    text = uiState.error ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -154,7 +138,7 @@ fun LoginScreen(
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                           onEvent(AuthEvent.SignInWithGoogle)
+                            onEvent(AuthEvent.SignInWithGoogle)
                         }
                     },
                     modifier = Modifier
@@ -171,7 +155,7 @@ fun LoginScreen(
                     Text("Sign in with Google")
                 }
 
-                Column (
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
@@ -200,5 +184,47 @@ fun LoginScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PasswordTextField(
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordVisibility: Boolean,
+    onTogglePasswordVisibility: () -> Unit
+) {
+    OutlinedTextField(
+        value = password,
+        onValueChange = onPasswordChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        label = { Text("Password") },
+        leadingIcon = { PasswordLeadingIcon() },
+        trailingIcon = { PasswordTrailingIcon(passwordVisibility, onTogglePasswordVisibility) },
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+    )
+}
+
+
+@Composable
+fun PasswordLeadingIcon() {
+    Icon(
+        imageVector = Icons.Filled.Lock,
+        contentDescription = "Password Icon"
+    )
+}
+
+@Composable
+fun PasswordTrailingIcon(
+    passwordVisibility: Boolean,
+    onTogglePasswordVisibility: () -> Unit
+) {
+    IconButton(onClick = onTogglePasswordVisibility) {
+        Icon(
+            imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+            contentDescription = if (passwordVisibility) "Hide password" else "Show password"
+        )
     }
 }

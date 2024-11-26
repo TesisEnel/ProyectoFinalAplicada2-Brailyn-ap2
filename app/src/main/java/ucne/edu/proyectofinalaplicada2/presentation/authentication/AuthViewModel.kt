@@ -206,8 +206,6 @@ class AuthViewModel @Inject constructor(
 
     private fun validar(): Boolean {
         var error = false
-
-
         _uistate.update {
             it.copy(
                 errorEmail = if (it.email.isBlank() || !isValidEmail(it.email)) {
