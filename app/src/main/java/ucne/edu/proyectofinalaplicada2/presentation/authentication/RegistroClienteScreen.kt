@@ -41,15 +41,11 @@ fun RegistroClienteScreen(
     viewModel: AuthViewModel = hiltViewModel(),
 
 ) {
-
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
-
     RegistroClienteBodyScreen(
         uiState = uiState,
         goToBack = goToBack,
         onEvent = { event -> viewModel.onEvent(event) },
-
-
     )
 }
 
@@ -59,7 +55,6 @@ fun RegistroClienteBodyScreen(
     goToBack: () -> Unit,
     onEvent: (AuthEvent) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +63,6 @@ fun RegistroClienteBodyScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Título
             Text(
                 text = "Registro de Usuario",
                 style = MaterialTheme.typography.titleLarge,
@@ -76,7 +70,6 @@ fun RegistroClienteBodyScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campos de entrada
             OutlinedTextField(
                 value = uiState.nombre ?: "",
                 onValueChange = { onEvent(AuthEvent.OnchangeNombre(it)) },
@@ -202,9 +195,6 @@ fun RegistroClienteBodyScreen(
 
 
             Spacer(modifier = Modifier.height(16.dp))
-
-
-            // Botón para registrar
             OutlinedButton(
                 onClick = {
                     onEvent(AuthEvent.Signup)
@@ -216,8 +206,6 @@ fun RegistroClienteBodyScreen(
             }
         }
 
-
-        // Botón flotante para regresar
         FloatingActionButton(
             onClick = goToBack,
             modifier = Modifier
@@ -264,8 +252,8 @@ fun CedulaInputField(
     OutlinedTextField(
         value = cedula,
         onValueChange = {
-            val onlyDigits = it.filter { char -> char.isDigit() } // Permitir solo dígitos
-            if (onlyDigits.length <= 11) { // Limitar a 11 dígitos
+            val onlyDigits = it.filter { char -> char.isDigit() }
+            if (onlyDigits.length <= 11) {
                 onCedulaChange(onlyDigits)
             }
         },
