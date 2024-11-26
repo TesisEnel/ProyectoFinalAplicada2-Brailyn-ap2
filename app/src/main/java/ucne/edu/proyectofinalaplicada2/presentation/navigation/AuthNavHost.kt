@@ -28,14 +28,9 @@ fun AuthNavHost(navHostController: NavHostController) {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Spacer(modifier = Modifier.weight(0.5f))
-
                 LoginScreen(
-                    applicationContext = navHostController.context,
-
                     onNavigationLogin = { navHostController.navigate(Screen.RegistroClienteScreen) },
-
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
             }
 

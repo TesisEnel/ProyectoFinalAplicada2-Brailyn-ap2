@@ -1,8 +1,15 @@
-package ucne.edu.proyectofinalaplicada2.presentation.cliente
+package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 
-data class ClienteUistate(
+
+
+data class ClienteUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val success: String? = null,
+    val email: String = "",
+    val password: String = "",
     val clienteId: Int? = null,
     val cedula: String = "",
     val nombre: String = "",
@@ -10,20 +17,18 @@ data class ClienteUistate(
     val direccion: String = "",
     val celular: String = "",
     val clientes: List<ClienteDto> = emptyList(),
-    val email: String = "",
-    val isLoading: Boolean = false,
-    val error: String = "",
-    val success: String = "",
     val errorNombre: String = "",
     val errorCedula: String = "",
     val errorApellidos: String = "",
     val errorDireccion: String = "",
     val errorCelular: String = "",
-    val errorEmail: String = "",
+    val errorEmail: String? = null,
+    val errorPassword: String? = null,
+    val clientebyEmail: ClienteDto? = null,
+    val existCliente: Boolean = false
+    )
 
-)
-
-fun ClienteUistate.toEntity() = ClienteDto(
+fun ClienteUiState.toEntity() = ClienteDto(
     clienteId = clienteId,
     cedula = cedula,
     nombre = nombre,

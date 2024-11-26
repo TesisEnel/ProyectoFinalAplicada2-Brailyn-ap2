@@ -181,7 +181,7 @@ fun MainBodyNavHost(
                             .verticalScroll(rememberScrollState())
                             .padding(12.dp)
                     ) {
-                        VehiculoRegistroScreen(onBackHome = {})
+                        VehiculoRegistroScreen()
                     }
                 }
 

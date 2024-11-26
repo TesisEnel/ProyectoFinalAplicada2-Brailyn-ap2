@@ -2,7 +2,6 @@
 
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,12 +48,10 @@ import ucne.edu.proyectofinalaplicada2.R
 
 @Composable
 fun LoginScreen(
-    applicationContext: Context,
     viewModel: AuthViewModel = hiltViewModel(),
     onNavigationLogin: () -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsState()
-    val googleAuthClient = GoogleAuthClient(applicationContext.applicationContext)
     val scope = rememberCoroutineScope()
     val onEvent: (AuthEvent) -> Unit = { event: AuthEvent ->
         viewModel.onEvent(event)
@@ -91,53 +88,29 @@ fun LoginScreen(
                     label = { Text("Email") }
                 )
 
-                // Password TextField
-                OutlinedTextField(
-                    value = uiState.password,
-                    onValueChange = { onEvent(AuthEvent.OnChangePassword(it)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    label = { Text("Password") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.Lock,
-                            contentDescription = "Password Icon"
-                        )
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                            Icon(
-                                imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = if (passwordVisibility) "Hide password" else "Show password"
-                            )
-                        }
-                    },
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
-                )
 
-                // Login Button (Email/Password)
+                PasswordTextField(
+                    password = uiState.password,
+                    onPasswordChange = { onEvent(AuthEvent.OnChangePassword(it)) },
+                    passwordVisibility = passwordVisibility,
+                    onTogglePasswordVisibility = { passwordVisibility = !passwordVisibility }
+                )
                 OutlinedButton(
                     onClick = { onEvent(AuthEvent.Login) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
 
-                ) {
+                    ) {
                     Text("Login")
                 }
+                Text(
+                    text = uiState.error ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
-                // Error Message
-                uiState.error?.let { error ->
-                    Text(
-                        text = error,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                }
-
-                // Divider with "OR"
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -162,12 +135,10 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
-
-                // Google Sign-In Button
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                           googleAuthClient.signIn()
+                            onEvent(AuthEvent.SignInWithGoogle)
                         }
                     },
                     modifier = Modifier
@@ -184,7 +155,7 @@ fun LoginScreen(
                     Text("Sign in with Google")
                 }
 
-                Column (
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
@@ -213,5 +184,47 @@ fun LoginScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PasswordTextField(
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordVisibility: Boolean,
+    onTogglePasswordVisibility: () -> Unit
+) {
+    OutlinedTextField(
+        value = password,
+        onValueChange = onPasswordChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        label = { Text("Password") },
+        leadingIcon = { PasswordLeadingIcon() },
+        trailingIcon = { PasswordTrailingIcon(passwordVisibility, onTogglePasswordVisibility) },
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+    )
+}
+
+
+@Composable
+fun PasswordLeadingIcon() {
+    Icon(
+        imageVector = Icons.Filled.Lock,
+        contentDescription = "Password Icon"
+    )
+}
+
+@Composable
+fun PasswordTrailingIcon(
+    passwordVisibility: Boolean,
+    onTogglePasswordVisibility: () -> Unit
+) {
+    IconButton(onClick = onTogglePasswordVisibility) {
+        Icon(
+            imageVector = if (passwordVisibility) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+            contentDescription = if (passwordVisibility) "Hide password" else "Show password"
+        )
     }
 }
