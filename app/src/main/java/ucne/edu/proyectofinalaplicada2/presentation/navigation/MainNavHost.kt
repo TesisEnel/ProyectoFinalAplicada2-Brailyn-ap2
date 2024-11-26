@@ -104,7 +104,7 @@ fun MainNavHost(navHostController: NavHostController) {
                             .verticalScroll(rememberScrollState())
                             .padding(12.dp)
                     ) {
-                        VehiculoRegistroScreen(onBackHome = {})
+                        VehiculoRegistroScreen()
                     }
                 }
 

@@ -55,7 +55,6 @@ fun VehiculoRegistroScreen(
     proveedorViewModel: ProveedorViewModel = hiltViewModel(),
     tipoVehiculoViewModel: TipoVehiculoViewModel = hiltViewModel(),
     tipoCombustibleViewModel: TipoCombustibleViewModel = hiltViewModel(),
-    onBackHome: () -> Unit
 ) {
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
     val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
@@ -69,7 +68,6 @@ fun VehiculoRegistroScreen(
         tipoVehiculoUiState = tipoVehiculoUiState,
         proveedorUiState = proveedorUiState,
         tipoCombustibleUiState = tipoCombustibleUiState,
-        onBackHome = onBackHome,
         onVehiculoEnvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) },
     )
 
@@ -85,7 +83,6 @@ fun VehiculoBodyRegistroScreen(
     proveedorUiState: ProveedorUistate,
     tipoVehiculoUiState: TipoVehiculoUistate,
     tipoCombustibleUiState: TipoCombustibleUistate,
-    onBackHome: () -> Unit,
     onVehiculoEnvent: (VehiculoEvent) -> Unit,
 
     ) {
