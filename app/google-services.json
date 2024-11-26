@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "138527275305",
+    "project_id": "authrentcar",
+    "storage_bucket": "authrentcar.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138527275305:android:0d3238578bb00f8a5fdf38",
+        "android_client_info": {
+          "package_name": "ucne.edu.proyectofinalaplicada2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "138527275305-loui72284ssbsk4aufu2l17r242aich8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ucne.edu.proyectofinalaplicada2",
+            "certificate_hash": "71a8e2366a4023caefbd1842ebc6fbe591860561"
+          }
+        },
+        {
+          "client_id": "138527275305-rumem49q75gpv51avv8ta4hvd7l3ep6s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ucne.edu.proyectofinalaplicada2",
+            "certificate_hash": "642044d8164d460b54c4817be6e9614634526b56"
+          }
+        },
+        {
+          "client_id": "138527275305-glcjm6vrapkqeqc83fpd1qdvdmjv6lb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCETz5Q887OLCB2D9tsDe9jgRNnD9XtSs4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "138527275305-glcjm6vrapkqeqc83fpd1qdvdmjv6lb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

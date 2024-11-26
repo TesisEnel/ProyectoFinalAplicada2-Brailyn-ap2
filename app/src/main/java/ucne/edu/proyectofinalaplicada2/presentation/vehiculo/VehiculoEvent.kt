@@ -1,11 +1,17 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import java.io.File
+
 sealed interface VehiculoEvent {
     data object Save : VehiculoEvent
-    data class OnchangeMarca(val marca: String) : VehiculoEvent
-    data class OnchangeModelo(val modelo: String) : VehiculoEvent
-    data class OnchangePrecio(val precio: Int) : VehiculoEvent
-    data class OnchangeDescripcion(val descripcion: String) : VehiculoEvent
-    data class OnchangeTipoCombustibleId(val tipoCombustibleId: Int) : VehiculoEvent
-    data class OnchangeTipoVehiculoId(val tipoVehiculoId: Int) : VehiculoEvent
+    data object GetVehiculos : VehiculoEvent
+    data class OnChangePrecio(val precio: Int) : VehiculoEvent
+    data class OnChangeDescripcion(val descripcion: String) : VehiculoEvent
+    data class OnChangeTipoCombustibleId(val tipoCombustibleId: Int) : VehiculoEvent
+    data class OnChangeTipoVehiculoId(val tipoVehiculoId: Int) : VehiculoEvent
+    data class OnChangeProveedorId(val proveedorId: Int): VehiculoEvent
+    data class OnChangeModeloId(val modeloId: Int): VehiculoEvent
+    data class OnChangeMarcaId(val marcaId: Int): VehiculoEvent
+    data class OnChangeAnio(val anio: Int): VehiculoEvent
+    data class OnChangeImagePath(val imagePath: List<File>): VehiculoEvent
 }
