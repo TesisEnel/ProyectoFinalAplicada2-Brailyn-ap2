@@ -1,17 +1,10 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-
-
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -19,21 +12,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.tasks.await
-import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
-import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 
 class GoogleAuthClient @Inject constructor(
     @ApplicationContext private val context: Context,
 
     )  {
-    private val tag = "GoogleAuthClient: "
     private val credentialManager = CredentialManager.create(context)
     private val firebaseAuth = FirebaseAuth.getInstance()
 
