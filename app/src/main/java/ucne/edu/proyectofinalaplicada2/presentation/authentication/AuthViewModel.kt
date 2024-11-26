@@ -1,10 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +8,6 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
@@ -37,11 +31,10 @@ class AuthViewModel @Inject constructor(
 
     init {
         checkAuthStatus()
-        getClienteByEmail(uistate.value.email)
         getClientes()
     }
 
-    fun signInWithGoogle() {
+    private fun signInWithGoogle() {
         viewModelScope.launch {
             _uistate.update { it.copy(isLoading = true) }
 
@@ -64,7 +57,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun getClientes() {
+    private fun getClientes() {
         viewModelScope.launch {
             clienteRepository.getClientes().collect { result ->
                 when (result) {
@@ -77,45 +70,21 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _uistate.update { it.copy(clientes = it.clientes) }
+                        _uistate.update { it.copy(clientes = result.data?: emptyList(), isLoading = false) }
                     }
                 }
             }
         }
     }
 
-     fun handleUserSignIn(user: FirebaseUser) {
-
-
+     private fun handleUserSignIn(user: FirebaseUser) {
         viewModelScope.launch {
-            clienteRepository.clienteNotExist(user.email?: "", _uistate.value.clientes).collect{ result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update { it.copy(existCliente = true, isLoading = false) }
-
-                    }
-                    is Resource.Loading -> {
-                        _uistate.update { it.copy(isLoading = true) }
-
-                    }
-                    is Resource.Success -> {
-                        _uistate.update { it.copy(existCliente = result.data?: false, isLoading = false) }
-
-                    }
-                }
-
-            }
-
-            // Esperar hasta que `existCliente` tenga un valor actualizado
-            val clienteExiste = _uistate.value.existCliente
+            val clienteExiste = clienteExist( user.email?:"")
             if (clienteExiste) {
                 _uistate.update { it.copy(success = "Bienvenido de nuevo.") }
                 return@launch
             }
 
-            // Verificar si el cliente ya existe en la API
-
-            // Crear nuevo cliente si no existe
             val clienteDto = ClienteDto(
                 clienteId = null,
                 cedula = "",
@@ -125,7 +94,6 @@ class AuthViewModel @Inject constructor(
                 celular = "",
                 email = user.email ?: ""
             )
-
             clienteRepository.addCliente(clienteDto).collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
@@ -153,6 +121,14 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+    private fun clienteExist(email: String): Boolean {
+        return try {
+            clienteRepository.clienteNotExist(email, _uistate.value.clientes)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
 
     private fun checkAuthStatus() {
         if (auth.currentUser == null) {
@@ -162,32 +138,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun doesClienteExist(email: String) {
-
-
-
-        viewModelScope.launch {
-            clienteRepository.clienteNotExist(email, _uistate.value.clientes).collect{ result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update { it.copy(existCliente = true, isLoading = false) }
-
-                    }
-                    is Resource.Loading -> {
-                        _uistate.update { it.copy(isLoading = true) }
-
-                    }
-                    is Resource.Success -> {
-                        _uistate.update { it.copy(existCliente = result.data?: false, isLoading = false) }
-
-                    }
-                }
-
-            }
-
-        }
-
-    }
 
     private fun login() {
         viewModelScope.launch {
@@ -248,17 +198,6 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
-
-//    private fun signInWithGoogle() {
-//        viewModelScope.launch {
-//            _uistate.update { it.copy(isLoading = true) }
-//            val success = googleAuthClient.signIn(clienteRepository)
-//            if (success) {
-//                println("Usuario registrado correctamente con Google.")
-//            }
-//            _uistate.update { it.copy(isLoading = false, success = success.toString()) }
-//        }
-//    }
 
     private fun signout() {
         auth.signOut()
@@ -373,40 +312,6 @@ class AuthViewModel @Inject constructor(
                             )
                         }
                     }
-                }
-            }
-        }
-    }
-
-    fun getClienteByEmail(email: String) {
-        viewModelScope.launch {
-            clienteRepository.getClienteByEmail(email).collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = "No se pudo obtener el cliente",
-                                isLoading = false
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                clientebyEmail = result.data
-                            )
-                        }
-                    }
-
                 }
             }
         }
