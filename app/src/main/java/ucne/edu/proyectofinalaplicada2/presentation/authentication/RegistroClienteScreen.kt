@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +20,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,13 +33,12 @@ import ucne.edu.proyectofinalaplicada2.components.CedulaVisualTransformation
 import ucne.edu.proyectofinalaplicada2.components.PhoneNumberVisualTransformation
 
 
-
 @Composable
 fun RegistroClienteScreen(
     goToBack: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
 
-) {
+    ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
     RegistroClienteBodyScreen(
         uiState = uiState,
@@ -71,65 +69,61 @@ fun RegistroClienteBodyScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = uiState.nombre ?: "",
+                value = uiState.nombre,
                 onValueChange = { onEvent(AuthEvent.OnchangeNombre(it)) },
                 label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorNombre?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
+            Text(
+                text = uiState.errorNombre,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
 
-                    )
-            }
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = uiState.apellidos ?: "",
+                value = uiState.apellidos,
                 onValueChange = { onEvent(AuthEvent.OnchangeApellidos(it)) },
                 label = { Text("Apellidos") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorApellidos?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
 
-                    )
-            }
+            Text(
+                text = uiState.errorApellidos,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+
+                )
+
 
             Spacer(modifier = Modifier.height(8.dp))
             PhoneInputField(
                 phone = uiState.celular,
                 onPhoneChange = { onEvent(AuthEvent.OnchangeCelular(it)) }
             )
-            uiState.errorCelular?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
 
-                    )
-            }
+            Text(
+                text = uiState.errorCelular,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = uiState.direccion ?: "",
+                value = uiState.direccion,
                 onValueChange = { onEvent(AuthEvent.OnchangeDireccion(it)) },
                 label = { Text("Dirección") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorDireccion?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
 
-                    )
-            }
+            Text(
+                text = uiState.errorDireccion,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+
+                )
             Spacer(modifier = Modifier.height(8.dp))
 
 
@@ -137,14 +131,11 @@ fun RegistroClienteBodyScreen(
                 cedula = uiState.cedula,
                 onCedulaChange = { onEvent(AuthEvent.OnchangeCedula(it)) }
             )
-            uiState.errorCedula?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-
-                    )
-            }
+            Text(
+                text = uiState.errorCedula,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -153,20 +144,18 @@ fun RegistroClienteBodyScreen(
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorEmail?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            uiState.error?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
+
+            Text(
+                text = uiState.errorEmail ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+
+            Text(
+                text = uiState.error ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -177,22 +166,17 @@ fun RegistroClienteBodyScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
-            uiState.errorPassword?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
+            Text(
+                text = uiState.errorPassword ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
 
-            uiState.error?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
+            Text(
+                text = uiState.error ?: "",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedButton(
@@ -213,7 +197,7 @@ fun RegistroClienteBodyScreen(
                 .padding(all = 16.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Volver"
             )
         }
