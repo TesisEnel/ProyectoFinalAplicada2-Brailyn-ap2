@@ -82,8 +82,6 @@ fun MainBodyNavHost(
     uiState: MainUiState,
 
 ) {
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
-fun MainNavHost(navHostController: NavHostController) {
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
