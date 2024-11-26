@@ -42,7 +42,6 @@ import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavHost(navHostController: NavHostController) {
-    // Pantallas con Scaffold
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     Scaffold(

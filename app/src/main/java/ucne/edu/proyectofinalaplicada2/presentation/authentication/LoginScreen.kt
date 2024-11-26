@@ -2,7 +2,6 @@
 
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,12 +48,10 @@ import ucne.edu.proyectofinalaplicada2.R
 
 @Composable
 fun LoginScreen(
-    applicationContext: Context,
     viewModel: AuthViewModel = hiltViewModel(),
     onNavigationLogin: () -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsState()
-    val googleAuthClient = GoogleAuthClient(applicationContext.applicationContext)
     val scope = rememberCoroutineScope()
     val onEvent: (AuthEvent) -> Unit = { event: AuthEvent ->
         viewModel.onEvent(event)
@@ -90,8 +87,6 @@ fun LoginScreen(
                     },
                     label = { Text("Email") }
                 )
-
-                // Password TextField
                 OutlinedTextField(
                     value = uiState.password,
                     onValueChange = { onEvent(AuthEvent.OnChangePassword(it)) },
@@ -115,8 +110,6 @@ fun LoginScreen(
                     },
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
                 )
-
-                // Login Button (Email/Password)
                 OutlinedButton(
                     onClick = { onEvent(AuthEvent.Login) },
                     modifier = Modifier
@@ -126,8 +119,6 @@ fun LoginScreen(
                 ) {
                     Text("Login")
                 }
-
-                // Error Message
                 uiState.error?.let { error ->
                     Text(
                         text = error,
@@ -136,8 +127,6 @@ fun LoginScreen(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
-
-                // Divider with "OR"
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -162,8 +151,6 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
-
-                // Google Sign-In Button
                 OutlinedButton(
                     onClick = {
                         scope.launch {
