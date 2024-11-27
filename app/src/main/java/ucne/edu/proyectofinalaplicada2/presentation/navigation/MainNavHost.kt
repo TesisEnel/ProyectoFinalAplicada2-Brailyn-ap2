@@ -194,7 +194,6 @@ fun MainBodyNavHost(
                     ) {
                         val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
                         TipoVehiculeListScreen(
-                            onBack = {},
                             onGoVehiculePresentation = {vehiculoId ->
                                 navHostController.navigate(Screen.RentaScreen(vehiculoId))
                             },
