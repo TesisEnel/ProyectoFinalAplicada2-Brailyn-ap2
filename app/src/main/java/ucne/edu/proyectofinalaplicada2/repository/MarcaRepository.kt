@@ -53,4 +53,18 @@ class MarcaRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
+    fun getMarcaById(id: Int): Flow<Resource<MarcaDto>> = flow{
+        try {
+            emit(Resource.Loading())
+            val marca = rentCarRemoteDataSource.getMarcaById(id)
+            emit(Resource.Success(marca))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        }
+        catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
+
 }
