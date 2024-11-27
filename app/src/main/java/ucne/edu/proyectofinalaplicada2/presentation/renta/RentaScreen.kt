@@ -51,13 +51,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
-import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -65,23 +60,15 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 @Composable
 fun RentaScreen(
     rentaViewModel: RentaViewModel = hiltViewModel(),
-    vehicoViewModel: VehiculoViewModel = hiltViewModel(),
-    marcaViewModel: MarcaViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
-    onBack: () -> Unit,
+    vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     vehiculoId: Int,
 ) {
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
-    val vehiculoUiState by vehicoViewModel.uistate.collectAsStateWithLifecycle()
-    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
-    val clienteUiState by authViewModel.uistate.collectAsStateWithLifecycle()
+    val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
 
     RentaBodyScreen(
         rentaUiState = rentaUiState,
         vehiculoUiState = vehiculoUiState,
-        marcaUiState = marcaUiState,
-        clienteUiState = clienteUiState,
-        onBack = onBack,
         vehiculoId = vehiculoId,
         onEvent = { rentaEvent -> rentaViewModel.onEvent(rentaEvent) }
     )
@@ -92,9 +79,6 @@ fun RentaScreen(
 fun RentaBodyScreen(
     rentaUiState: RentaUistate,
     vehiculoUiState: VehiculoUistate,
-    marcaUiState: MarcaUiState,
-    clienteUiState: ClienteUiState,
-    onBack: () -> Unit,
     vehiculoId: Int,
     onEvent: (RentaEvent) -> Unit = {}
 ) {
@@ -107,18 +91,19 @@ fun RentaBodyScreen(
 
 
     LaunchedEffect(datePickerStateRenta.selectedDateMillis) {
-        datePickerStateRenta.selectedDateMillis?.let { selectedDateMillis ->
-            val selectedDate = Converter().convertToDate(selectedDateMillis)
+        handleDatePickerResult(
+            datePickerStateRenta.selectedDateMillis
+        ) { selectedDate ->
             onEvent(RentaEvent.OnchangeFechaRenta(selectedDate))
-            delay(300)
             showDatePickerRenta = false
         }
     }
+
     LaunchedEffect(datePickerStateEntrega.selectedDateMillis) {
-        datePickerStateEntrega.selectedDateMillis?.let { selectedDateMillis ->
-            val selectedDate = Converter().convertToDate(selectedDateMillis)
+        handleDatePickerResult(
+            datePickerStateEntrega.selectedDateMillis
+        ) { selectedDate ->
             onEvent(RentaEvent.OnchangeFechaEntrega(selectedDate))
-            delay(300)
             showDatePickerEntrega = false
         }
     }
@@ -315,13 +300,12 @@ fun RentaBodyScreen(
                 vehiculoName = rentaUiState.vehiculoNombre,
                 fechaRenta = rentaUiState.fechaRenta,
                 fechaEntrega = rentaUiState.fechaEntrega,
-                costoTotal = rentaUiState.total?.toDouble(),
+                costoTotal = rentaUiState.total,
                 onConfirm = {
                     onEvent(RentaEvent.ConfirmRenta)
                     showModal = false
                 },
                 onDismiss = { showModal = false },
-                createRenta = {}
             )
             Text(rentaUiState.error ?: "", color = MaterialTheme.colorScheme.error)
         }
@@ -360,7 +344,6 @@ fun ConfirmRentaDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     costoTotal: Double?,
-    createRenta: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -378,7 +361,6 @@ fun ConfirmRentaDialog(
         confirmButton = {
             Button(
                 onClick = { onConfirm()
-                    createRenta()
                 }) {
                 Text("Confirmar")
             }
@@ -389,4 +371,14 @@ fun ConfirmRentaDialog(
             }
         }
     )
+}
+
+fun handleDatePickerResult(
+    selectedDateMillis: Long?,
+    onDateSelected: (String) -> Unit
+) {
+    selectedDateMillis?.let { millis ->
+        val selectedDate = Converter().convertToDate(millis)
+        onDateSelected(selectedDate)
+    }
 }
