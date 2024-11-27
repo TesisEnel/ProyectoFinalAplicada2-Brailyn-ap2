@@ -11,7 +11,7 @@ data class RentaUistate(
     val vehiculoId: Int? = null,
     val fechaRenta: String = "",
     val fechaEntrega: String? = null,
-    val total: Int? = null,
+    val total: Double? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
     val success: String? = null,
@@ -19,5 +19,6 @@ data class RentaUistate(
     val vehiculoNombre: String? = null,
     val marca: MarcaDto? = null,
     val vehiculo: VehiculoDto? = null,
-    val cliente: ClienteDto? = null
+    val cliente: ClienteDto? = null,
+    val renta: RentaDto? = null
 )
