@@ -29,6 +29,18 @@ class VehiculoRepository @Inject constructor(
         }
     }
 
+    fun getVehiculoById(id: Int): Flow<Resource<VehiculoDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val vehiculo = rentCarRemoteDataSource.getVehiculoById(id)
+            emit(Resource.Success(vehiculo))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        }
+        catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
 
     fun addVehiculo(
         tipoCombustibleId: Int,
