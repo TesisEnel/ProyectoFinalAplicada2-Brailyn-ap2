@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 
 @Dao
@@ -20,6 +21,6 @@ interface MarcaDao {
     @Delete
     suspend fun delete(marca: MarcaEntity)
     @Query("SELECT * FROM Marcas")
-    suspend fun getAll(): List<MarcaEntity>
+     fun getAll(): Flow<List<MarcaEntity>>
 
 }
