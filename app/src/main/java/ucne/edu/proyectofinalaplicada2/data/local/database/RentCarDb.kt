@@ -2,6 +2,8 @@ package ucne.edu.proyectofinalaplicada2.data.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import ucne.edu.proyectofinalaplicada2.Converter
 import ucne.edu.proyectofinalaplicada2.data.local.dao.ClienteDao
 import ucne.edu.proyectofinalaplicada2.data.local.dao.MarcaDao
 import ucne.edu.proyectofinalaplicada2.data.local.dao.ModeloDao
@@ -30,10 +32,11 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
         TipoVehiculoEntity::class,
         VehiculoEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
+@TypeConverters(Converter::class)
 abstract class RentCarDb : RoomDatabase() {
     abstract fun clienteDao(): ClienteDao
     abstract fun marcaDao(): MarcaDao

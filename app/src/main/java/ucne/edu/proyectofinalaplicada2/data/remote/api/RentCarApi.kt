@@ -49,7 +49,7 @@ interface RentCarApi {
         @Part("tipoVehiculoId") tipoVehiculoId: RequestBody,
         @Part("proveedorId") proveedorId: RequestBody,
         @Part("precio") precio: RequestBody,
-        @Part("descripcion") descripcion: RequestBody,
+        @Part("descripcion") descripcion: RequestBody?,
         @Part("marcaId") marcaId: RequestBody,
         @Part("modeloId") modeloId: RequestBody,
         @Part images: List<MultipartBody.Part>,
