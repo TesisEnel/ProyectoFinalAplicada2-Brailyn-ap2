@@ -10,4 +10,6 @@ sealed interface RentaEvent {
     data class OnchangeFechaEntrega(val fechaEntrega: String) : RentaEvent
     data class OnchangeTotal(val total: Int) : RentaEvent
     data class CalculeTotal(val fechaRenta: String, val fechaEntrega: String, val costoDiario: Int) : RentaEvent
+    data class PrepareRentaData(val emailCliente: String?, val vehiculoId: Int) : RentaEvent
+    data object ConfirmRenta : RentaEvent
 }
