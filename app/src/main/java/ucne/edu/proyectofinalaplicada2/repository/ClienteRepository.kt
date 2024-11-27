@@ -25,7 +25,7 @@ class ClienteRepository @Inject constructor(
     fun getClienteByEmail(email: String): Flow<Resource<ClienteDto>> = flow {
         try {
             emit(Resource.Loading())
-            val cliente = rentCarRemoteDataSource.getClienteByEmail(email)
+            val cliente = rentCarRemoteDataSource.getClientes().first{ it.email == email}
             emit(Resource.Success(cliente))
         }
         catch (e: HttpException) {
