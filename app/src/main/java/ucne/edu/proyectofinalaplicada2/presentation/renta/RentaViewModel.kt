@@ -6,10 +6,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
@@ -99,147 +102,65 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
-    private fun getMarcaById(id: Int) {
+
+    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
         viewModelScope.launch {
-            marcaRepository.getMarcaById(id).collect { result ->
 
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marca = result.data
-                            )
-                        }
-                    }
+            val cliente = getClienteByEmail(emailCliente ?: "")
+            if (cliente != null) {
+                _uistate.update {
+                    it.copy(
+                        clienteId = cliente.clienteId
+                    )
                 }
             }
-        }
-    }
-    private fun getVehiculoById(id: Int) {
-        viewModelScope.launch {
-            vehiucloRepository.getVehiculoById(id).collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                vehiculo = result.data
-                            )
-                        }
-                    }
+            val vehiculo = getvehiculoById(vehiculoId)
+            if (vehiculo != null) {
+                _uistate.update {
+                    it.copy(
+                        vehiculo = vehiculo
+                    )
                 }
             }
-        }
-
-    }
-    private fun getClienteByEmail(email: String) {
-        viewModelScope.launch {
-            clienteRepository.getClienteByEmail(email).collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                cliente = result.data
-                            )
-                        }
-                    }
+            val marca = getMarcaById(uistate.value.vehiculo?.marcaId ?: 0)
+            if (marca != null) {
+                _uistate.update {
+                    it.copy(
+                        marca = marca
+                    )
                 }
             }
-        }
-    }
-
-    fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
-        viewModelScope.launch {
-            getClienteByEmail(emailCliente?:"")
-            getVehiculoById(vehiculoId)
-            getMarcaById(uistate.value.vehiculo?.vehiculoId?:0)
-
             _uistate.update {
                 it.copy(
                     vehiculoNombre = uistate.value.marca?.nombreMarca,
-                    clienteId = uistate.value.cliente?.clienteId,
                     vehiculoId = uistate.value.vehiculo?.vehiculoId,
                 )
             }
         }
     }
-    fun createRenta(): RentaDto? {
-        val uistate = _uistate.value
-        return if (uistate.fechaRenta.isNotEmpty() && uistate.fechaEntrega != null) {
-            RentaDto(
-                clienteId = uistate.clienteId,
-                vehiculoId = uistate.vehiculoId,
-                fechaRenta = uistate.fechaRenta,
-                fechaEntrega = uistate.fechaEntrega,
-                total = uistate.total
-            )
-        } else null
+
+    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+        return clienteRepository.getClienteByEmail(email).last().data
     }
 
-    private fun nuevo() {
-        _uistate.update {
-            it.copy(
-                rentaId = null,
-                clienteId = null,
-                vehiculoId = null,
-                fechaRenta = "",
-                fechaEntrega = null,
-                total = null,
-                success = "",
-                error = "",
-            )
-        }
+    private suspend fun getvehiculoById(id: Int): VehiculoDto? {
+        return vehiucloRepository.getVehiculoById(id).last().data
     }
 
+    private suspend fun getMarcaById(id: Int): MarcaDto? {
+        return marcaRepository.getMarcaById(id).last().data
+    }
+
+    private fun createRenta() {
+        val renta = RentaDto(
+            clienteId = uistate.value.clienteId,
+            vehiculoId = uistate.value.vehiculo?.vehiculoId,
+            fechaRenta = uistate.value.fechaRenta,
+            fechaEntrega = uistate.value.fechaEntrega,
+            total = uistate.value.total
+        )
+        save(renta)
+    }
     private fun onChangeClienteId(clienteId: Int) {
         _uistate.update {
             it.copy(
@@ -272,7 +193,7 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeTotal(total: Int) {
+    private fun onChangeTotal(total: Double) {
         _uistate.update {
             it.copy(
                 total = total
@@ -299,7 +220,7 @@ class RentaViewModel @Inject constructor(
                 val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
 
                 val total = diffInDays * costoDiario
-                onChangeTotal(total)
+                onChangeTotal(total.toDouble())
             } else {
                 _uistate.update {
                     it.copy(total = null)
@@ -312,20 +233,23 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
+
     fun onEvent(event: RentaEvent) {
         when (event) {
             is RentaEvent.OnchangeClienteId -> onChangeClienteId(event.clienteId)
-            is RentaEvent.OnchangeFechaEntrega ->  onChangeFechaEntrega(event.fechaEntrega)
+            is RentaEvent.OnchangeFechaEntrega -> onChangeFechaEntrega(event.fechaEntrega)
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
             is RentaEvent.Save -> save(event.renta)
-            is RentaEvent.CalculeTotal -> calculateTotal(event.fechaRenta, event.fechaEntrega,event.costoDiario)
+            is RentaEvent.CalculeTotal -> calculateTotal(
+                event.fechaRenta,
+                event.fechaEntrega,
+                event.costoDiario
+            )
+
             is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
-            RentaEvent.ConfirmRenta -> {
-                val renta = createRenta()
-                renta?.let { save(it) }
-            }
+            RentaEvent.ConfirmRenta -> createRenta()
         }
     }
 
