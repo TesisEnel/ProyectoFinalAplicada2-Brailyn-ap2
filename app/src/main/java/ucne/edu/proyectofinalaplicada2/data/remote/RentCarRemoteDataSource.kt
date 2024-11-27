@@ -4,9 +4,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import ucne.edu.proyectofinalaplicada2.data.remote.api.RentCarApi
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoCombustibleDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import javax.inject.Inject
 
@@ -50,10 +48,6 @@ class RentCarRemoteDataSource @Inject constructor(
         images,
         anio
     )
-
-    suspend fun updateVehiculo(id: Int, vehiculoDto: VehiculoDto) =
-        rentCarApi.updateVehiculo(id, vehiculoDto)
-
     //Marca
     suspend fun getMarcas() = rentCarApi.getMarcas()
     suspend fun getMarcaById(id: Int) = rentCarApi.getMarcaById(id)
