@@ -29,7 +29,7 @@ class RentCarRemoteDataSource @Inject constructor(
         tipoVehiculoId: RequestBody,
         proveedorId: RequestBody,
         precio: RequestBody,
-        descripcion: RequestBody,
+        descripcion: RequestBody?,
         marcaId: RequestBody,
         modeloId: RequestBody,
         images: List<MultipartBody.Part>,

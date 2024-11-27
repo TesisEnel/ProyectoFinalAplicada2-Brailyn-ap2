@@ -20,10 +20,11 @@ class MarcaViewModel @Inject constructor(
 
 
     init {
-        getModelos()
+        getMarcas()
+        getMarcas2()
     }
 
-    private fun getModelos() {
+    private fun getMarcas() {
         viewModelScope.launch {
             marcaRepository.getMarcas().collect { result ->
 
@@ -55,6 +56,39 @@ class MarcaViewModel @Inject constructor(
             }
         }
     }
+    private fun getMarcas2() {
+        viewModelScope.launch {
+            marcaRepository.getVehiculoConMarca().collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                marcaVehiculos = result.data ?: emptyList()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun onChangeMarcaId(marcaId: Int) {
         _uistate.update {
             it.copy(

@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
@@ -95,7 +96,7 @@ fun TipoVehiculeBodyListScreen(
 
 @Composable
 fun TipoVehiculeColumn(
-    newVehiculos: List<VehiculoDto>,
+    newVehiculos: List<VehiculoEntity>,
     marcaUiState: MarcaUiState,
     onGoVehiculePresentation: (Int) -> Unit,
     onEvent: (VehiculoEvent) -> Unit,

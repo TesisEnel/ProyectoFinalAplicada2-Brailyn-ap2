@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
@@ -20,7 +21,21 @@ data class VehiculoUistate(
     val error: String = "",
     val success: String = "",
     val marcas: List<MarcaDto> = emptyList(),
-    val vehiculos: List<VehiculoDto> = emptyList(),
+    val vehiculos: List<VehiculoEntity> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
     )
 
+fun VehiculoUistate.toEntity()= VehiculoDto(
+    vehiculoId = vehiculoId,
+    tipoCombustibleId = tipoCombustibleId,
+    tipoVehiculoId = tipoVehiculoId,
+    marcaId = marcaId,
+    modeloId = modeloId,
+    precio = precio,
+    descripcion = descripcion,
+    anio = anio,
+    imagePath = imagePath,
+    proveedorId = proveedorId
+
+
+)

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 
@@ -29,7 +30,7 @@ fun TipoVehiculoList(
     marca: String,
     onGoVehiculeList: ((Int) -> Unit)? = null, // Hacer funciones opcionales
     onGoVehiculePresentation: ((Int) -> Unit)? = null, // Hacer funciones opcionales
-    vehiculoDto: VehiculoDto,
+    vehiculoDto: VehiculoEntity,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Card(

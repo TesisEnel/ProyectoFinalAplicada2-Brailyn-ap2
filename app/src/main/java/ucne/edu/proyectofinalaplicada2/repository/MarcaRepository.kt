@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.MarcaVehiculoUiState
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -28,11 +29,12 @@ class MarcaRepository @Inject constructor(
         try {
             emit(Resource.Loading())
             val marcas = rentCarRemoteDataSource.getMarcas()
-            val vehiculos = rentCarRemoteDataSource.getVehiculos()
+            val vehiculos = rentCarRemoteDataSource.getVehiculos().map { it.toEntity() }
             val marcaConVehiculos = marcas.map { marca ->
                 val vehiculosMarca = vehiculos.filter { vehiculo ->
                     vehiculo.marcaId == marca.marcaId
                 }
+
                 if (vehiculosMarca.isNotEmpty()) {
                     MarcaVehiculoUiState(
                         marcaId = marca.marcaId,
