@@ -54,14 +54,13 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
-
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
+import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
 fun RentaScreen(
@@ -99,7 +98,6 @@ fun RentaBodyScreen(
     vehiculoId: Int,
     onEvent: (RentaEvent) -> Unit = {}
 ) {
-    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
     val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
@@ -116,8 +114,6 @@ fun RentaBodyScreen(
             showDatePickerRenta = false
         }
     }
-
-    // Manejar fecha de entrega
     LaunchedEffect(datePickerStateEntrega.selectedDateMillis) {
         datePickerStateEntrega.selectedDateMillis?.let { selectedDateMillis ->
             val selectedDate = Converter().convertToDate(selectedDateMillis)
@@ -144,7 +140,7 @@ fun RentaBodyScreen(
                         state = pagerState,
                         modifier = Modifier.fillMaxWidth()
                     ) { page ->
-                        val painter = rememberAsyncImagePainter(url + imagePaths[page])
+                        val painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + imagePaths[page])
                         ImageCard(
                             contentDescription = "Vehículo Imagen $page",
                             painter = painter,
@@ -179,7 +175,7 @@ fun RentaBodyScreen(
                                 val isSelected = pagerState.currentPage == index
                                 Box(
                                     modifier = Modifier
-                                        .size(if (isSelected) 14.dp else 8.dp) // Tamaño más prominente
+                                        .size(if (isSelected) 14.dp else 8.dp)
                                         .background(
                                             color = if (isSelected) MaterialTheme.colorScheme.primary
                                             else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -215,7 +211,6 @@ fun RentaBodyScreen(
                 .align(Alignment.CenterHorizontally),
             fontWeight = FontWeight.W700
         )
-        // Row con dos DatePickers
         Column(
             modifier = Modifier
                 .padding(15.dp)
@@ -299,6 +294,10 @@ fun RentaBodyScreen(
                 }
             }
         }
+        LaunchedEffect(Unit) {
+            val emailCliente = FirebaseAuth.getInstance().currentUser?.email
+            onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId))
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
@@ -312,32 +311,19 @@ fun RentaBodyScreen(
             Text(text = "Rentar Ahora")
         }
         if (showModal) {
-            val marca = marcaUiState.marcas.find { it.marcaId == vehiculo?.marcaId }
-            val emailCliente = FirebaseAuth.getInstance().currentUser?.email
-            val cliente = clienteUiState.clientes.find { it.email == emailCliente }
-            val renta = RentaDto(
-                clienteId = cliente?.clienteId,
-                vehiculoId = vehiculo?.vehiculoId,
-                fechaRenta = rentaUiState.fechaRenta,
-                fechaEntrega = rentaUiState.fechaEntrega,
-                total = rentaUiState.total
-            )
             ConfirmRentaDialog(
-                vehiculoName = marca?.nombreMarca,
+                vehiculoName = rentaUiState.vehiculoNombre,
                 fechaRenta = rentaUiState.fechaRenta,
                 fechaEntrega = rentaUiState.fechaEntrega,
                 costoTotal = rentaUiState.total?.toDouble(),
                 onConfirm = {
+                    onEvent(RentaEvent.ConfirmRenta)
                     showModal = false
                 },
-                onDismiss = {
-                    showModal = false
-
-                },
-
-                createRenta = { onEvent(RentaEvent.Save(renta)) },
+                onDismiss = { showModal = false },
+                createRenta = {}
             )
-            Text(rentaUiState.error?:"", color = MaterialTheme.colorScheme.error)
+            Text(rentaUiState.error ?: "", color = MaterialTheme.colorScheme.error)
         }
     }
 }
