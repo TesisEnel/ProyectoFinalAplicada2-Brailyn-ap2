@@ -16,8 +16,6 @@ class RentCarRemoteDataSource @Inject constructor(
     //cliente
     suspend fun getClientes() = rentCarApi.getClientes()
     suspend fun addCliente(clienteDto: ClienteDto) = rentCarApi.addCliente(clienteDto)
-    suspend fun updateCliente(id: Int, clienteDto: ClienteDto) =
-        rentCarApi.updateCliente(id, clienteDto)
     suspend fun getClienteByEmail(email: String) = rentCarApi.getClienteByEmail(email)
 
     //renta
@@ -59,16 +57,11 @@ class RentCarRemoteDataSource @Inject constructor(
     //Marca
     suspend fun getMarcas() = rentCarApi.getMarcas()
     suspend fun getMarcaById(id: Int) = rentCarApi.getMarcaById(id)
-    suspend fun addMarca(marcaDto: MarcaDto) = rentCarApi.addMarca(marcaDto)
-    suspend fun updateMarca(id: Int, marcaDto: MarcaDto) = rentCarApi.updateMarca(id, marcaDto)
+
 
     //TipoCombustible
     suspend fun getTiposCombustibles() = rentCarApi.getTipoCombustibles()
-    suspend fun addTipoCombustible(tipoCombustibleDto: TipoCombustibleDto) =
-        rentCarApi.addTipoCombustible(tipoCombustibleDto)
 
-    suspend fun updateTipoCombustible(id: Int, tipoCombustibleDto: TipoCombustibleDto) =
-        rentCarApi.updateTipoCombustible(id, tipoCombustibleDto)
 
     //TipoVehiculo
     suspend fun getTiposVehiculos() = rentCarApi.getTipoVehiculos()
