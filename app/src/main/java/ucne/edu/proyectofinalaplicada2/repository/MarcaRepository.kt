@@ -58,7 +58,7 @@ class MarcaRepository @Inject constructor(
     fun getMarcaById(id: Int): Flow<Resource<MarcaDto>> = flow{
         try {
             emit(Resource.Loading())
-            val marca = rentCarRemoteDataSource.getMarcaById(id)
+            val marca = rentCarRemoteDataSource.getMarcas().first{ it.marcaId == id}
             emit(Resource.Success(marca))
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
