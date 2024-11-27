@@ -9,7 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
+import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
+import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
+import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import java.util.Date
 import java.util.Locale
@@ -19,13 +23,16 @@ import javax.inject.Inject
 @HiltViewModel
 class RentaViewModel @Inject constructor(
     private val rentaRepository: RentaRepository,
+    private val vehiucloRepository: VehiculoRepository,
+    private val clienteRepository: ClienteRepository,
+    private val marcaRepository: MarcaRepository,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
 
     init {
         getRentas()
-        }
+    }
 
     private fun getRentas() {
         viewModelScope.launch {
@@ -91,6 +98,131 @@ class RentaViewModel @Inject constructor(
                 }
             }
         }
+    }
+    private fun getMarcaById(id: Int) {
+        viewModelScope.launch {
+            marcaRepository.getMarcaById(id).collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                marca = result.data
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun getVehiculoById(id: Int) {
+        viewModelScope.launch {
+            vehiucloRepository.getVehiculoById(id).collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                vehiculo = result.data
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+    private fun getClienteByEmail(email: String) {
+        viewModelScope.launch {
+            clienteRepository.getClienteByEmail(email).collect { result ->
+
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                cliente = result.data
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
+        viewModelScope.launch {
+            getClienteByEmail(emailCliente?:"")
+            getVehiculoById(vehiculoId)
+            getMarcaById(uistate.value.vehiculo?.vehiculoId?:0)
+
+            _uistate.update {
+                it.copy(
+                    vehiculoNombre = uistate.value.marca?.nombreMarca,
+                    clienteId = uistate.value.cliente?.clienteId,
+                    vehiculoId = uistate.value.vehiculo?.vehiculoId,
+                )
+            }
+        }
+    }
+    fun createRenta(): RentaDto? {
+        val uistate = _uistate.value
+        return if (uistate.fechaRenta.isNotEmpty() && uistate.fechaEntrega != null) {
+            RentaDto(
+                clienteId = uistate.clienteId,
+                vehiculoId = uistate.vehiculoId,
+                fechaRenta = uistate.fechaRenta,
+                fechaEntrega = uistate.fechaEntrega,
+                total = uistate.total
+            )
+        } else null
     }
 
     private fun nuevo() {
@@ -158,11 +290,8 @@ class RentaViewModel @Inject constructor(
 
         try {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-
-            println("Parsing fechaRenta: $fechaRenta")
             val rentaDate: Date? = fechaRenta.let { dateFormat.parse(it) }
 
-            println("Parsing fechaEntrega: $fechaEntrega")
             val entregaDate: Date? = fechaEntrega.let { dateFormat.parse(it) }
 
             if (rentaDate != null && entregaDate != null && !entregaDate.before(rentaDate)) {
@@ -170,17 +299,14 @@ class RentaViewModel @Inject constructor(
                 val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
 
                 val total = diffInDays * costoDiario
-                println("Total calculado: $total")
                 onChangeTotal(total)
             } else {
-                println("Fechas inválidas: entrega es antes que renta")
                 _uistate.update {
                     it.copy(total = null)
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            println("Error al calcular el total: ${e.message}")
             _uistate.update {
                 it.copy(total = null)
             }
@@ -195,6 +321,11 @@ class RentaViewModel @Inject constructor(
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
             is RentaEvent.Save -> save(event.renta)
             is RentaEvent.CalculeTotal -> calculateTotal(event.fechaRenta, event.fechaEntrega,event.costoDiario)
+            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
+            RentaEvent.ConfirmRenta -> {
+                val renta = createRenta()
+                renta?.let { save(it) }
+            }
         }
     }
 
