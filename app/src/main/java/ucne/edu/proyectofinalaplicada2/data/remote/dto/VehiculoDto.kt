@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.data.remote.dto
 
+import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 
 data class VehiculoDto(
@@ -12,7 +13,8 @@ data class VehiculoDto(
     val descripcion: String?,
     val anio: Int?,
     val imagePath: List<String?>,
-    val proveedorId: Int?
+    val proveedorId: Int?,
+    val marca: MarcaEntity?
 )
 
 fun VehiculoDto.toEntity() = VehiculoEntity(
