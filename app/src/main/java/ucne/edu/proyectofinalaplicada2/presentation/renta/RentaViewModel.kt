@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
@@ -147,7 +147,7 @@ class RentaViewModel @Inject constructor(
         return vehiculoRepository.getVehiculoById(id).last().data
     }
 
-    private suspend fun getMarcaById(id: Int): MarcaDto? {
+    private suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
 
