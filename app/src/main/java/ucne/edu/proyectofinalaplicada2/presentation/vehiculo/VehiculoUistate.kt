@@ -21,10 +21,15 @@ data class VehiculoUistate(
     var isLoadingData: Boolean? = null,
     val error: String = "",
     val success: String = "",
-    val marcas: List<MarcaDto> = emptyList(),
+    val marcas: List<MarcaEntity> = emptyList(),
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
-    val marca: MarcaEntity? = null
+    val marca: MarcaEntity? = null,
+    val vehiculoConMarcas: List<VehiculoConMarca> = emptyList()
+)
+data class VehiculoConMarca(
+    val vehiculo: VehiculoEntity,
+    val nombreMarca: String?
 )
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
