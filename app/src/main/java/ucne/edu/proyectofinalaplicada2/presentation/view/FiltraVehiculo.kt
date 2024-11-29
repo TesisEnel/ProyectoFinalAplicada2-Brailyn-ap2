@@ -41,9 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
-import kotlinx.coroutines.delay
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
@@ -71,18 +70,16 @@ fun FiltraVehiculoBody(
 ) {
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2), // Dos columnas
+        columns = GridCells.Fixed(2),
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ){
-        items(uiState.vehiculos) { vehiculo ->
-            val painter = vehiculo.imagePath.firstOrNull()
+        items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
+            val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
             MostrarVehiculos(
                 url = Constant.URL_BLOBSTORAGE + painter,
-                vehiculo = vehiculo,
-                onEvent = onEvent,
-                uiState = uiState
+                vehiculoConMarca = vehiculoConMarca,
             )
         }
     }
@@ -92,18 +89,12 @@ fun FiltraVehiculoBody(
 @Composable
 fun MostrarVehiculos(
     url: String,
-    vehiculo: VehiculoEntity,
-    onEvent: (VehiculoEvent) -> Unit,
-    uiState: VehiculoUistate
+    vehiculoConMarca: VehiculoConMarca,
 ) {
-    if (vehiculo.marcaId != null && uiState.marca == null) {
-        onEvent(VehiculoEvent.GetMarca(vehiculo.marcaId))
-    }
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-
         Card(
             modifier = Modifier
                 .width(150.dp)
@@ -125,13 +116,13 @@ fun MostrarVehiculos(
 
                 )
                 Text(
-                    text = uiState.marca?.nombreMarca?:"",
+                    text = vehiculoConMarca.nombreMarca?:"",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(10.dp)
                 )
                 Text(
-                    text = "Precio: ${vehiculo.precio}\n Año: ${vehiculo.anio}",
+                    text = "Precio: ${vehiculoConMarca.vehiculo.precio}\n Año: ${vehiculoConMarca.vehiculo.anio}",
                     fontSize = 13.sp,
                     modifier = Modifier.padding(6.dp),
                     maxLines = 3,
@@ -148,7 +139,7 @@ fun MostrarVehiculos(
 
 @Composable
 fun SearchBar(
-    onGoSearch: () -> Unit = {}
+    onGoSearch: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -156,7 +147,7 @@ fun SearchBar(
         focusRequester.requestFocus()
     }
     TextField(
-        value = "",
+        value = "" ,
         onValueChange = {},
         leadingIcon = {
             Icon(
