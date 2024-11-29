@@ -148,7 +148,7 @@ class RentaViewModel @Inject constructor(
     }
 
     private suspend fun getMarcaById(id: Int): MarcaEntity? {
-        return marcaRepository.getMarcaById(id)
+        return marcaRepository.getMarcaById(id).data
     }
 
     private fun createRenta() {
