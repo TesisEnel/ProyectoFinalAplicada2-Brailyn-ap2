@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RentaViewModel @Inject constructor(
     private val rentaRepository: RentaRepository,
-    private val vehiucloRepository: VehiculoRepository,
+    private val vehiculoRepository: VehiculoRepository,
     private val clienteRepository: ClienteRepository,
     private val marcaRepository: MarcaRepository,
 ) : ViewModel() {
@@ -144,11 +144,11 @@ class RentaViewModel @Inject constructor(
     }
 
     private suspend fun getvehiculoById(id: Int): VehiculoDto? {
-        return vehiucloRepository.getVehiculoById(id).last().data
+        return vehiculoRepository.getVehiculoById(id).last().data
     }
 
     private suspend fun getMarcaById(id: Int): MarcaDto? {
-        return marcaRepository.getMarcaById(id).last().data
+        return marcaRepository.getMarcaById(id).data
     }
 
     private fun createRenta() {
