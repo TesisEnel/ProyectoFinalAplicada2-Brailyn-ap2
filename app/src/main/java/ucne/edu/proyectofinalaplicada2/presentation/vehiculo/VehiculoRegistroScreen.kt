@@ -202,7 +202,7 @@ fun SelectMultipleImages() {
                 uriToFile(uri, context)
             }
             if (imageFiles.isNotEmpty()) {
-                viewModel.onEvent(VehiculoEvent.OnChangeImagePath(imageFiles)) // Asumiendo que el evento recibe una lista de archivos
+                viewModel.onEvent(VehiculoEvent.OnChangeImagePath(imageFiles))
             }
         }
     }
