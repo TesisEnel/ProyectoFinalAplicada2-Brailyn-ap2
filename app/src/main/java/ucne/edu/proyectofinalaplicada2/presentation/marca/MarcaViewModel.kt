@@ -65,7 +65,7 @@ class MarcaViewModel @Inject constructor(
             val vehiculos = vehiculoRepository.getVehiculos().last().data
             val marcasUnicas = vehiculos?.distinctBy { it.marcaId }
             val marcas = marcasUnicas?.map { vehiculo ->
-                marcaRepository.getMarcaById(vehiculo.marcaId?:0).data
+                marcaRepository.getMarcaById(vehiculo.marcaId?:0)
             }
 
             _uistate.update {
