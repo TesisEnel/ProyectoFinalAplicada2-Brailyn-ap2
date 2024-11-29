@@ -34,12 +34,15 @@ class MarcaRepository @Inject constructor(
         }
     }
 
-    suspend fun getMarcaById(id: Int): MarcaEntity?{
-         try {
+    suspend fun getMarcaById(id: Int): Resource<MarcaEntity?>{
+        return try {
             val marca = marcaDao.getByMarcaIdId(id)
-             return marca
+            Resource.Success(marca)
         } catch (e: HttpException) {
-            return null
+            Resource.Error("Error de internet ${e.message}")
+        }
+        catch (e: Exception) {
+            Resource.Error("Error desconocido ${e.message}")
         }
     }
 
