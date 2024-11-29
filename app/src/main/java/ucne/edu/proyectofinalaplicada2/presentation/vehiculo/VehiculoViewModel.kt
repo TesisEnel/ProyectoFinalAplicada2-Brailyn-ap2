@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -17,6 +19,7 @@ import javax.inject.Inject
 class VehiculoViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
     private val modeloRepository: ModeloRepository,
+    private val marcaRepository: MarcaRepository
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(VehiculoUistate())
     val uistate = _uistate.asStateFlow()
@@ -127,6 +130,39 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
+    private fun getMarca(marcaId: Int){
+        viewModelScope.launch {
+            when(val result = marcaRepository.getNameMarca(marcaId)){
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                marca = result.data,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+
+        }
+    }
+
+    private suspend fun getMarcaById(id: Int): MarcaEntity? {
+        return marcaRepository.getMarcaById(id).data
+    }
     private fun onChangePrecio(precio: Int) {
         _uistate.update {
             it.copy(
@@ -214,6 +250,7 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.GetVehiculos -> getVehiculos()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
+            is VehiculoEvent.GetMarca -> getMarca(event.vehiculoId)
         }
     }
 }
