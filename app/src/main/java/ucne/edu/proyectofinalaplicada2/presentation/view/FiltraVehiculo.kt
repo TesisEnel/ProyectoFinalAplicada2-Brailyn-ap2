@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.delay
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
@@ -73,19 +74,18 @@ fun FiltraVehiculoBody(
         columns = GridCells.Fixed(2), // Dos columnas
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        content = {
-            items(uiState.vehiculos) { vehiculo ->
-                val painter = vehiculo.imagePath.firstOrNull()
-                MostrarVehiculos(
-                    url = Constant.URL_BLOBSTORAGE + painter,
-                    vehiculo = vehiculo,
-                    onEvent = onEvent,
-                    uiState = uiState
-                )
-            }
+            .padding(16.dp)
+    ){
+        items(uiState.vehiculos) { vehiculo ->
+            val painter = vehiculo.imagePath.firstOrNull()
+            MostrarVehiculos(
+                url = Constant.URL_BLOBSTORAGE + painter,
+                vehiculo = vehiculo,
+                onEvent = onEvent,
+                uiState = uiState
+            )
         }
-    )
+    }
 
 }
 
@@ -96,8 +96,8 @@ fun MostrarVehiculos(
     onEvent: (VehiculoEvent) -> Unit,
     uiState: VehiculoUistate
 ) {
-    LaunchedEffect(vehiculo.marcaId) {
-        onEvent(VehiculoEvent.GetMarca(vehiculo.marcaId?:0))
+    if (vehiculo.marcaId != null && uiState.marca == null) {
+        onEvent(VehiculoEvent.GetMarca(vehiculo.marcaId))
     }
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -131,7 +131,7 @@ fun MostrarVehiculos(
                     modifier = Modifier.padding(10.dp)
                 )
                 Text(
-                    text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make ",
+                    text = "Precio: ${vehiculo.precio}\n Año: ${vehiculo.anio}",
                     fontSize = 13.sp,
                     modifier = Modifier.padding(6.dp),
                     maxLines = 3,
