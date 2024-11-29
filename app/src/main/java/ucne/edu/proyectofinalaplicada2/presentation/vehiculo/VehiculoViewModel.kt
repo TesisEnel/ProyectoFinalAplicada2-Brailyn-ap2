@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.repository.*
+import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
+import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import java.io.File
 import javax.inject.Inject
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VehiculoViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
-    private val modeloRepository: ModeloRepository
+    private val modeloRepository: ModeloRepository,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(VehiculoUistate())
     val uistate = _uistate.asStateFlow()
@@ -196,18 +197,6 @@ class VehiculoViewModel @Inject constructor(
         _uistate.update {
             it.copy(
                 anio = anio
-            )
-        }
-    }
-
-    fun nuevo() {
-        _uistate.update {
-            it.copy(
-                vehiculoId = null,
-                tipoCombustibleId = null,
-                tipoVehiculoId = null,
-                success = "",
-                error = "",
             )
         }
     }
