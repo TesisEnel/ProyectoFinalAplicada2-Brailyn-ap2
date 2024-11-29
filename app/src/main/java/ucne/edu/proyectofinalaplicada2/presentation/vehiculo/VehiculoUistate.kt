@@ -25,7 +25,7 @@ data class VehiculoUistate(
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
     val marca: MarcaEntity? = null
-    )
+)
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
     vehiculoId = vehiculoId,
@@ -37,7 +37,7 @@ fun VehiculoUistate.toEntity()= VehiculoDto(
     descripcion = descripcion,
     anio = anio,
     imagePath = imagePath,
-    proveedorId = proveedorId
-
+    proveedorId = proveedorId,
+    marca = marca
 
 )
