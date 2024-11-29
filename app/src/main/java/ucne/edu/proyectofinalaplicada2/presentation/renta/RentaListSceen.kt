@@ -72,7 +72,7 @@ fun ExpandableCard(
 ) {
     var isExpanded by remember { mutableStateOf<Int?>(null)  }
 
-    uiState.rentas.forEachIndexed{index, renta ->
+    uiState.rentas.forEachIndexed{index, _ ->
         ExpandableCard(
             uiState = uiState,
             isExpanded = isExpanded == index,
