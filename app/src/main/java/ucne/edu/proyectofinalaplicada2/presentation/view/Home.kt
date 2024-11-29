@@ -80,7 +80,6 @@ fun Home(
                     marcaUiState = marcaUistate,
                     vehiculoUiState = vehiculoUistate,
                     onGoVehiculeList = onGoVehiculeList,
-                    onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
                 )
             }
         }
@@ -155,7 +154,6 @@ fun TiposDeVehiculos(
     marcaUiState: MarcaUiState,
     vehiculoUiState: VehiculoUistate,
     onGoVehiculeList:(Int)-> Unit,
-    onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Column {
         Text(
