@@ -27,8 +27,8 @@ import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 fun TipoVehiculoList(
     painter: Painter,
     marca: String,
-    onGoVehiculeList: ((Int) -> Unit)? = null, // Hacer funciones opcionales
-    onGoVehiculePresentation: ((Int) -> Unit)? = null, // Hacer funciones opcionales
+    onGoVehiculeList: ((Int) -> Unit)? = null,
+    onGoRenta: ((Int) -> Unit)? = null,
     vehiculoDto: VehiculoEntity?,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
@@ -42,7 +42,7 @@ fun TipoVehiculoList(
                     if (onGoVehiculeList != null) {
                         onGoVehiculeList(marcaId)
                     } else {
-                        onGoVehiculePresentation?.invoke(vehiculoDto.vehiculoId ?: 0)
+                        onGoRenta?.invoke(vehiculoDto.vehiculoId ?: 0)
                     }
                 }
             }
