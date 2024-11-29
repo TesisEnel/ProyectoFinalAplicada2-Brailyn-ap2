@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
@@ -55,6 +54,7 @@ class VehiculoViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        getVehiculoConMarcas()
                     }
                 }
             }
@@ -130,21 +130,21 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun getMarca(marcaId: Int){
-        viewModelScope.launch {
-            val marca = getMarcaById(marcaId)
-            _uistate.update {
-                it.copy(
-                    marca = marca
-                )
-            }
-
+    private suspend fun getVehiculoConMarcas() {
+        val vehiculoConMarcas = _uistate.value.vehiculos.map { vehiculo ->
+            val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0)
+            VehiculoConMarca(
+                nombreMarca = marca?.nombreMarca,
+                vehiculo = vehiculo
+            )
+        }
+        _uistate.update {
+            it.copy(
+                vehiculoConMarcas = vehiculoConMarcas
+            )
         }
     }
 
-    private suspend fun getMarcaById(id: Int): MarcaEntity? {
-        return marcaRepository.getMarcaById(id).data
-    }
     private fun onChangePrecio(precio: Int) {
         _uistate.update {
             it.copy(
@@ -232,7 +232,6 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.GetVehiculos -> getVehiculos()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
-            is VehiculoEvent.GetMarca -> getMarca(event.vehiculoId)
         }
     }
 }
