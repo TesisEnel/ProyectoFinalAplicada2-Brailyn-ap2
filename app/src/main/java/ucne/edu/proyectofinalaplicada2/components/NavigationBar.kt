@@ -45,7 +45,7 @@ fun NavigationBar(
                 title = "Settings",
                 selectedIcon = Icons.Filled.Settings,
                 unSelectedIcon = Icons.Outlined.Settings,
-                screen = Screen.Home
+                screen = Screen.RentaListScreen
             )
         )
 
