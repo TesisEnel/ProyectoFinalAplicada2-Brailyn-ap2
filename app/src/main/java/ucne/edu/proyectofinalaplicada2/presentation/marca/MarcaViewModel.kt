@@ -5,25 +5,30 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
+import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
 class MarcaViewModel @Inject constructor(
     private val marcaRepository: MarcaRepository,
+    private val vehiculoRepository: VehiculoRepository
 ):ViewModel() {
     private val _uistate = MutableStateFlow(MarcaUiState())
     val uistate = _uistate.asStateFlow()
 
 
     init {
-        getModelos()
+        getMarcas()
+        getNombreMarca()
     }
 
-    private fun getModelos() {
+    private fun getMarcas() {
         viewModelScope.launch {
             marcaRepository.getMarcas().collect { result ->
 
@@ -55,6 +60,26 @@ class MarcaViewModel @Inject constructor(
             }
         }
     }
+    private fun getNombreMarca() {
+        viewModelScope.launch {
+            val vehiculos = vehiculoRepository.getVehiculos().last().data
+            val marcasUnicas = vehiculos?.distinctBy { it.marcaId }
+            val marcas = marcasUnicas?.map { vehiculo ->
+                marcaRepository.getMarcaById(vehiculo.marcaId?:0).last().data
+            }
+
+            _uistate.update {
+                it.copy(
+                    marcas = marcas?: emptyList(),
+                    vehiculos = vehiculos?: emptyList()
+                )
+            }
+        }
+    }
+    private suspend fun getVehiculos(): List<VehiculoEntity> {
+        return vehiculoRepository.getVehiculos().last().data?: emptyList()
+    }
+
     private fun onChangeMarcaId(marcaId: Int) {
         _uistate.update {
             it.copy(

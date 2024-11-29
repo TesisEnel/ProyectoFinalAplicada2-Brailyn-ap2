@@ -6,10 +6,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
+import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
+import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import java.util.Date
 import java.util.Locale
@@ -19,13 +26,16 @@ import javax.inject.Inject
 @HiltViewModel
 class RentaViewModel @Inject constructor(
     private val rentaRepository: RentaRepository,
+    private val vehiucloRepository: VehiculoRepository,
+    private val clienteRepository: ClienteRepository,
+    private val marcaRepository: MarcaRepository,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
 
     init {
         getRentas()
-        }
+    }
 
     private fun getRentas() {
         viewModelScope.launch {
@@ -93,21 +103,64 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun nuevo() {
-        _uistate.update {
-            it.copy(
-                rentaId = null,
-                clienteId = null,
-                vehiculoId = null,
-                fechaRenta = "",
-                fechaEntrega = null,
-                total = null,
-                success = "",
-                error = "",
-            )
+    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
+        viewModelScope.launch {
+
+            val cliente = getClienteByEmail(emailCliente ?: "")
+            if (cliente != null) {
+                _uistate.update {
+                    it.copy(
+                        clienteId = cliente.clienteId
+                    )
+                }
+            }
+            val vehiculo = getvehiculoById(vehiculoId)
+            if (vehiculo != null) {
+                _uistate.update {
+                    it.copy(
+                        vehiculo = vehiculo
+                    )
+                }
+            }
+            val marca = getMarcaById(uistate.value.vehiculo?.marcaId ?: 0)
+            if (marca != null) {
+                _uistate.update {
+                    it.copy(
+                        marca = marca
+                    )
+                }
+            }
+            _uistate.update {
+                it.copy(
+                    vehiculoNombre = uistate.value.marca?.nombreMarca,
+                    vehiculoId = uistate.value.vehiculo?.vehiculoId,
+                )
+            }
         }
     }
 
+    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+        return clienteRepository.getClienteByEmail(email).last().data
+    }
+
+    private suspend fun getvehiculoById(id: Int): VehiculoDto? {
+        return vehiucloRepository.getVehiculoById(id).last().data
+    }
+
+    private suspend fun getMarcaById(id: Int): MarcaDto? {
+        return marcaRepository.getMarcaById(id).last().data
+    }
+
+    private fun createRenta() {
+        val renta = RentaDto(
+            clienteId = uistate.value.clienteId,
+            vehiculoId = uistate.value.vehiculo?.vehiculoId,
+            fechaRenta = uistate.value.fechaRenta,
+            fechaEntrega = uistate.value.fechaEntrega,
+            total = uistate.value.total
+        )
+        save(renta)
+    }
     private fun onChangeClienteId(clienteId: Int) {
         _uistate.update {
             it.copy(
@@ -140,7 +193,7 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeTotal(total: Int) {
+    private fun onChangeTotal(total: Double) {
         _uistate.update {
             it.copy(
                 total = total
@@ -158,11 +211,8 @@ class RentaViewModel @Inject constructor(
 
         try {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-
-            println("Parsing fechaRenta: $fechaRenta")
             val rentaDate: Date? = fechaRenta.let { dateFormat.parse(it) }
 
-            println("Parsing fechaEntrega: $fechaEntrega")
             val entregaDate: Date? = fechaEntrega.let { dateFormat.parse(it) }
 
             if (rentaDate != null && entregaDate != null && !entregaDate.before(rentaDate)) {
@@ -170,31 +220,36 @@ class RentaViewModel @Inject constructor(
                 val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
 
                 val total = diffInDays * costoDiario
-                println("Total calculado: $total")
-                onChangeTotal(total)
+                onChangeTotal(total.toDouble())
             } else {
-                println("Fechas inválidas: entrega es antes que renta")
                 _uistate.update {
                     it.copy(total = null)
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            println("Error al calcular el total: ${e.message}")
             _uistate.update {
                 it.copy(total = null)
             }
         }
     }
+
     fun onEvent(event: RentaEvent) {
         when (event) {
             is RentaEvent.OnchangeClienteId -> onChangeClienteId(event.clienteId)
-            is RentaEvent.OnchangeFechaEntrega ->  onChangeFechaEntrega(event.fechaEntrega)
+            is RentaEvent.OnchangeFechaEntrega -> onChangeFechaEntrega(event.fechaEntrega)
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
             is RentaEvent.Save -> save(event.renta)
-            is RentaEvent.CalculeTotal -> calculateTotal(event.fechaRenta, event.fechaEntrega,event.costoDiario)
+            is RentaEvent.CalculeTotal -> calculateTotal(
+                event.fechaRenta,
+                event.fechaEntrega,
+                event.costoDiario
+            )
+
+            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
+            RentaEvent.ConfirmRenta -> createRenta()
         }
     }
 

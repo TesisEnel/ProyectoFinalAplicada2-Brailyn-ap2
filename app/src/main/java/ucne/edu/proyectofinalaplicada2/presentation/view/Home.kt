@@ -78,6 +78,7 @@ fun Home(
             item {
                 TiposDeVehiculos(
                     marcaUiState = marcaUistate,
+                    vehiculoUiState = vehiculoUistate,
                     onGoVehiculeList = onGoVehiculeList,
                     onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
                 )
@@ -135,7 +136,7 @@ fun VehiculosMasDestacados(
             items(vehiculoUistate.vehiculos) { vehiculo ->
                 Box {
                     val marca =
-                        marcaUiState.marcas.find { marcaDto -> marcaDto.marcaId == vehiculo.marcaId }
+                        marcaUiState.marcas.find { marcaDto -> marcaDto?.marcaId == vehiculo.marcaId }
                     ImageCard(
                         painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculo.imagePath.firstOrNull()),
                         contentDescription = vehiculo.descripcion ?: "",
@@ -152,6 +153,7 @@ fun VehiculosMasDestacados(
 @Composable
 fun TiposDeVehiculos(
     marcaUiState: MarcaUiState,
+    vehiculoUiState: VehiculoUistate,
     onGoVehiculeList:(Int)-> Unit,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
@@ -164,18 +166,20 @@ fun TiposDeVehiculos(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
         )
 
-        marcaUiState.marcaVehiculos.forEach { marcaConVehiculos ->
+        marcaUiState.marcas.forEach { marca ->
+            val vehiculo = vehiculoUiState.vehiculos.find { it.marcaId == marca?.marcaId }
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val painter = rememberAsyncImagePainter(marcaConVehiculos.imageUrl)
+                val painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculo?.imagePath?.firstOrNull())
+
                 TipoVehiculoList(
                     painter = painter,
-                    marca = marcaConVehiculos.nombreMarca?:"",
-                    onGoVehiculeList = { onGoVehiculeList(marcaConVehiculos.marcaId?:0) },
-                    vehiculoDto = marcaConVehiculos.vehiculos.first(),
-                    onMarcaEvent = onMarcaEvent
+                    marca = marca?.nombreMarca?:"",
+                    onGoVehiculeList = { onGoVehiculeList(marca?.marcaId?:0) },
+                    vehiculoDto = vehiculo, // Aquí ya no necesitas el vehiculoDto
+                    onMarcaEvent = {}
                 )
             }
         }

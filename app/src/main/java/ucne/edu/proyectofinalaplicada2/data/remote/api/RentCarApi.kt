@@ -41,6 +41,8 @@ interface RentCarApi {
     @GET("api/Vehiculos")
     suspend fun getVehiculos(): List<VehiculoDto>
 
+    @GET("api/Vehiculos/{id}")
+    suspend fun getVehiculoById(@Path("id") id: Int): VehiculoDto
 
     @Multipart
     @POST("api/Vehiculos")
@@ -49,7 +51,7 @@ interface RentCarApi {
         @Part("tipoVehiculoId") tipoVehiculoId: RequestBody,
         @Part("proveedorId") proveedorId: RequestBody,
         @Part("precio") precio: RequestBody,
-        @Part("descripcion") descripcion: RequestBody,
+        @Part("descripcion") descripcion: RequestBody?,
         @Part("marcaId") marcaId: RequestBody,
         @Part("modeloId") modeloId: RequestBody,
         @Part images: List<MultipartBody.Part>,
@@ -62,6 +64,8 @@ interface RentCarApi {
     // Marca
     @GET("api/Marcas")
     suspend fun getMarcas(): List<MarcaDto>
+    @GET("api/Marcas/{id}")
+    suspend fun getMarcaById(@Path("id") id: Int): MarcaDto
     @POST("api/Marcas")
     suspend fun addMarca(@Body marcaDto: MarcaDto): MarcaDto
     @PUT("api/Marcas/{id}")

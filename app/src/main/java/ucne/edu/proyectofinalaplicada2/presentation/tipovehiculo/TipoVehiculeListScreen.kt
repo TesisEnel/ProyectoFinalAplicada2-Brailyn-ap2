@@ -20,19 +20,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 
 @Composable
 fun TipoVehiculeListScreen(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     marcaViewModel: MarcaViewModel= hiltViewModel(),
-    onBack: () -> Unit,
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
 ) {
@@ -42,11 +40,9 @@ fun TipoVehiculeListScreen(
         vehiculoUistate = uiState,
         marcaUiState = marcaUiState,
         marcaId = marcaId,
-        onBack = onBack,
         onGoVehiculePresentation =
             onGoVehiculePresentation
         ,
-        onVehiculoEvent = { event -> vehiculoViewModel.onEvent(event) },
         onMarcaEvent = { event -> marcaViewModel.onEvent(event) }
     )
 
@@ -57,9 +53,7 @@ fun TipoVehiculeBodyListScreen(
     vehiculoUistate: VehiculoUistate,
     marcaUiState: MarcaUiState,
     marcaId: Int,
-    onBack: () -> Unit,
     onGoVehiculePresentation: (Int) -> Unit,
-    onVehiculoEvent: (VehiculoEvent) -> Unit,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     LaunchedEffect(marcaId) {
@@ -83,7 +77,6 @@ fun TipoVehiculeBodyListScreen(
             TipoVehiculeColumn(
                 newVehiculos = newVehiculos,
                 onGoVehiculePresentation = onGoVehiculePresentation,
-                onEvent = onVehiculoEvent,
                 onMarcaEvent = onMarcaEvent,
                 marcaUiState = marcaUiState
             )
@@ -95,10 +88,9 @@ fun TipoVehiculeBodyListScreen(
 
 @Composable
 fun TipoVehiculeColumn(
-    newVehiculos: List<VehiculoDto>,
+    newVehiculos: List<VehiculoEntity>,
     marcaUiState: MarcaUiState,
     onGoVehiculePresentation: (Int) -> Unit,
-    onEvent: (VehiculoEvent) -> Unit,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
@@ -113,7 +105,7 @@ fun TipoVehiculeColumn(
         newVehiculos.forEach { vehiculoDto ->
             val image = vehiculoDto.imagePath.firstOrNull()
             val painter = rememberAsyncImagePainter(url + image)
-            val marca = marcaUiState.marcas.find { it.marcaId == vehiculoDto.marcaId }
+            val marca = marcaUiState.marcas.find { it?.marcaId == vehiculoDto.marcaId }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -109,9 +109,9 @@ fun VehiculoBodyRegistroScreen(
                 label = "Marca",
                 options = marcaUiState.marcas,
                 onOptionSelected = {
-                    onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
+                    onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it?.marcaId?:0))
                 },
-                labelSelector = { it.nombreMarca }
+                labelSelector = { it?.nombreMarca?:"" }
             )
 
             InputSelect(

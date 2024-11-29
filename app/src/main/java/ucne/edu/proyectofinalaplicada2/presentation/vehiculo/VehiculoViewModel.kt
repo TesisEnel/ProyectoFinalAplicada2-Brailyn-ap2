@@ -90,26 +90,9 @@ class VehiculoViewModel @Inject constructor(
     }
     private fun save() {
         viewModelScope.launch {
-            val precio = uistate.value.precio
-            val descripcion = uistate.value.descripcion
-            val imagen = uistate.value.imagePath
-            val tipoCombustibleId =uistate.value.tipoCombustibleId ?: 0
-            val tipoVehiculoId =uistate.value.tipoVehiculoId ?: 0
-            val proveedorId =uistate.value.proveedorId ?: 0
-            val marcaId =uistate.value.marcaId
-            val modeloId =uistate.value.modeloId
-            val anio = uistate.value.anio
 
             val vehiculo = vehiculoRepository.addVehiculo(
-                tipoCombustibleId = tipoCombustibleId ,
-                tipoVehiculoId = tipoVehiculoId,
-                proveedorId = proveedorId,
-                precio = precio ?: 0,
-                descripcion = descripcion,
-                marcaId = marcaId,
-                modeloId = modeloId,
-                images = imagen,
-                anio = anio ?: 0
+                uistate.value.toEntity()
             )
 
             vehiculo.collect { result ->
