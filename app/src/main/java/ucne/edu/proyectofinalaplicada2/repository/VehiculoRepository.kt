@@ -23,12 +23,6 @@ class VehiculoRepository @Inject constructor(
     private val vehiculoDao: VehiculoDao
 ){
     fun getVehiculos(): Flow<Resource<List<VehiculoEntity>>> = flow {
-
-        emit(Resource.Loading())
-        val localVehiculos = vehiculoDao.getAll().firstOrNull()
-        if(!localVehiculos.isNullOrEmpty()){
-            emit(Resource.Success(localVehiculos))
-        }
         try {
             emit(Resource.Loading())
             val vehiculos = rentCarRemoteDataSource.getVehiculos()
@@ -38,7 +32,11 @@ class VehiculoRepository @Inject constructor(
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+
+            val localVehiculos = vehiculoDao.getAll().firstOrNull()
+            if(!localVehiculos.isNullOrEmpty()){
+                emit(Resource.Success(localVehiculos))
+            }
         }
     }
 
