@@ -43,7 +43,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -57,7 +56,6 @@ fun FiltraVehiculo(
         SearchBar()
         FiltraVehiculoBody(
             uiState = uiState,
-            onEvent = { event -> viewModel.onEvent(event) }
         )
     }
 
@@ -66,7 +64,6 @@ fun FiltraVehiculo(
 @Composable
 fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
-    onEvent: (VehiculoEvent) -> Unit
 ) {
 
     LazyVerticalGrid(

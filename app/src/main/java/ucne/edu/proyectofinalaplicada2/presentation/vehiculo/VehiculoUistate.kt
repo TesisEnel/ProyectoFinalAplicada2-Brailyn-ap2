@@ -2,7 +2,6 @@ package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
