@@ -45,15 +45,4 @@ class MarcaRepository @Inject constructor(
             Resource.Error("Error desconocido ${e.message}")
         }
     }
-
-    suspend fun getNameMarca(marcaId: Int): Resource<MarcaEntity>{
-        return try {
-            val marcas = marcaDao.getByMarcaIdId(marcaId)
-            Resource.Success(marcas)
-        }catch ( e: HttpException){
-            Resource.Error("Error de internet ${e.message}")
-        }catch (e: Exception){
-            Resource.Error("Error desconocido ${e.message}")
-        }
-    }
 }

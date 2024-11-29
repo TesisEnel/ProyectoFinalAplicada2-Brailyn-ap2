@@ -132,7 +132,7 @@ class VehiculoViewModel @Inject constructor(
 
     private suspend fun getVehiculoConMarcas() {
         val vehiculoConMarcas = _uistate.value.vehiculos.map { vehiculo ->
-            val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0)
+            val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
             VehiculoConMarca(
                 nombreMarca = marca?.nombreMarca,
                 vehiculo = vehiculo
