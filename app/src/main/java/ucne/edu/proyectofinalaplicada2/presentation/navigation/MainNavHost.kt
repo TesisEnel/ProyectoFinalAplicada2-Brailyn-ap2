@@ -57,6 +57,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
+import ucne.edu.proyectofinalaplicada2.presentation.view.FiltraVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
@@ -170,6 +171,9 @@ fun MainBodyNavHost(
                     Home(
                         onGoVehiculeList = {
                             navHostController.navigate(Screen.TipoVehiculoListScreen(it))
+                        },
+                        onGoSearch = {
+                            navHostController.navigate(Screen.FiltraVehiculo)
                         }
                     )
                 }
@@ -224,6 +228,15 @@ fun MainBodyNavHost(
                             .verticalScroll(rememberScrollState())
                     ) {
                         RentaListSceen()
+                    }
+                }
+                composable<Screen.FiltraVehiculo> {
+                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry?: return@composable))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        FiltraVehiculo()
                     }
                 }
             }
