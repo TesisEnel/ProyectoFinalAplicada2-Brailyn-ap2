@@ -23,4 +23,8 @@ interface MarcaDao {
     @Query("SELECT * FROM Marcas")
      fun getAll(): Flow<List<MarcaEntity>>
 
+     @Query("SELECT * FROM Marcas WHERE marcaId = :marcaId")
+     suspend fun getByMarcaIdId(marcaId: Int): MarcaEntity
+
+
 }
