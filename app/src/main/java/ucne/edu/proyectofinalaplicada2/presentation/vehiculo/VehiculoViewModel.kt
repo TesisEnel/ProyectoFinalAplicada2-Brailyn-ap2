@@ -132,30 +132,12 @@ class VehiculoViewModel @Inject constructor(
 
     private fun getMarca(marcaId: Int){
         viewModelScope.launch {
-            when(val result = marcaRepository.getNameMarca(marcaId)){
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marca = result.data,
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
+            val marca = getMarcaById(marcaId)
+            _uistate.update {
+                it.copy(
+                    marca = marca
+                )
+            }
 
         }
     }
