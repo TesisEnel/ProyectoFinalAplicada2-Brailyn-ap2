@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
-import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
@@ -41,9 +40,8 @@ fun TipoVehiculeListScreen(
         marcaUiState = marcaUiState,
         marcaId = marcaId,
         onGoVehiculePresentation =
-            onGoVehiculePresentation
-        ,
-        onMarcaEvent = { event -> marcaViewModel.onEvent(event) }
+        onGoVehiculePresentation,
+        onMarcaEvent = { event -> marcaViewModel.onEvent(event) },
     )
 
 }
@@ -73,13 +71,13 @@ fun TipoVehiculeBodyListScreen(
         if (vehiculoUistate.isLoading == true) {
             CircularProgressIndicator()
         } else {
-            val newVehiculos = vehiculoUistate.vehiculos.filter { it.marcaId == marcaId }
-            TipoVehiculeColumn(
-                newVehiculos = newVehiculos,
-                onGoVehiculePresentation = onGoVehiculePresentation,
-                onMarcaEvent = onMarcaEvent,
-                marcaUiState = marcaUiState
-            )
+//            val newVehiculos = vehiculoUistate.vehiculos.filter { it.marcaId == marcaId }
+//            TipoVehiculeColumn(
+//                newVehiculos = vehiculoConMarca,
+//                onGoVehiculePresentation = onGoVehiculePresentation,
+//                onMarcaEvent = onMarcaEvent,
+//                marcaUiState = marcaUiState
+//            )
         }
     }
 
@@ -117,13 +115,13 @@ fun TipoVehiculeColumn(
                 ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TipoVehiculoList(
-                    painter = painter,
-                    marca = marca?.nombreMarca ?: "",
-                    onGoRenta = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
-                    vehiculoDto = vehiculoDto,
-                    onMarcaEvent = onMarcaEvent
-                )
+//                TipoVehiculoList(
+//                    painter = painter,
+//                    marca = marca?.nombreMarca ?: "",
+//                    onGoRenta = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
+//                    vehiculoConMarca = vehiculoDto,
+//                    onMarcaEvent = onMarcaEvent
+//                )
             }
 
         }
