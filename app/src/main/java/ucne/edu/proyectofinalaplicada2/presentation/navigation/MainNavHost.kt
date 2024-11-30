@@ -256,13 +256,9 @@ fun MainBodyNavHost(
                     }
                     composable<Screen.RentaListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            RentaListSceen()
-                        }
+
+                        RentaListSceen()
+
                     }
                     composable<Screen.FiltraVehiculo> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
