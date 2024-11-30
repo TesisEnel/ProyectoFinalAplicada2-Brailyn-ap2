@@ -28,7 +28,8 @@ data class VehiculoUistate(
 )
 data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,
-    val nombreMarca: String?
+    val nombreMarca: String?,
+    val nombreModelo: String? = null
 )
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
