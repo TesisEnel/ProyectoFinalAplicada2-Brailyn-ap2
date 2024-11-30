@@ -1,8 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -71,6 +68,7 @@ class AuthViewModel @Inject constructor(
     private fun signInWithGoogle() {
         viewModelScope.launch {
             _uistate.update { it.copy(isLoading = true) }
+
             try {
                 val user = googleAuthClient.signInAndGetUser()
                 if(readRole() == null){
@@ -163,7 +161,6 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
     private fun clienteExist(email: String): Boolean {
         return try {
             clienteRepository.clienteNotExist(email, _uistate.value.clientes)
@@ -171,7 +168,6 @@ class AuthViewModel @Inject constructor(
             false
         }
     }
-
     private fun isAdminUser(email: String): Boolean {
         val userAdmin = uistate.value.clientes.any { it.isAdmin == true && it.email == email }
         viewModelScope.launch {
@@ -182,8 +178,10 @@ class AuthViewModel @Inject constructor(
 
     private fun updateUsuario(emailUsuario: String?) {
         viewModelScope.launch {
+            // Obtener los datos del cliente desde la API
             val cliente = getClienteByEmail(emailUsuario ?: "")
             if (cliente != null) {
+                // Actualizar el estado con los datos obtenidos
                 _uistate.update {
                     it.copy(
                         clienteId = cliente.clienteId,
@@ -196,6 +194,8 @@ class AuthViewModel @Inject constructor(
                     )
                 }
             }
+
+            // Preparar los datos para enviar la actualización a la API
             val clienteDto = ClienteDto(
                 clienteId = _uistate.value.clienteId,
                 cedula = _uistate.value.cedula,
@@ -207,14 +207,18 @@ class AuthViewModel @Inject constructor(
                 isAdmin = true
             )
 
+        }
+    }
 
-            clienteRepository.updateCliente(clienteDto.clienteId ?: 0, clienteDto)
-                .collect { result ->
+    private fun uppdateClient(){
+        if (!validarSettings()) return
+        viewModelScope.launch {
+
+                clienteRepository.updateCliente(uistate.value.clienteId?:0, uistate.value.toEntity()).collect { result ->
                     when (result) {
                         is Resource.Loading -> {
                             _uistate.update { it.copy(isLoading = true) }
                         }
-
                         is Resource.Success -> {
                             _uistate.update {
                                 it.copy(
@@ -223,7 +227,6 @@ class AuthViewModel @Inject constructor(
                                 )
                             }
                         }
-
                         is Resource.Error -> {
                             _uistate.update {
                                 it.copy(
@@ -234,11 +237,12 @@ class AuthViewModel @Inject constructor(
                         }
                     }
                 }
+            }
         }
     }
 
     private suspend fun getClienteByEmail(email: String): ClienteDto? {
-        return clienteRepository.getClienteByEmail(email).data
+        return clienteRepository.getClienteByEmail(email).last().data
     }
 
 
@@ -360,6 +364,34 @@ class AuthViewModel @Inject constructor(
         }
         return !error
     }
+    private fun validarSettings(): Boolean {
+        var error = false
+        _uistate.update {
+            it.copy(
+
+                errorCelular = if (it.celular.isBlank() || !isValidPhone(it.celular)) {
+                    error = true
+                    if (it.celular.isBlank()) "El celular no puede estar vacio" else
+                        "El número de celular no es válido ej 8299440000"
+                } else "",
+                errorCedula = if (it.cedula.isBlank() || !isValidCedula(it.cedula)) {
+                    error = true
+                    if (it.cedula.isBlank()) "La cedula no puede estar vacia" else
+                        "La cedula no es valida"
+                } else "",
+                errorApellidos = if (it.apellidos.isBlank()) {
+                    error = true
+                    "El apellido no puede estar vacios"
+                } else "",
+                errorDireccion = if (it.direccion.isBlank()) {
+                    error = true
+                    "La direccion no puede estar vacia"
+                } else ""
+            )
+        }
+        return !error
+    }
+
 
     private fun isValidPhone(phone: String): Boolean {
         if (phone.length != 10 || !phone.all { it.isDigit() }) return false
@@ -512,11 +544,14 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeCelular -> onChangeCelular(event.celular)
             is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
-            //       is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
+            is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
-
+            is AuthEvent.UpdateClient -> uppdateClient()
+            is AuthEvent.CheckIfUserIsAdmin -> TODO()
         }
     }
+
+
 }
 
 

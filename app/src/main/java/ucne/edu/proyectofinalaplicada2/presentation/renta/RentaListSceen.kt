@@ -71,22 +71,20 @@ fun ExpandableCard(
     uiState: RentaUistate
 ) {
     var isExpanded by remember { mutableStateOf<Int?>(null)  }
-
-    uiState.rentas.forEachIndexed{index, _ ->
-        ExpandableCard(
-            uiState = uiState,
+    uiState.rentaConVehiculo.forEachIndexed{ index, renta ->
+        ExpandableBodyCard(
             isExpanded = isExpanded == index,
-            onCardArrowClick = { isExpanded = if (isExpanded == index) null else index }
+            onCardArrowClick = { isExpanded = if (isExpanded == index) null else index },
+            rentaConVehiculo = renta
         )
     }
-
 }
 
 @Composable
-fun ExpandableCard(
-    uiState: RentaUistate,
+fun ExpandableBodyCard(
     isExpanded: Boolean,
-    onCardArrowClick: () -> Unit
+    onCardArrowClick: () -> Unit,
+    rentaConVehiculo: RentaConVehiculo
 ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -107,7 +105,7 @@ fun ExpandableCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Marca",
+                    text = rentaConVehiculo.marca?.nombreMarca?:"",
                     modifier = Modifier.weight(1f),
                     fontWeight = FontWeight.W500,
                     fontSize = 20.sp
@@ -125,11 +123,11 @@ fun ExpandableCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Modelo: \nAño: \nTotal: ${uiState.total}",
+                        text = "Modelo:${rentaConVehiculo.nombreModelo} \nAño:${rentaConVehiculo.anio} \nTotal: ${rentaConVehiculo.renta?.total}",
                         modifier = Modifier.padding(top = 8.dp)
                     )
                     Text(
-                        text = "Renta: \nEntrega: ",
+                        text = "Renta: ${rentaConVehiculo.renta?.fechaRenta} \nEntrega: ${rentaConVehiculo.renta?.fechaEntrega} ",
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }

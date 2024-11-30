@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,41 +38,18 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
 import java.io.File
-import androidx.compose.ui.graphics.Color
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorUistate
-import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleUistate
-import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoUistate
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun VehiculoRegistroScreen(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
-    marcaViewModel: MarcaViewModel = hiltViewModel(),
-    proveedorViewModel: ProveedorViewModel = hiltViewModel(),
-    tipoVehiculoViewModel: TipoVehiculoViewModel = hiltViewModel(),
-    tipoCombustibleViewModel: TipoCombustibleViewModel = hiltViewModel(),
 ) {
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
-    val proveedorUiState by proveedorViewModel.uistate.collectAsStateWithLifecycle()
-    val tipoVehiculoUiState by tipoVehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    val tipoCombustibleUiState by tipoCombustibleViewModel.uistate.collectAsStateWithLifecycle()
 
     VehiculoBodyRegistroScreen(
         vehiculoUiState = vehiculoUiState,
-        marcaUiState = marcaUiState,
-        tipoVehiculoUiState = tipoVehiculoUiState,
-        proveedorUiState = proveedorUiState,
-        tipoCombustibleUiState = tipoCombustibleUiState,
         onVehiculoEnvent = { vehiculoEvent -> vehiculoViewModel.onEvent(vehiculoEvent) },
     )
-
-
 }
 
 
@@ -79,15 +57,8 @@ fun VehiculoRegistroScreen(
 @Composable
 fun VehiculoBodyRegistroScreen(
     vehiculoUiState: VehiculoUistate,
-    marcaUiState: MarcaUiState,
-    proveedorUiState: ProveedorUistate,
-    tipoVehiculoUiState: TipoVehiculoUistate,
-    tipoCombustibleUiState: TipoCombustibleUistate,
     onVehiculoEnvent: (VehiculoEvent) -> Unit,
-
     ) {
-
-
     ElevatedCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         shape = RoundedCornerShape(20.dp),
@@ -103,20 +74,20 @@ fun VehiculoBodyRegistroScreen(
         ) {
             AsyncImage(
                 model = "https://rentcarblobstorage.blob.core.windows.net/images/carlogo.png",
-                contentDescription = null
+                contentDescription = "Imagen"
             )
             InputSelect(
                 label = "Marca",
-                options = marcaUiState.marcas,
+                options = vehiculoUiState.marcas,
                 onOptionSelected = {
-                    onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it?.marcaId?:0))
+                    onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
                 },
-                labelSelector = { it?.nombreMarca?:"" }
+                labelSelector = { it.nombreMarca }
             )
 
             InputSelect(
                 label = "Tipo Combustible",
-                options = tipoCombustibleUiState.tipoCombustibles,
+                options = vehiculoUiState.tipoCombustibles?: emptyList(),
                 onOptionSelected = {
                     onVehiculoEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
                 },
@@ -126,7 +97,7 @@ fun VehiculoBodyRegistroScreen(
 
             InputSelect(
                 label = "Tipo Vehiculo",
-                options = tipoVehiculoUiState.tipoVehiculos,
+                options = vehiculoUiState.tipoVehiculos?: emptyList(),
                 onOptionSelected = { onVehiculoEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId)) },
                 labelSelector = { it.nombreTipoVehiculo }
             )
@@ -142,7 +113,7 @@ fun VehiculoBodyRegistroScreen(
 
             InputSelect(
                 label = "Proveedor",
-                options = proveedorUiState.proveedores,
+                options = vehiculoUiState.proveedores?: emptyList(),
                 onOptionSelected = { onVehiculoEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId)) },
                 labelSelector = { it.nombre }
             )
