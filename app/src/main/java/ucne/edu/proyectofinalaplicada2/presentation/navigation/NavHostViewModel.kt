@@ -37,6 +37,7 @@ class NavHostViewModel @Inject constructor(
             is Screen.Home -> "Bienvenido, ${user?.displayName}"
             Screen.RentaListScreen -> "Rentas"
             Screen.FiltraVehiculo -> "Puedes buscar tu vehículo"
+            Screen.Settings -> "Configura tu perfil"
         }
 
         _uiState.update {

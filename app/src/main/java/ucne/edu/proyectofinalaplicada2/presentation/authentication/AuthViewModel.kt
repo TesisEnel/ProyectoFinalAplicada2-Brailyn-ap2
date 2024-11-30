@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
@@ -92,7 +93,8 @@ class AuthViewModel @Inject constructor(
                 apellido = "",
                 direccion = "",
                 celular = "",
-                email = user.email ?: ""
+                email = user.email ?: "",
+                isAdmin = true
             )
             clienteRepository.addCliente(clienteDto).collect { resource ->
                 when (resource) {
@@ -127,6 +129,76 @@ class AuthViewModel @Inject constructor(
         } catch (e: Exception) {
             false
         }
+    }
+    private fun isAdminUser(email: String): Boolean {
+        return try {
+            clienteRepository.isAdminUser(email, _uistate.value.clientes)
+        } catch (e: Exception) {
+            false
+        }
+    }
+    private fun checkIfUserIsAdmin(email: String) {
+        viewModelScope.launch {
+            val isAdmin = isAdminUser(email)
+            _uistate.update { it.copy(isAdmin = isAdmin) }
+        }
+    }
+    private fun updateUsuario(emailUsuario: String?) {
+        viewModelScope.launch {
+            // Obtener los datos del cliente desde la API
+            val cliente = getClienteByEmail(emailUsuario ?: "")
+            if (cliente != null) {
+                // Actualizar el estado con los datos obtenidos
+                _uistate.update {
+                    it.copy(
+                        clienteId = cliente.clienteId,
+                        nombre = cliente.nombre ?: "",
+                        email = cliente.email ?: "",
+                        apellidos = cliente.apellido ?: "",
+                        cedula = cliente.cedula ?: "",
+                        celular = cliente.celular ?: "",
+                        direccion = cliente.direccion ?: "",
+                    )
+                }
+            }
+
+
+        }
+    }
+
+    private fun uppdateClient(){
+        if (!validarSettings()) return
+        viewModelScope.launch {
+
+                clienteRepository.updateCliente(uistate.value.clienteId?:0, uistate.value.toEntity()).collect { result ->
+                    when (result) {
+                        is Resource.Loading -> {
+                            _uistate.update { it.copy(isLoading = true) }
+                        }
+                        is Resource.Success -> {
+                            _uistate.update {
+                                it.copy(
+                                    isLoading = false,
+                                    success = "Usuario actualizado correctamente."
+                                )
+                            }
+                        }
+                        is Resource.Error -> {
+                            _uistate.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Error al actualizar usuario: ${result.message}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+        return clienteRepository.getClienteByEmail(email).last().data
     }
 
 
@@ -181,7 +253,7 @@ class AuthViewModel @Inject constructor(
                         }
 
                         is Resource.Success -> {
-                            saveCliente(uistate.value.toEntity())
+                            saveCliente()
                             _uistate.update { it.copy(isLoading = false, error = null) }
                             nuevo()
                         }
@@ -248,6 +320,34 @@ class AuthViewModel @Inject constructor(
         }
         return !error
     }
+    private fun validarSettings(): Boolean {
+        var error = false
+        _uistate.update {
+            it.copy(
+
+                errorCelular = if (it.celular.isBlank() || !isValidPhone(it.celular)) {
+                    error = true
+                    if (it.celular.isBlank()) "El celular no puede estar vacio" else
+                        "El número de celular no es válido ej 8299440000"
+                } else "",
+                errorCedula = if (it.cedula.isBlank() || !isValidCedula(it.cedula)) {
+                    error = true
+                    if (it.cedula.isBlank()) "La cedula no puede estar vacia" else
+                        "La cedula no es valida"
+                } else "",
+                errorApellidos = if (it.apellidos.isBlank()) {
+                    error = true
+                    "El apellido no puede estar vacios"
+                } else "",
+                errorDireccion = if (it.direccion.isBlank()) {
+                    error = true
+                    "La direccion no puede estar vacia"
+                } else ""
+            )
+        }
+        return !error
+    }
+
 
     private fun isValidPhone(phone: String): Boolean {
         if (phone.length != 10 || !phone.all { it.isDigit() }) return false
@@ -281,9 +381,9 @@ class AuthViewModel @Inject constructor(
         )
     }
 
-    private fun saveCliente(cliente: ClienteDto) {
+    private fun saveCliente() {
         viewModelScope.launch {
-            clienteRepository.addCliente(cliente).collect { result ->
+            clienteRepository.addCliente(uistate.value.toEntity()).collect { result ->
                 when (result) {
                     is Resource.Error -> {
                         _uistate.update {
@@ -389,6 +489,7 @@ class AuthViewModel @Inject constructor(
         when (event) {
             AuthEvent.Login -> login()
             AuthEvent.Signup -> signup()
+            AuthEvent.SaveCliente -> saveCliente()
             AuthEvent.Signout -> signout()
             is AuthEvent.OnChangeEmail -> onEmailChanged(event.email)
             is AuthEvent.OnChangePassword -> onPasswordChanged(event.password)
@@ -399,6 +500,10 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeCelular -> onChangeCelular(event.celular)
             is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
+            is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
+            is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
+            is AuthEvent.UpdateClient -> uppdateClient()
+            is AuthEvent.CheckIfUserIsAdmin -> TODO()
         }
     }
 
