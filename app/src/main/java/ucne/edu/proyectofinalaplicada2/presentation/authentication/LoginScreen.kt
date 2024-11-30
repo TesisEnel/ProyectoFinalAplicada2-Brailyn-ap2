@@ -57,14 +57,14 @@ fun LoginScreen(
         viewModel.onEvent(event)
     }
     var passwordVisibility by remember { mutableStateOf(false) }
-
+    val isRoleVerified by viewModel.isRoleVerified.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (uiState.isLoading) {
+        if (uiState.isLoading|| !isRoleVerified) {
             CircularProgressIndicator()
         } else {
             Column(
