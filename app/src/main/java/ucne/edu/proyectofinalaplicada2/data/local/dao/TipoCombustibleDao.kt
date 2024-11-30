@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 
 @Dao
@@ -22,6 +23,6 @@ interface TipoCombustibleDao {
     suspend fun delete(tipoCombustible: TipoCombustibleEntity)
 
     @Query("SELECT * FROM TiposCombustibles")
-    suspend fun getAll(): List<TipoCombustibleEntity>
+    fun getAll(): Flow<List<TipoCombustibleEntity>>
 
 }
