@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,15 +35,11 @@ fun SettingUser(
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
-
-
-
     EditarUsuarioBodyScreen(
         uiState = uiState,
         goToBack = goToBack,
         onEvent = { event -> viewModel.onEvent(event) }
     )
-
 }
 
 @Composable
@@ -64,21 +59,17 @@ fun EditarUsuarioBodyScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        val scrollState = rememberScrollState() // Habilita el estado del scroll
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState) // Aplica el scroll a la columna
+                .verticalScroll(rememberScrollState())
         ) {
             Text(
                 text = "Editar Usuario",
-                style = MaterialTheme.typography.h4,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campos editables
             OutlinedTextField(
                 value = uiState.nombre,
                 onValueChange = { onEvent(AuthEvent.OnchangeNombre(it)) },
@@ -146,7 +137,7 @@ fun EditarUsuarioBodyScreen(
                 value = uiState.email,
                 onValueChange = { onEvent(AuthEvent.OnChangeEmail(it)) },
                 label = { Text("Email") },
-                enabled = false, // No editable en caso de que el email no deba cambiarse
+                enabled = false,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))

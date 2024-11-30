@@ -182,10 +182,8 @@ class AuthViewModel @Inject constructor(
 
     private fun updateUsuario(emailUsuario: String?) {
         viewModelScope.launch {
-            // Obtener los datos del cliente desde la API
             val cliente = getClienteByEmail(emailUsuario ?: "")
             if (cliente != null) {
-                // Actualizar el estado con los datos obtenidos
                 _uistate.update {
                     it.copy(
                         clienteId = cliente.clienteId,
@@ -198,8 +196,6 @@ class AuthViewModel @Inject constructor(
                     )
                 }
             }
-
-            // Preparar los datos para enviar la actualización a la API
             val clienteDto = ClienteDto(
                 clienteId = _uistate.value.clienteId,
                 cedula = _uistate.value.cedula,
@@ -521,8 +517,6 @@ class AuthViewModel @Inject constructor(
 
         }
     }
-
-
 }
 
 

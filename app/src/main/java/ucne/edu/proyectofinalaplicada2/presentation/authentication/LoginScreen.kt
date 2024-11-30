@@ -72,7 +72,6 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(16.dp)
             ) {
-                // Email TextField
                 OutlinedTextField(
                     value = uiState.email,
                     onValueChange = { onEvent(AuthEvent.OnChangeEmail(it)) },
