@@ -53,6 +53,8 @@ import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import ucne.edu.proyectofinalaplicada2.components.NavigationBar
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthEvent
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
@@ -65,12 +67,14 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 fun MainNavHost(
     navHostController: NavHostController,
     mainViewModel: NavHostViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     MainBodyNavHost(
         navHostController = navHostController,
         onEvent = { event -> mainViewModel.onEvent(event) },
         uiState = uiState,
+        onEventAuth = { event -> authViewModel.onEvent(event) }
     )
 }
 
@@ -82,18 +86,29 @@ fun MainBodyNavHost(
     navHostController: NavHostController,
     onEvent: (MainEvent) -> Unit = {},
     uiState: MainUiState,
+    viewModel: AuthViewModel = hiltViewModel(),
+    onEventAuth: (AuthEvent) -> Unit
 
 ) {
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
+    val AuthUiState by viewModel.uistate.collectAsStateWithLifecycle()
 
+    // Verificar si el usuario es admin al cargar
+    LaunchedEffect(Unit) {
+        val email = FirebaseAuth.getInstance().currentUser?.email
+        if (email != null) {
+            onEventAuth(AuthEvent.CheckIfUserIsAdmin(email))// Aquí se llama
+        }
+    }
     Scaffold(
         bottomBar = {
             NavigationBar(
                 navHostController = navHostController,
                 selectedItemIndex = selectedItemIndex,
-                onSelectItem = { selectedIndex -> selectedItemIndex = selectedIndex }
+                onSelectItem = { selectedIndex -> selectedItemIndex = selectedIndex },
+                uistate = AuthUiState
             )
         },
         topBar = {

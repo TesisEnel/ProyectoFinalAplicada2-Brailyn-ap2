@@ -56,4 +56,9 @@ class ClienteRepository @Inject constructor(
             false
         }
     }
+
+    fun isAdminUser(email: String, clientes: List<ClienteDto>): Boolean {
+        return clientes.any { it.email == email && (it.isAdmin ?: false) }
+    }
+
 }

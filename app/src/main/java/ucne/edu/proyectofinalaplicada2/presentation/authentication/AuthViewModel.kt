@@ -92,7 +92,8 @@ class AuthViewModel @Inject constructor(
                 apellido = "",
                 direccion = "",
                 celular = "",
-                email = user.email ?: ""
+                email = user.email ?: "",
+                isAdmin = true
             )
             clienteRepository.addCliente(clienteDto).collect { resource ->
                 when (resource) {
@@ -126,6 +127,20 @@ class AuthViewModel @Inject constructor(
             clienteRepository.clienteNotExist(email, _uistate.value.clientes)
         } catch (e: Exception) {
             false
+        }
+    }
+    private fun isAdminUser(email: String): Boolean {
+        return try {
+            clienteRepository.isAdminUser(email, _uistate.value.clientes)
+        } catch (e: Exception) {
+            // Manejar el error, por ejemplo, registrar en logs o retornar un valor predeterminado.
+            false
+        }
+    }
+    fun checkIfUserIsAdmin(email: String) {
+        viewModelScope.launch {
+            val isAdmin = isAdminUser(email)
+            _uistate.update { it.copy(isAdmin = isAdmin) }
         }
     }
 
@@ -399,6 +414,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeCelular -> onChangeCelular(event.celular)
             is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
+            is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
         }
     }
 
