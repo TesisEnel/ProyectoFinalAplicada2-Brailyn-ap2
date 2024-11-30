@@ -34,6 +34,7 @@ class VehiculoViewModel @Inject constructor(
         getMarcas()
         getTipoCombustible()
         getProveedores()
+        getTipoVehiculos()
     }
 
     private fun getVehiculos() {
@@ -122,38 +123,24 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
-//    private fun getModelosById(id: Int) {
-//        viewModelScope.launch {
-//            modeloRepository.getModelosById(id).collect { result ->
-//                when (result) {
-//                    is Resource.Error -> {
-//                        _uistate.update {
-//                            it.copy(
-//                                error = result.message ?: "Error"
-//                            )
-//                        }
-//                    }
-//
-//                    is Resource.Loading -> {
-//                        _uistate.update {
-//                            it.copy(
-//                                isLoading = true
-//                            )
-//                        }
-//                    }
-//
-//                    is Resource.Success -> {
-//                        _uistate.update {
-//                            it.copy(
-//                                modelos = result.data ?: emptyList(),
-//                                isLoading = false
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
+    private fun getTipoVehiculos(){
+        viewModelScope.launch {
+            val tipoVehiculos = tipoVehiculoRepository.getTiposVehiculos().data
+            _uistate.update {
+                it.copy(tipoVehiculos = tipoVehiculos?: emptyList())
+            }
+        }
+    }
+    private fun getModelosByMarcaId(id: Int) {
+        viewModelScope.launch {
+           val modelos = modeloRepository.getModelosByMarcaId(id).data
+            _uistate.update {
+                it.copy(
+                    modelos = modelos?: emptyList()
+                )
+            }
+        }
+    }
     private fun save() {
         viewModelScope.launch {
 
@@ -215,7 +202,7 @@ class VehiculoViewModel @Inject constructor(
         }
     }
     private fun onChangeMarcaId(marcaId: Int) {
-//        getModelosById(marcaId)
+        getModelosByMarcaId(marcaId)
         _uistate.update {
             it.copy(
                 marcaId = marcaId

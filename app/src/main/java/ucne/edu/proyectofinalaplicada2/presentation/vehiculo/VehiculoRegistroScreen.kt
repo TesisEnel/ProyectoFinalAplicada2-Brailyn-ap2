@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,15 +38,6 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
 import java.io.File
-import androidx.compose.ui.graphics.Color
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorUistate
-import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleUistate
-import ucne.edu.proyectofinalaplicada2.presentation.tipoCombustible.TipoCombustibleViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoUistate
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculoViewModel
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
