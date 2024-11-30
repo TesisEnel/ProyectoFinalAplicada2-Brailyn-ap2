@@ -19,9 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
 
 @Composable
 fun TipoVehiculoList(
@@ -29,7 +30,7 @@ fun TipoVehiculoList(
     marca: String,
     onGoVehiculeList: ((Int) -> Unit)? = null,
     onGoRenta: ((Int) -> Unit)? = null,
-    vehiculoDto: VehiculoEntity?,
+    vehiculoConMarca: VehiculoConMarca,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Card(
@@ -37,12 +38,12 @@ fun TipoVehiculoList(
             .padding(horizontal = 8.dp, vertical = 8.dp)
             .fillMaxWidth()
             .clickable(onClick = {
-                onMarcaEvent(MarcaEvent.OnchangeMarcaId(vehiculoDto?.marcaId ?: 0))
-                vehiculoDto?.marcaId?.let { marcaId ->
+                onMarcaEvent(MarcaEvent.OnchangeMarcaId(vehiculoConMarca.vehiculo.marcaId ?: 0))
+                vehiculoConMarca.vehiculo.marcaId?.let { marcaId ->
                     if (onGoVehiculeList != null) {
                         onGoVehiculeList(marcaId)
                     } else {
-                        onGoRenta?.invoke(vehiculoDto.vehiculoId ?: 0)
+                        onGoRenta?.invoke(vehiculoConMarca.vehiculo.vehiculoId ?: 0)
                     }
                 }
             }
@@ -66,7 +67,10 @@ fun TipoVehiculoList(
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically)
             ) {
-                Text(text = marca, style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    text = marca, style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.W500
+                )
             }
         }
     }
