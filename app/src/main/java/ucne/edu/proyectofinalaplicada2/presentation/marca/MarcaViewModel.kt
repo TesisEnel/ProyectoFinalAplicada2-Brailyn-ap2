@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -65,7 +64,7 @@ class MarcaViewModel @Inject constructor(
             val vehiculos = vehiculoRepository.getVehiculos().last().data
             val marcasUnicas = vehiculos?.distinctBy { it.marcaId }
             val marcas = marcasUnicas?.map { vehiculo ->
-                marcaRepository.getMarcaById(vehiculo.marcaId?:0).last().data
+                marcaRepository.getMarcaById(vehiculo.marcaId?:0).data
             }
 
             _uistate.update {
@@ -76,10 +75,6 @@ class MarcaViewModel @Inject constructor(
             }
         }
     }
-    private suspend fun getVehiculos(): List<VehiculoEntity> {
-        return vehiculoRepository.getVehiculos().last().data?: emptyList()
-    }
-
     private fun onChangeMarcaId(marcaId: Int) {
         _uistate.update {
             it.copy(

@@ -23,12 +23,6 @@ class VehiculoRepository @Inject constructor(
     private val vehiculoDao: VehiculoDao
 ){
     fun getVehiculos(): Flow<Resource<List<VehiculoEntity>>> = flow {
-
-        emit(Resource.Loading())
-        val localVehiculos = vehiculoDao.getAll().firstOrNull()
-        if(!localVehiculos.isNullOrEmpty()){
-            emit(Resource.Success(localVehiculos))
-        }
         try {
             emit(Resource.Loading())
             val vehiculos = rentCarRemoteDataSource.getVehiculos()
@@ -38,20 +32,22 @@ class VehiculoRepository @Inject constructor(
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            val localVehiculos = vehiculoDao.getAll().firstOrNull()
+            if(!localVehiculos.isNullOrEmpty()){
+                emit(Resource.Success(localVehiculos))
+            }
         }
     }
 
-    fun getVehiculoById(id: Int): Flow<Resource<VehiculoDto>> = flow {
-        try {
-            emit(Resource.Loading())
-            val vehiculo = rentCarRemoteDataSource.getVehiculos().first{ it.vehiculoId == id}
-            emit(Resource.Success(vehiculo))
+    suspend fun getVehiculoById(id: Int): Resource<VehiculoEntity?>  {
+        return try {
+            val vehiculo = vehiculoDao.find(id)
+            Resource.Success(vehiculo)
         } catch (e: HttpException) {
-            emit(Resource.Error("Error de internet ${e.message}"))
+            Resource.Error("Error de internet ${e.message}")
         }
         catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+           Resource.Error("Error desconocido ${e.message}")
         }
     }
 

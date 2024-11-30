@@ -1,8 +1,11 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ProveedorEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.MarcaDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 data class VehiculoUistate(
@@ -20,10 +23,20 @@ data class VehiculoUistate(
     var isLoadingData: Boolean? = null,
     val error: String = "",
     val success: String = "",
-    val marcas: List<MarcaDto> = emptyList(),
+    val marcas: List<MarcaEntity> = emptyList(),
     val vehiculos: List<VehiculoEntity> = emptyList(),
-    val modelos: List<ModeloDto> = emptyList(),
-    )
+    val modelos: List<ModeloEntity> = emptyList(),
+    val marca: MarcaEntity? = null,
+    val vehiculoConMarcas: List<VehiculoConMarca> = emptyList(),
+    val tipoCombustibles: List<TipoCombustibleEntity>? = emptyList(),
+    val proveedores: List<ProveedorEntity>? = emptyList(),
+    val tipoVehiculos: List<TipoVehiculoEntity>? = emptyList()
+)
+data class VehiculoConMarca(
+    val vehiculo: VehiculoEntity,
+    val nombreMarca: String?,
+    val nombreModelo: String? = null
+)
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
     vehiculoId = vehiculoId,
@@ -35,7 +48,7 @@ fun VehiculoUistate.toEntity()= VehiculoDto(
     descripcion = descripcion,
     anio = anio,
     imagePath = imagePath,
-    proveedorId = proveedorId
-
+    proveedorId = proveedorId,
+    marca = marca
 
 )

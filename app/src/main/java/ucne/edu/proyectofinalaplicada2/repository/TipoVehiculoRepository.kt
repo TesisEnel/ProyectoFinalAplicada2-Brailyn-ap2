@@ -1,25 +1,30 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
+import ucne.edu.proyectofinalaplicada2.data.local.dao.TipoVehiculoDao
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.TipoVehiculoDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 class TipoVehiculoRepository @Inject constructor(
-    private val rentCarRemoteDataSource: RentCarRemoteDataSource
+    private val rentCarRemoteDataSource: RentCarRemoteDataSource,
+    private val tipoVehiculoDao: TipoVehiculoDao
+
 ) {
-    fun getTiposVehiculos(): Flow<Resource<List<TipoVehiculoDto>>> = flow {
-        try {
-            emit(Resource.Loading())
+    suspend fun getTiposVehiculos(): Resource<List<TipoVehiculoEntity>> {
+        return try {
             val tiposVehiculos = rentCarRemoteDataSource.getTiposVehiculos()
-            emit(Resource.Success(tiposVehiculos))
+            tiposVehiculos.forEach { tipoVehiculoDao.save(it.toEntity()) }
+            val tipoVehiculosLocal = tipoVehiculoDao.getAll().firstOrNull()
+            Resource.Success(tipoVehiculosLocal?: emptyList())
         } catch (e: HttpException) {
-            emit(Resource.Error("Error de internet ${e.message}"))
+            Resource.Error("Error de internet ${e.message}")
         } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            val tipoVehiculosLocal = tipoVehiculoDao.getAll().firstOrNull()
+            Resource.Success(tipoVehiculosLocal?: emptyList())
         }
     }
 }

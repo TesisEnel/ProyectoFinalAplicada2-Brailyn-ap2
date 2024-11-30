@@ -11,7 +11,7 @@ data class MarcaUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val success: String? = null,
-    val marcas: List<MarcaDto?> = emptyList(),
+    val marcas: List<MarcaEntity?> = emptyList(),
     val imageUrl: String? = null,
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val marca: MarcaDto? = null

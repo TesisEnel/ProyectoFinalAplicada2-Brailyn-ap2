@@ -120,7 +120,7 @@ fun TipoVehiculeColumn(
                 TipoVehiculoList(
                     painter = painter,
                     marca = marca?.nombreMarca ?: "",
-                    onGoVehiculePresentation = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
+                    onGoRenta = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
                     vehiculoDto = vehiculoDto,
                     onMarcaEvent = onMarcaEvent
                 )

@@ -10,5 +10,5 @@ class RentaEntity(
     val vehiculoId: Int?,
     val fechaRenta: String?,
     val fechaEntrega: String?,
-    val total: Int?
+    val total: Double?
 )

@@ -1,6 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.view
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,12 +16,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,7 +37,6 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.components.ImageCard
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
 import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -47,7 +47,8 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 fun Home(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     marcaViewModel: MarcaViewModel = hiltViewModel(),
-    onGoVehiculeList:(Int)-> Unit
+    onGoVehiculeList:(Int)-> Unit,
+    onGoSearch: () -> Unit
 ) {
     val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
     val marcaUistate by marcaViewModel.uistate.collectAsStateWithLifecycle()
@@ -67,7 +68,9 @@ fun Home(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                SearchBar()
+                FakeSearchBar(
+                    onGoSearch = onGoSearch
+                )
             }
             item {
                 VehiculosMasDestacados(
@@ -80,7 +83,6 @@ fun Home(
                     marcaUiState = marcaUistate,
                     vehiculoUiState = vehiculoUistate,
                     onGoVehiculeList = onGoVehiculeList,
-                    onMarcaEvent = { marcaEvent -> marcaViewModel.onEvent(marcaEvent) }
                 )
             }
         }
@@ -88,29 +90,39 @@ fun Home(
 }
 
 @Composable
-fun SearchBar() {
-    TextField(
-        value = "",
-        onValueChange = {},
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null
-            )
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            focusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface
-        ),
-        placeholder = {
-            Text(stringResource(R.string.placeholder_search))
-        },
+fun FakeSearchBar(
+    onGoSearch: () -> Unit
+) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 50.dp)
+            .heightIn(max = 80.dp)
             .padding(15.dp)
-    )
+            .clickable(onClick = onGoSearch),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = stringResource(R.string.placeholder_search),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = stringResource(R.string.placeholder_search),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
 }
+
 
 @Composable
 fun VehiculosMasDestacados(
@@ -119,7 +131,7 @@ fun VehiculosMasDestacados(
 ) {
 
     Column(
-        modifier = Modifier.padding(bottom = 5.dp, top = 20.dp)
+        modifier = Modifier.padding(bottom = 5.dp, top = 20.dp),
     ) {
         Text(
             text = "Vehiculos destacados",
@@ -155,7 +167,6 @@ fun TiposDeVehiculos(
     marcaUiState: MarcaUiState,
     vehiculoUiState: VehiculoUistate,
     onGoVehiculeList:(Int)-> Unit,
-    onMarcaEvent: (MarcaEvent) -> Unit
 ) {
     Column {
         Text(

@@ -20,13 +20,13 @@ import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 interface RentCarApi {
     // clientes
-    @GET("api/Clientes")
+    @GET("api/Usuarios")
     suspend fun getClientes(): List<ClienteDto>
-    @POST("api/Clientes")
+    @POST("api/Usuarios")
     suspend fun addCliente(@Body clienteDto: ClienteDto): ClienteDto
-    @PUT("api/Clientes/{id}")
+    @PUT("api/Usuarios/{id}")
     suspend fun updateCliente(@Path ("id") id: Int ,@Body clienteDto: ClienteDto): ClienteDto
-    @GET("api/Clientes/GetByEmail/{email}")
+    @GET("api/Usuarios/GetByEmail/{email}")
     suspend fun getClienteByEmail(@Path("email") email: String): ClienteDto
 
     // rentas

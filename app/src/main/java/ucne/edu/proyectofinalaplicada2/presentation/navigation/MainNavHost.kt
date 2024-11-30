@@ -53,9 +53,11 @@ import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import ucne.edu.proyectofinalaplicada2.components.NavigationBar
+import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
+import ucne.edu.proyectofinalaplicada2.presentation.view.FiltraVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
@@ -169,6 +171,9 @@ fun MainBodyNavHost(
                     Home(
                         onGoVehiculeList = {
                             navHostController.navigate(Screen.TipoVehiculoListScreen(it))
+                        },
+                        onGoSearch = {
+                            navHostController.navigate(Screen.FiltraVehiculo)
                         }
                     )
                 }
@@ -213,6 +218,25 @@ fun MainBodyNavHost(
                         RentaScreen(
                             vehiculoId = id
                         )
+                    }
+                }
+                composable<Screen.RentaListScreen> {
+                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry?: return@composable))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        RentaListSceen()
+                    }
+                }
+                composable<Screen.FiltraVehiculo> {
+                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry?: return@composable))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        FiltraVehiculo()
                     }
                 }
             }

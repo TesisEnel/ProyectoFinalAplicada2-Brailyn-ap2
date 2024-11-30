@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
 
 @Dao
@@ -21,6 +22,6 @@ interface RentaDao {
     suspend fun delete(renta: RentaEntity)
 
     @Query("SELECT * FROM Rentas")
-    suspend fun getAll(): List<RentaEntity>
+    fun getAll(): Flow<List<RentaEntity>>
 
 }

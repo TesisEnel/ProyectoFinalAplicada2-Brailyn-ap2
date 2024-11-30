@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 
 @Dao
@@ -20,5 +21,13 @@ interface ModeloDao {
     @Delete
     suspend fun delete(modelo: ModeloEntity)
     @Query("SELECT * FROM Modelos")
-    suspend fun getAll(): List<ModeloEntity>
+    fun getAll(): Flow<List<ModeloEntity>>
+    @Query(
+        """
+    SELECT * 
+    FROM Modelos 
+    WHERE marcaId = :marcaId
+    """
+    )
+    suspend fun findByMarcaId(marcaId: Int): List<ModeloEntity>
 }
