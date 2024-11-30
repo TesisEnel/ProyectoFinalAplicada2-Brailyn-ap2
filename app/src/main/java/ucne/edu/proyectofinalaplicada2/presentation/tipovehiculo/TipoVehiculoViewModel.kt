@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.repository.TipoVehiculoRepository
-import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,40 +18,15 @@ class TipoVehiculoViewModel @Inject constructor(
     val uistate = _uistate.asStateFlow()
 
     init {
-        getProveedores()
+        getTipoVehiculos()
     }
 
-    private fun getProveedores(){
+    private fun getTipoVehiculos(){
         viewModelScope.launch {
-            tipoVehiculoRepository.getTiposVehiculos().collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                tipoVehiculos = result.data ?: emptyList()
-                            )
-                        }
-                    }
-                }
+            val tipoVehiculos = tipoVehiculoRepository.getTiposVehiculos().data
+            _uistate.update {
+                it.copy(tipoVehiculos = tipoVehiculos?: emptyList())
             }
         }
     }
-
-
 }
