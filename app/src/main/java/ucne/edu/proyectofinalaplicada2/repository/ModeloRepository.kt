@@ -45,4 +45,19 @@ class ModeloRepository @Inject constructor(
         }
     }
 
+    suspend fun getModelosByMarcaId(marcaId: Int): Resource<List<ModeloEntity>> {
+        return try{
+            val modelos = rentCarRemoteDataSource.getModelos()
+            modelos.forEach{ modelo -> modeloDao.save(modelo.toEntity())}
+            val localModelos = modeloDao.findByMarcaId(marcaId)
+            Resource.Success(localModelos)
+        }catch (e: HttpException){
+            Resource.Error("Error de internet ${e.message}")
+        }
+        catch (e: Exception){
+            val localModelos = modeloDao.findByMarcaId(marcaId)
+            Resource.Success(localModelos)
+        }
+    }
+
 }
