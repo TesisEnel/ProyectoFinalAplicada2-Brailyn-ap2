@@ -24,32 +24,11 @@ class ProveedorViewModel @Inject constructor(
 
     private fun getProveedores(){
         viewModelScope.launch {
-            proveedorRepository.getProveedores().collect { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                proveedores = result.data ?: emptyList()
-                            )
-                        }
-                    }
-                }
+           val proveedores = proveedorRepository.getProveedores().data
+            _uistate.update {
+                it.copy(
+                    proveedores = proveedores?: emptyList()
+                )
             }
         }
     }
