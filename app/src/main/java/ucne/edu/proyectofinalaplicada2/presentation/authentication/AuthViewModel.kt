@@ -195,7 +195,7 @@ class AuthViewModel @Inject constructor(
                 }
             }
         }
-    }
+
 
     private suspend fun getClienteByEmail(email: String): ClienteDto? {
         return clienteRepository.getClienteByEmail(email).last().data
@@ -503,7 +503,6 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
             is AuthEvent.UpdateClient -> uppdateClient()
-            is AuthEvent.CheckIfUserIsAdmin -> TODO()
         }
     }
 
