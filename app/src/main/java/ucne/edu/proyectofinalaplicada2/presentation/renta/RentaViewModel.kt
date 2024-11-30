@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
+import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
 import ucne.edu.proyectofinalaplicada2.repository.RentaRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
@@ -29,6 +30,7 @@ class RentaViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
     private val clienteRepository: ClienteRepository,
     private val marcaRepository: MarcaRepository,
+    private val modeloRepository: ModeloRepository,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
@@ -36,6 +38,8 @@ class RentaViewModel @Inject constructor(
     init {
         getRentas()
     }
+
+
 
     private fun getRentas() {
         viewModelScope.launch {
@@ -64,6 +68,7 @@ class RentaViewModel @Inject constructor(
                                 rentas = result.data ?: emptyList()
                             )
                         }
+                        mostrarDatosVehiculo()
                     }
                 }
             }
@@ -103,6 +108,28 @@ class RentaViewModel @Inject constructor(
         }
     }
 
+    private fun mostrarDatosVehiculo() {
+        viewModelScope.launch {
+            val rentaConVehiculo = _uistate.value.rentas.map { rentaEntity ->
+                val vehiculo = getVehiculoById(rentaEntity.vehiculoId?:0)
+                val marca = marcaRepository.getMarcaById(vehiculo?.marcaId ?: 0).data
+                val modelo = _uistate.value.modelos.find { modelo-> modelo.marcaId == marca?.marcaId }
+                RentaConVehiculo(
+                    marca = marca,
+                    renta = rentaEntity,
+                    nombreModelo = modelo?.modeloVehiculo,
+                    anio = vehiculo?.anio
+                )
+            }
+            _uistate.update {
+                it.copy(
+                    rentaConVehiculo = rentaConVehiculo
+                )
+            }
+
+        }
+    }
+
     private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
         viewModelScope.launch {
 
@@ -138,13 +165,17 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
+    private suspend fun getVehiculoById(id: Int): VehiculoEntity?{
+       return vehiculoRepository.getVehiculoById(id).data
+
+    }
 
     private suspend fun getClienteByEmail(email: String): ClienteDto? {
         return clienteRepository.getClienteByEmail(email).last().data
     }
 
-    private suspend fun getvehiculoById(id: Int): VehiculoDto? {
-        return vehiculoRepository.getVehiculoById(id).last().data
+    private suspend fun getvehiculoById(id: Int): VehiculoEntity? {
+        return vehiculoRepository.getVehiculoById(id).data
     }
 
     private suspend fun getMarcaById(id: Int): MarcaEntity? {
