@@ -143,7 +143,6 @@ class AuthViewModel @Inject constructor(
             _uistate.update { it.copy(isAdmin = isAdmin) }
         }
     }
-
     private fun updateUsuario(emailUsuario: String?) {
         viewModelScope.launch {
             // Obtener los datos del cliente desde la API
@@ -163,38 +162,34 @@ class AuthViewModel @Inject constructor(
                 }
             }
 
-            // Preparar los datos para enviar la actualización a la API
-            val clienteDto = ClienteDto(
-                clienteId = _uistate.value.clienteId,
-                cedula = _uistate.value.cedula,
-                nombre = _uistate.value.nombre,
-                apellido = _uistate.value.apellidos,
-                direccion = _uistate.value.direccion,
-                celular = _uistate.value.celular,
-                email = _uistate.value.email,
-                isAdmin = true
-            )
 
+        }
+    }
 
-            clienteRepository.updateCliente(clienteDto.clienteId ?: 0, clienteDto).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        _uistate.update { it.copy(isLoading = true) }
-                    }
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = false,
-                                success = "Usuario actualizado correctamente."
-                            )
+    private fun uppdateClient(){
+        if (!validarSettings()) return
+        viewModelScope.launch {
+
+                clienteRepository.updateCliente(uistate.value.clienteId?:0, uistate.value.toEntity()).collect { result ->
+                    when (result) {
+                        is Resource.Loading -> {
+                            _uistate.update { it.copy(isLoading = true) }
                         }
-                    }
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = false,
-                                error = "Error al actualizar usuario: ${result.message}"
-                            )
+                        is Resource.Success -> {
+                            _uistate.update {
+                                it.copy(
+                                    isLoading = false,
+                                    success = "Usuario actualizado correctamente."
+                                )
+                            }
+                        }
+                        is Resource.Error -> {
+                            _uistate.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Error al actualizar usuario: ${result.message}"
+                                )
+                            }
                         }
                     }
                 }
@@ -325,6 +320,34 @@ class AuthViewModel @Inject constructor(
         }
         return !error
     }
+    private fun validarSettings(): Boolean {
+        var error = false
+        _uistate.update {
+            it.copy(
+
+                errorCelular = if (it.celular.isBlank() || !isValidPhone(it.celular)) {
+                    error = true
+                    if (it.celular.isBlank()) "El celular no puede estar vacio" else
+                        "El número de celular no es válido ej 8299440000"
+                } else "",
+                errorCedula = if (it.cedula.isBlank() || !isValidCedula(it.cedula)) {
+                    error = true
+                    if (it.cedula.isBlank()) "La cedula no puede estar vacia" else
+                        "La cedula no es valida"
+                } else "",
+                errorApellidos = if (it.apellidos.isBlank()) {
+                    error = true
+                    "El apellido no puede estar vacios"
+                } else "",
+                errorDireccion = if (it.direccion.isBlank()) {
+                    error = true
+                    "La direccion no puede estar vacia"
+                } else ""
+            )
+        }
+        return !error
+    }
+
 
     private fun isValidPhone(phone: String): Boolean {
         if (phone.length != 10 || !phone.all { it.isDigit() }) return false
@@ -479,7 +502,8 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
             is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
-
+            is AuthEvent.UpdateClient -> uppdateClient()
+            is AuthEvent.CheckIfUserIsAdmin -> TODO()
         }
     }
 
