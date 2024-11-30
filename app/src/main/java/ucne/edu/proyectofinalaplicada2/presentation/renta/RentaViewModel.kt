@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
@@ -112,8 +113,8 @@ class RentaViewModel @Inject constructor(
         viewModelScope.launch {
             val rentaConVehiculo = _uistate.value.rentas.map { rentaEntity ->
                 val vehiculo = getVehiculoById(rentaEntity.vehiculoId?:0)
-                val marca = marcaRepository.getMarcaById(vehiculo?.marcaId ?: 0).data
-                val modelo = _uistate.value.modelos.find { modelo-> modelo.marcaId == marca?.marcaId }
+                val marca = getMarcaById(vehiculo?.marcaId ?: 0)
+                val modelo = getModeloById(vehiculo?.modeloId?:0)
                 RentaConVehiculo(
                     marca = marca,
                     renta = rentaEntity,
@@ -167,9 +168,7 @@ class RentaViewModel @Inject constructor(
     }
     private suspend fun getVehiculoById(id: Int): VehiculoEntity?{
        return vehiculoRepository.getVehiculoById(id).data
-
     }
-
     private suspend fun getClienteByEmail(email: String): ClienteDto? {
         return clienteRepository.getClienteByEmail(email).last().data
     }
@@ -180,6 +179,9 @@ class RentaViewModel @Inject constructor(
 
     private suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
+    }
+    private suspend fun getModeloById(id: Int): ModeloEntity? {
+        return modeloRepository.getModelosById(id).data
     }
 
     private fun createRenta() {
