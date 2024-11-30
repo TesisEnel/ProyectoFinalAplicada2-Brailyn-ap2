@@ -14,7 +14,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.BottomNavigationItem
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
@@ -25,10 +27,11 @@ fun NavigationBar(
     navHostController: NavHostController,
     selectedItemIndex: Int,
     onSelectItem: (Int) -> Unit,
-    uistate: ClienteUiState
+    roleFlow: Flow<Boolean>
 ) {
+    val isAdmin = roleFlow.collectAsStateWithLifecycle(false)
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        val items = if (uistate.isAdmin) {
+        val items = if (isAdmin.value) {
             listOf(
                 BottomNavigationItem(
                     title = "Home",
@@ -89,4 +92,6 @@ fun NavigationBar(
             )
         }
     }
+
+
 }
