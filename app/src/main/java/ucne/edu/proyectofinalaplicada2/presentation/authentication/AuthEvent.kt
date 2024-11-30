@@ -14,7 +14,6 @@ sealed interface AuthEvent {
     data class OnchangeApellidos(val apellidos: String) : AuthEvent
     data class OnchangeDireccion(val direccion: String) : AuthEvent
     data class OnchangeCelular(val celular: String) : AuthEvent
-    data class CheckIfUserIsAdmin(val email: String) : AuthEvent
     data class UpdateUsuario(val email:String): AuthEvent
     data object SaveCliente: AuthEvent
 
