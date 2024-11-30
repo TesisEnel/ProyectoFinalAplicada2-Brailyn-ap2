@@ -98,7 +98,9 @@ dependencies {
     // Also add the dependency for the Google Play services library and specify its version
     implementation(libs.play.services.auth)
 
-
+    //DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.datastore.preferences.core)
 
     //Accompanish
     implementation (libs.accompanist.pager)
