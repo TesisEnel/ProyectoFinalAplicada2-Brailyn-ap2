@@ -118,7 +118,6 @@ fun MainBodyNavHost(
                     navHostController = navHostController,
                     selectedItemIndex = selectedItemIndex,
                     onSelectItem = { selectedIndex -> selectedItemIndex = selectedIndex },
-                    authState = authUistate,
                     roleFlow = roleFlow
                 )
             },
