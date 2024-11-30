@@ -26,7 +26,7 @@ interface RentCarApi {
     suspend fun addCliente(@Body clienteDto: ClienteDto): ClienteDto
     @PUT("api/Usuarios/{id}")
     suspend fun updateCliente(@Path ("id") id: Int ,@Body clienteDto: ClienteDto): ClienteDto
-    @GET("api/Usuarios/GetByEmail/{email}")
+    @GET("api/Usuarios/api/Clientes/GetByEmail/{email}")
     suspend fun getClienteByEmail(@Path("email") email: String): ClienteDto
 
     // rentas

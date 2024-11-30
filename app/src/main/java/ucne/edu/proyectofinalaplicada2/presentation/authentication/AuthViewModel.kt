@@ -1,19 +1,26 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
+import ucne.edu.proyectofinalaplicada2.utils.PreferenceKeys
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
@@ -22,6 +29,8 @@ class AuthViewModel @Inject constructor(
     private val clienteRepository: ClienteRepository,
     private val authRepository: AuthRepository,
     private val googleAuthClient: GoogleAuthClient,
+    private val dataStore: DataStore<Preferences>
+
 ) : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _authState = MutableLiveData<AuthState>()
@@ -29,10 +38,34 @@ class AuthViewModel @Inject constructor(
     private val _uistate = MutableStateFlow(ClienteUiState())
     val uistate = _uistate.asStateFlow()
 
+    val roleFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[PreferenceKeys.role] ?: false
+    }
+
 
     init {
         checkAuthStatus()
         getClientes()
+    }
+
+    private suspend fun saveRole(role: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKeys.role] = role
+        }
+    }
+
+    private fun clearDataStore() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences.clear()
+            }
+        }
+    }
+
+    private suspend fun readRole(): Boolean? {
+        return dataStore.data.map { preferences ->
+            preferences[PreferenceKeys.role]
+        }.firstOrNull()
     }
 
     private fun signInWithGoogle() {
@@ -41,6 +74,9 @@ class AuthViewModel @Inject constructor(
 
             try {
                 val user = googleAuthClient.signInAndGetUser()
+                if (readRole() == null) {
+                    async { isAdminUser(user?.email ?: "") }.await()
+                }
                 if (user != null) {
                     handleUserSignIn(user)
                 } else {
@@ -71,16 +107,21 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _uistate.update { it.copy(clientes = result.data?: emptyList(), isLoading = false) }
+                        _uistate.update {
+                            it.copy(
+                                clientes = result.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }
         }
     }
 
-     private fun handleUserSignIn(user: FirebaseUser) {
+    private fun handleUserSignIn(user: FirebaseUser) {
         viewModelScope.launch {
-            val clienteExiste = clienteExist( user.email?:"")
+            val clienteExiste = clienteExist(user.email ?: "")
             if (clienteExiste) {
                 _uistate.update { it.copy(success = "Bienvenido de nuevo.") }
                 return@launch
@@ -102,7 +143,7 @@ class AuthViewModel @Inject constructor(
                         _uistate.update {
                             it.copy(
                                 isLoading = false,
-                                success = "Cliente registrado exitosamente."
+                                success = "Cliente registrado exitosamente.",
                             )
                         }
                     }
@@ -123,6 +164,7 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
     private fun clienteExist(email: String): Boolean {
         return try {
             clienteRepository.clienteNotExist(email, _uistate.value.clientes)
@@ -130,19 +172,16 @@ class AuthViewModel @Inject constructor(
             false
         }
     }
+
     private fun isAdminUser(email: String): Boolean {
-        return try {
-            clienteRepository.isAdminUser(email, _uistate.value.clientes)
-        } catch (e: Exception) {
-            false
-        }
-    }
-    private fun checkIfUserIsAdmin(email: String) {
+        val userAdmin = uistate.value.clientes.any { it.isAdmin == true && it.email == email }
         viewModelScope.launch {
-            val isAdmin = isAdminUser(email)
-            _uistate.update { it.copy(isAdmin = isAdmin) }
+            async { saveRole(userAdmin) }.await()
         }
+        return userAdmin
     }
+
+
     private fun updateUsuario(emailUsuario: String?) {
         viewModelScope.launch {
             // Obtener los datos del cliente desde la API
@@ -166,15 +205,17 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun uppdateClient(){
+    private fun uppdateClient() {
         if (!validarSettings()) return
         viewModelScope.launch {
 
-                clienteRepository.updateCliente(uistate.value.clienteId?:0, uistate.value.toEntity()).collect { result ->
+            clienteRepository.updateCliente(uistate.value.clienteId ?: 0, uistate.value.toEntity())
+                .collect { result ->
                     when (result) {
                         is Resource.Loading -> {
                             _uistate.update { it.copy(isLoading = true) }
                         }
+
                         is Resource.Success -> {
                             _uistate.update {
                                 it.copy(
@@ -183,6 +224,7 @@ class AuthViewModel @Inject constructor(
                                 )
                             }
                         }
+
                         is Resource.Error -> {
                             _uistate.update {
                                 it.copy(
@@ -193,14 +235,13 @@ class AuthViewModel @Inject constructor(
                         }
                     }
                 }
-            }
         }
 
-
-    private suspend fun getClienteByEmail(email: String): ClienteDto? {
-        return clienteRepository.getClienteByEmail(email).last().data
     }
 
+    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+        return clienteRepository.getClienteByEmail(email).data
+    }
 
     private fun checkAuthStatus() {
         if (auth.currentUser == null) {
@@ -320,6 +361,7 @@ class AuthViewModel @Inject constructor(
         }
         return !error
     }
+
     private fun validarSettings(): Boolean {
         var error = false
         _uistate.update {
@@ -500,20 +542,18 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeCelular -> onChangeCelular(event.celular)
             is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
-            is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
             is AuthEvent.UpdateClient -> uppdateClient()
         }
     }
 
-
 }
 
 
 sealed class AuthState {
-    object Authenticated : AuthState()
-    object Unauthenticated : AuthState()
-    object Loading : AuthState()
+    data object Authenticated : AuthState()
+    data object Unauthenticated : AuthState()
+    data object Loading : AuthState()
     data class Error(val message: String) : AuthState()
 }
 
