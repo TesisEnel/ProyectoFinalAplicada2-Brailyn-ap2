@@ -22,4 +22,12 @@ interface ModeloDao {
     suspend fun delete(modelo: ModeloEntity)
     @Query("SELECT * FROM Modelos")
     fun getAll(): Flow<List<ModeloEntity>>
+    @Query(
+        """
+    SELECT * 
+    FROM Modelos 
+    WHERE marcaId = :marcaId
+    """
+    )
+    suspend fun findByMarcaId(marcaId: Int): List<ModeloEntity>
 }
