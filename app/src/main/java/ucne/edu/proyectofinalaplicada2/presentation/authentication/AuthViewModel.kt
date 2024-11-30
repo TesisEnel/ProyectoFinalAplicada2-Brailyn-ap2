@@ -213,7 +213,7 @@ class AuthViewModel @Inject constructor(
                     }
                 }
         }
-    }
+
 
 
     private fun checkAuthStatus() {
