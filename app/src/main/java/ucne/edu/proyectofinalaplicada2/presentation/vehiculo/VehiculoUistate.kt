@@ -1,6 +1,8 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ProveedorEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
@@ -24,7 +26,9 @@ data class VehiculoUistate(
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
     val marca: MarcaEntity? = null,
-    val vehiculoConMarcas: List<VehiculoConMarca> = emptyList()
+    val vehiculoConMarcas: List<VehiculoConMarca> = emptyList(),
+    val tipoCombustibles: List<TipoCombustibleEntity>? = emptyList(),
+    val proveedores: List<ProveedorEntity>? = emptyList()
 )
 data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,
