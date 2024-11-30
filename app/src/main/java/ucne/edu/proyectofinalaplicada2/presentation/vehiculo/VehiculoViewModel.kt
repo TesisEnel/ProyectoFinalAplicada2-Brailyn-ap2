@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
+import ucne.edu.proyectofinalaplicada2.repository.ProveedorRepository
+import ucne.edu.proyectofinalaplicada2.repository.TipoCombustibleRepository
+import ucne.edu.proyectofinalaplicada2.repository.TipoVehiculoRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import java.io.File
@@ -18,13 +21,19 @@ import javax.inject.Inject
 class VehiculoViewModel @Inject constructor(
     private val vehiculoRepository: VehiculoRepository,
     private val modeloRepository: ModeloRepository,
-    private val marcaRepository: MarcaRepository
+    private val marcaRepository: MarcaRepository,
+    private val tipoCombustibleRepository: TipoCombustibleRepository,
+    private val tipoVehiculoRepository: TipoVehiculoRepository,
+    private val proveedorRepository: ProveedorRepository
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(VehiculoUistate())
     val uistate = _uistate.asStateFlow()
 
     init {
         getVehiculos()
+        getMarcas()
+        getTipoCombustible()
+        getProveedores()
     }
 
     private fun getVehiculos() {
@@ -60,18 +69,19 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
-    private fun getModelosById(id: Int) {
+    private fun getMarcas() {
         viewModelScope.launch {
-            modeloRepository.getModelosById(id).collect { result ->
+            marcaRepository.getMarcas().collect { result ->
+
                 when (result) {
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoading = false
                             )
                         }
                     }
-
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -79,19 +89,71 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
-
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                modelos = result.data ?: emptyList(),
+                                marcas = result.data ?: emptyList(),
                                 isLoading = false
                             )
                         }
+                        getVehiculoConMarcas()
                     }
                 }
             }
         }
     }
+    private fun getTipoCombustible(){
+        viewModelScope.launch {
+            val tiposCombustibles = tipoCombustibleRepository.getTiposCombustibles().data
+            _uistate.update {
+                it.copy(
+                    tipoCombustibles = tiposCombustibles
+                )
+            }
+        }
+    }
+    private fun getProveedores(){
+        viewModelScope.launch {
+            val proveedores = proveedorRepository.getProveedores().data
+            _uistate.update {
+                it.copy(
+                    proveedores = proveedores?: emptyList()
+                )
+            }
+        }
+    }
+//    private fun getModelosById(id: Int) {
+//        viewModelScope.launch {
+//            modeloRepository.getModelosById(id).collect { result ->
+//                when (result) {
+//                    is Resource.Error -> {
+//                        _uistate.update {
+//                            it.copy(
+//                                error = result.message ?: "Error"
+//                            )
+//                        }
+//                    }
+//
+//                    is Resource.Loading -> {
+//                        _uistate.update {
+//                            it.copy(
+//                                isLoading = true
+//                            )
+//                        }
+//                    }
+//
+//                    is Resource.Success -> {
+//                        _uistate.update {
+//                            it.copy(
+//                                modelos = result.data ?: emptyList(),
+//                                isLoading = false
+//                            )
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     private fun save() {
         viewModelScope.launch {
 
@@ -153,7 +215,7 @@ class VehiculoViewModel @Inject constructor(
         }
     }
     private fun onChangeMarcaId(marcaId: Int) {
-        getModelosById(marcaId)
+//        getModelosById(marcaId)
         _uistate.update {
             it.copy(
                 marcaId = marcaId
