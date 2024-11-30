@@ -1,6 +1,7 @@
 [versions]
 accompanistPager = "0.36.0"
 agp = "8.7.1"
+datastorePreferencesCore = "1.1.1"
 firebaseBom = "33.6.0"
 gson = "2.10.1"
 kotlin = "2.0.20"
@@ -30,6 +31,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentialsPlayServicesAuth" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 

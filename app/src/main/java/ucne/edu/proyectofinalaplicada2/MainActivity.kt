@@ -6,12 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.RentCarNavHost
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -24,13 +23,5 @@ class MainActivity : ComponentActivity() {
                 RentCarNavHost(navController)
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ProyectoFinalAplicada2Theme {
-
     }
 }

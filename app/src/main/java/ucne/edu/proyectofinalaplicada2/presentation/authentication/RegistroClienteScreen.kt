@@ -95,8 +95,6 @@ fun RegistroClienteBodyScreen(
                 style = MaterialTheme.typography.bodyMedium,
 
                 )
-
-
             Spacer(modifier = Modifier.height(8.dp))
             PhoneInputField(
                 phone = uiState.celular,
@@ -231,7 +229,8 @@ fun PhoneInputField(
 @Composable
 fun CedulaInputField(
     cedula: String,
-    onCedulaChange: (String) -> Unit
+    onCedulaChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
         value = cedula,
@@ -247,6 +246,6 @@ fun CedulaInputField(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     )
 }

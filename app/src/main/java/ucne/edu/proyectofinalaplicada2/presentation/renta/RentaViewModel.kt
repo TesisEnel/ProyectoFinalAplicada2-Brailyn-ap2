@@ -172,7 +172,7 @@ class RentaViewModel @Inject constructor(
        return vehiculoRepository.getVehiculoById(id).data
     }
     private suspend fun getClienteByEmail(email: String): ClienteDto? {
-        return clienteRepository.getClienteByEmail(email).last().data
+        return clienteRepository.getClienteByEmail(email).data
     }
 
     private suspend fun getvehiculoById(id: Int): VehiculoEntity? {

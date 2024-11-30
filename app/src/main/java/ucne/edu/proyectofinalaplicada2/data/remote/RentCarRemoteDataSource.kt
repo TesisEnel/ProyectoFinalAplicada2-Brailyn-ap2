@@ -13,8 +13,8 @@ class RentCarRemoteDataSource @Inject constructor(
     //cliente
     suspend fun getClientes() = rentCarApi.getClientes()
     suspend fun addCliente(clienteDto: ClienteDto) = rentCarApi.addCliente(clienteDto)
+    suspend fun updateCliente(id: Int, clienteDto: ClienteDto) = rentCarApi.updateCliente(id, clienteDto)
     suspend fun getClienteByEmail(email: String) = rentCarApi.getClienteByEmail(email)
-
     //renta
     suspend fun getRentas() = rentCarApi.getRentas()
     suspend fun addRenta(rentaDto: RentaDto) = rentCarApi.addRenta(rentaDto)

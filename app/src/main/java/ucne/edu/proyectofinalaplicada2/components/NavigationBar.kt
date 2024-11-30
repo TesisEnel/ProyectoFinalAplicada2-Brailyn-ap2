@@ -14,7 +14,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.Flow
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.BottomNavigationItem
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 
@@ -23,31 +26,48 @@ import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 fun NavigationBar(
     navHostController: NavHostController,
     selectedItemIndex: Int,
-    onSelectItem: (Int) -> Unit
+    onSelectItem: (Int) -> Unit,
+    roleFlow: Flow<Boolean>
 ) {
-    NavigationBar(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val items = listOf(
-            BottomNavigationItem(
-                title = "Home",
-                selectedIcon = Icons.Filled.Home,
-                unSelectedIcon = Icons.Outlined.Home,
-                screen = Screen.Home
-            ),
-            BottomNavigationItem(
-                title = "Renta",
-                selectedIcon = Icons.Filled.Call,
-                unSelectedIcon = Icons.Outlined.Call,
-                screen = Screen.VehiculoRegistroScreen
-            ),
-            BottomNavigationItem(
-                title = "Settings",
-                selectedIcon = Icons.Filled.Settings,
-                unSelectedIcon = Icons.Outlined.Settings,
-                screen = Screen.RentaListScreen
+    val isAdmin = roleFlow.collectAsStateWithLifecycle(false)
+    NavigationBar(modifier = Modifier.fillMaxWidth()) {
+        val items = if (isAdmin.value) {
+            listOf(
+                BottomNavigationItem(
+                    title = "Home",
+                    selectedIcon = Icons.Filled.Home,
+                    unSelectedIcon = Icons.Outlined.Home,
+                    screen = Screen.Home
+                ),
+                BottomNavigationItem(
+                    title = "Renta",
+                    selectedIcon = Icons.Filled.Call,
+                    unSelectedIcon = Icons.Outlined.Call,
+                    screen = Screen.VehiculoRegistroScreen
+                ),
+                BottomNavigationItem(
+                    title = "Historial",
+                    selectedIcon = Icons.Filled.Settings,
+                    unSelectedIcon = Icons.Outlined.Settings,
+                    screen = Screen.RentaListScreen
+                )
             )
-        )
+        } else {
+            listOf(
+                BottomNavigationItem(
+                    title = "Home",
+                    selectedIcon = Icons.Filled.Home,
+                    unSelectedIcon = Icons.Outlined.Home,
+                    screen = Screen.Home
+                ),
+                BottomNavigationItem(
+                    title = "Historial",
+                    selectedIcon = Icons.Filled.Settings,
+                    unSelectedIcon = Icons.Outlined.Settings,
+                    screen = Screen.RentaListScreen
+                )
+            )
+        }
 
         items.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -72,4 +92,6 @@ fun NavigationBar(
             )
         }
     }
+
+
 }

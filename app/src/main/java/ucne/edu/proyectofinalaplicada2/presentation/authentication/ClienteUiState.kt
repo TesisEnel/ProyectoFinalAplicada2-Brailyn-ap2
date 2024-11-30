@@ -25,7 +25,8 @@ data class ClienteUiState(
     val errorEmail: String? = null,
     val errorPassword: String? = null,
     val clientebyEmail: ClienteDto? = null,
-    val existCliente: Boolean = false
+    val existCliente: Boolean = false,
+    val isAdmin: Boolean = false,
     )
 
 fun ClienteUiState.toEntity() = ClienteDto(
@@ -35,5 +36,6 @@ fun ClienteUiState.toEntity() = ClienteDto(
     apellido = apellidos,
     direccion = direccion,
     celular = celular,
-    email = email
+    email = email,
+    isAdmin = isAdmin
 )

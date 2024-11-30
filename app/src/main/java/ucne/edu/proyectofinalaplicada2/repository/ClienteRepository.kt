@@ -22,17 +22,16 @@ class ClienteRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
-    fun getClienteByEmail(email: String): Flow<Resource<ClienteDto>> = flow {
-        try {
-            emit(Resource.Loading())
-            val cliente = rentCarRemoteDataSource.getClientes().first{ it.email == email}
-            emit(Resource.Success(cliente))
+    suspend fun getClienteByEmail(email: String): Resource<ClienteDto?>  {
+        return try {
+            val cliente = rentCarRemoteDataSource.getClienteByEmail(email)
+            Resource.Success(cliente)
         }
         catch (e: HttpException) {
-            emit(Resource.Error("Error de internet ${e.message}"))
+            Resource.Error("Error de internet ${e.message}")
         }
         catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            Resource.Error("Error desconocido ${e.message}")
         }
     }
 
@@ -49,6 +48,18 @@ class ClienteRepository @Inject constructor(
         }
     }
 
+    fun updateCliente(id: Int, clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val cliente = rentCarRemoteDataSource.updateCliente(id,clienteDto)
+            emit(Resource.Success(cliente))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
     fun clienteNotExist(email: String, clientes: List<ClienteDto>): Boolean {
         return try {
             clientes.any { it.email == email }
@@ -56,4 +67,9 @@ class ClienteRepository @Inject constructor(
             false
         }
     }
+
+    suspend fun isAdminUser(email: String): Boolean? {
+        return getClienteByEmail(email).data?.isAdmin
+    }
+
 }
