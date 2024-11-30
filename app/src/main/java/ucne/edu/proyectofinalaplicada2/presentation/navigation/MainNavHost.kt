@@ -55,6 +55,7 @@ import kotlinx.coroutines.delay
 import ucne.edu.proyectofinalaplicada2.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthEvent
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
@@ -165,6 +166,13 @@ fun MainBodyNavHost(
                                     FirebaseAuth.getInstance().signOut()
                                 }
                             )
+                            DropdownMenuItem(
+                                text = { Text("Settings") },
+                                onClick = {
+                                    navHostController.navigate(Screen.Settings)
+                                }
+                            )
+
                         }
                     }
                 }
@@ -252,6 +260,17 @@ fun MainBodyNavHost(
                             .fillMaxSize()
                     ) {
                         FiltraVehiculo()
+                    }
+                }
+                composable<Screen.Settings> {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ){
+                        SettingUser(
+                            goToBack = { navHostController.popBackStack() }
+                        )
                     }
                 }
             }

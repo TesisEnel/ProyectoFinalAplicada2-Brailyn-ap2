@@ -23,6 +23,8 @@ sealed class Screen {
     data object RentaListScreen: Screen()
     @Serializable
     data object FiltraVehiculo: Screen()
+    @Serializable
+    data object Settings: Screen()
 
     companion object {
         fun fromRoute(route: String, args: Bundle?): Screen? {

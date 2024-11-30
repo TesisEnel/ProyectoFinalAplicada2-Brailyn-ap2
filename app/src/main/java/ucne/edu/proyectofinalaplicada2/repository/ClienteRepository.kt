@@ -49,6 +49,18 @@ class ClienteRepository @Inject constructor(
         }
     }
 
+    fun updateCliente(id: Int, clienteDto: ClienteDto): Flow<Resource<ClienteDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val cliente = rentCarRemoteDataSource.updateCliente(id,clienteDto)
+            emit(Resource.Success(cliente))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
     fun clienteNotExist(email: String, clientes: List<ClienteDto>): Boolean {
         return try {
             clientes.any { it.email == email }

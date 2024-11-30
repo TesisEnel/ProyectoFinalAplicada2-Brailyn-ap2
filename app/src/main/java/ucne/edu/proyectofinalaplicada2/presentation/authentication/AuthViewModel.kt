@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
@@ -133,15 +134,76 @@ class AuthViewModel @Inject constructor(
         return try {
             clienteRepository.isAdminUser(email, _uistate.value.clientes)
         } catch (e: Exception) {
-            // Manejar el error, por ejemplo, registrar en logs o retornar un valor predeterminado.
             false
         }
     }
-    fun checkIfUserIsAdmin(email: String) {
+    private fun checkIfUserIsAdmin(email: String) {
         viewModelScope.launch {
             val isAdmin = isAdminUser(email)
             _uistate.update { it.copy(isAdmin = isAdmin) }
         }
+    }
+
+    private fun updateUsuario(emailUsuario: String?) {
+        viewModelScope.launch {
+            // Obtener los datos del cliente desde la API
+            val cliente = getClienteByEmail(emailUsuario ?: "")
+            if (cliente != null) {
+                // Actualizar el estado con los datos obtenidos
+                _uistate.update {
+                    it.copy(
+                        clienteId = cliente.clienteId,
+                        nombre = cliente.nombre ?: "",
+                        email = cliente.email ?: "",
+                        apellidos = cliente.apellido ?: "",
+                        cedula = cliente.cedula ?: "",
+                        celular = cliente.celular ?: "",
+                        direccion = cliente.direccion ?: "",
+                    )
+                }
+            }
+
+            // Preparar los datos para enviar la actualización a la API
+            val clienteDto = ClienteDto(
+                clienteId = _uistate.value.clienteId,
+                cedula = _uistate.value.cedula,
+                nombre = _uistate.value.nombre,
+                apellido = _uistate.value.apellidos,
+                direccion = _uistate.value.direccion,
+                celular = _uistate.value.celular,
+                email = _uistate.value.email,
+                isAdmin = true
+            )
+
+
+            clienteRepository.updateCliente(clienteDto.clienteId ?: 0, clienteDto).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _uistate.update { it.copy(isLoading = true) }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = false,
+                                success = "Usuario actualizado correctamente."
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = false,
+                                error = "Error al actualizar usuario: ${result.message}"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+        return clienteRepository.getClienteByEmail(email).last().data
     }
 
 
@@ -196,7 +258,7 @@ class AuthViewModel @Inject constructor(
                         }
 
                         is Resource.Success -> {
-                            saveCliente(uistate.value.toEntity())
+                            saveCliente()
                             _uistate.update { it.copy(isLoading = false, error = null) }
                             nuevo()
                         }
@@ -296,9 +358,9 @@ class AuthViewModel @Inject constructor(
         )
     }
 
-    private fun saveCliente(cliente: ClienteDto) {
+    private fun saveCliente() {
         viewModelScope.launch {
-            clienteRepository.addCliente(cliente).collect { result ->
+            clienteRepository.addCliente(uistate.value.toEntity()).collect { result ->
                 when (result) {
                     is Resource.Error -> {
                         _uistate.update {
@@ -404,6 +466,7 @@ class AuthViewModel @Inject constructor(
         when (event) {
             AuthEvent.Login -> login()
             AuthEvent.Signup -> signup()
+            AuthEvent.SaveCliente -> saveCliente()
             AuthEvent.Signout -> signout()
             is AuthEvent.OnChangeEmail -> onEmailChanged(event.email)
             is AuthEvent.OnChangePassword -> onPasswordChanged(event.password)
@@ -415,6 +478,8 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeDireccion -> onChangeDireccion(event.direccion)
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
             is AuthEvent.CheckIfUserIsAdmin -> checkIfUserIsAdmin(event.email)
+            is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
+
         }
     }
 

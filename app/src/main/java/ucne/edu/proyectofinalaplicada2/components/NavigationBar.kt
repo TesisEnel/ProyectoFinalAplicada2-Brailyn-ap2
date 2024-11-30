@@ -28,7 +28,7 @@ fun NavigationBar(
     uistate: ClienteUiState
 ) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        val items = if (uistate.isAdmin == true) {
+        val items = if (uistate.isAdmin) {
             listOf(
                 BottomNavigationItem(
                     title = "Home",
@@ -43,7 +43,7 @@ fun NavigationBar(
                     screen = Screen.VehiculoRegistroScreen
                 ),
                 BottomNavigationItem(
-                    title = "Settings",
+                    title = "Historial",
                     selectedIcon = Icons.Filled.Settings,
                     unSelectedIcon = Icons.Outlined.Settings,
                     screen = Screen.RentaListScreen
@@ -58,7 +58,7 @@ fun NavigationBar(
                     screen = Screen.Home
                 ),
                 BottomNavigationItem(
-                    title = "Settings",
+                    title = "Historial",
                     selectedIcon = Icons.Filled.Settings,
                     unSelectedIcon = Icons.Outlined.Settings,
                     screen = Screen.RentaListScreen
