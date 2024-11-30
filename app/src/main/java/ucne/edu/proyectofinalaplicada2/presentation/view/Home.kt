@@ -46,12 +46,10 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 @Composable
 fun Home(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
-    marcaViewModel: MarcaViewModel = hiltViewModel(),
     onGoVehiculeList:(Int)-> Unit,
     onGoSearch: () -> Unit
 ) {
     val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    val marcaUistate by marcaViewModel.uistate.collectAsStateWithLifecycle()
     if (vehiculoUistate.isLoading == true) {
         Box(
             modifier = Modifier
@@ -75,12 +73,10 @@ fun Home(
             item {
                 VehiculosMasDestacados(
                     vehiculoUistate = vehiculoUistate,
-                    marcaUiState = marcaUistate
                 )
             }
             item {
                 TiposDeVehiculos(
-                    marcaUiState = marcaUistate,
                     vehiculoUiState = vehiculoUistate,
                     onGoVehiculeList = onGoVehiculeList,
                 )
@@ -127,9 +123,7 @@ fun FakeSearchBar(
 @Composable
 fun VehiculosMasDestacados(
     vehiculoUistate: VehiculoUistate,
-    marcaUiState: MarcaUiState
 ) {
-
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 20.dp),
     ) {
@@ -145,16 +139,12 @@ fun VehiculosMasDestacados(
             modifier = Modifier.padding(vertical = 5.dp),
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
-            items(vehiculoUistate.vehiculos) { vehiculo ->
+            items(vehiculoUistate.vehiculoConMarcas) { vehiculoConMarca ->
                 Box {
-                    val marca =
-                        marcaUiState.marcas.find { marcaDto -> marcaDto?.marcaId == vehiculo.marcaId }
                     ImageCard(
-                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculo.imagePath.firstOrNull()),
-                        contentDescription = vehiculo.descripcion ?: "",
-                        title = marca?.nombreMarca?:"",
-                        height = 180,
-                        width = 150
+                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()),
+                        contentDescription = "",
+                        title = vehiculoConMarca.nombreMarca?:"",
                     )
                 }
             }
@@ -164,34 +154,44 @@ fun VehiculosMasDestacados(
 
 @Composable
 fun TiposDeVehiculos(
-    marcaUiState: MarcaUiState,
     vehiculoUiState: VehiculoUistate,
-    onGoVehiculeList:(Int)-> Unit,
+    onGoVehiculeList: (Int) -> Unit,
 ) {
+    val marcasUnicas = mutableListOf<Int>()
     Column {
         Text(
             text = "Tipos de marcas",
             fontFamily = FontFamily.Serif,
             fontSize = 20.sp,
             fontWeight = FontWeight.W700,
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 8.dp)
         )
+        Text(
+            text = "Aquí estarán todas las marcas de nuestros vehículos",
+            fontFamily = FontFamily.Serif,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 15.dp)
+        )
+        vehiculoUiState.vehiculoConMarcas.forEach { vehiculoConMarca ->
+            val marcaId = vehiculoConMarca.vehiculo.marcaId ?: 0
+            if (!marcasUnicas.contains(marcaId)) {
+                marcasUnicas.add(marcaId)
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val painter = rememberAsyncImagePainter(
+                        Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                    )
 
-        marcaUiState.marcas.forEach { marca ->
-            val vehiculo = vehiculoUiState.vehiculos.find { it.marcaId == marca?.marcaId }
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculo?.imagePath?.firstOrNull())
-
-                TipoVehiculoList(
-                    painter = painter,
-                    marca = marca?.nombreMarca?:"",
-                    onGoVehiculeList = { onGoVehiculeList(marca?.marcaId?:0) },
-                    vehiculoDto = vehiculo, // Aquí ya no necesitas el vehiculoDto
-                    onMarcaEvent = {}
-                )
+                    TipoVehiculoList(
+                        painter = painter,
+                        marca = vehiculoConMarca.nombreMarca ?: "",
+                        onGoVehiculeList = { onGoVehiculeList(marcaId) },
+                        vehiculoConMarca = vehiculoConMarca,
+                        onMarcaEvent = {}
+                    )
+                }
             }
         }
     }
