@@ -2,14 +2,18 @@ package ucne.edu.proyectofinalaplicada2.presentation.renta
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,34 +39,50 @@ fun RentaListSceen(
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
 
-    RentaListBodyScreen(
-        uiState = uiState,
-    )
+    if(uiState.isLoading){
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }else{
+        RentaListBodyScreen(
+            uiState = uiState,
+        )
+    }
 }
 
 @Composable
 fun RentaListBodyScreen(
     uiState: RentaUistate,
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(
-            text = "Rentas",
-            modifier = Modifier
-                .fillMaxWidth(),
-            fontWeight = FontWeight.W500,
-            fontSize = 32.sp
-        )
-        Text(
-            text = "Recuerda que puedes expandir para ver mas detalles",
-            modifier = Modifier
-                .fillMaxWidth(),
-            fontSize = 15.sp
-        )
-        ExpandableCard(uiState = uiState)
+        item {
+            Text(
+                text = "Rentas",
+                modifier = Modifier
+                    .fillMaxWidth(),
+                fontWeight = FontWeight.W500,
+                fontSize = 32.sp
+            )
+        }
+        item {
+            Text(
+                text = "Recuerda que puedes expandir para ver mas detalles",
+                modifier = Modifier
+                    .fillMaxWidth(),
+                fontSize = 15.sp
+            )
+        }
+        item {
+            ExpandableCard(uiState = uiState)
+        }
     }
 }
 
