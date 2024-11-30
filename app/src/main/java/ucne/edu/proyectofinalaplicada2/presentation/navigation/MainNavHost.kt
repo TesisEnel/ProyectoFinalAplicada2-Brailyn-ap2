@@ -76,6 +76,7 @@ fun MainNavHost(
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.uistate.collectAsStateWithLifecycle()
     val roleFlow = authViewModel.roleFlow
+    val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
 
     MainBodyNavHost(
         navHostController = navHostController,
@@ -83,6 +84,7 @@ fun MainNavHost(
         uiState = uiState,
         authUistate = authState,
         roleFlow = roleFlow,
+        isRoleVerified = isRoleVerified
     )
 }
 
@@ -94,13 +96,14 @@ fun MainBodyNavHost(
     onEvent: (MainEvent) -> Unit = {},
     uiState: MainUiState,
     authUistate: ClienteUiState,
-    roleFlow: Flow<Boolean>
+    roleFlow: Flow<Boolean>,
+    isRoleVerified: Boolean
 ) {
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
 
-    if (authUistate.isLoading) {
+    if (authUistate.isLoading || !isRoleVerified) {
 
         Box(
             modifier = Modifier
