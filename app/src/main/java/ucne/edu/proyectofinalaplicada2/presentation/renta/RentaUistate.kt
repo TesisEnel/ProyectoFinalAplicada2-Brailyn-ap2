@@ -6,7 +6,6 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ModeloDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
 
 data class RentaUistate(
     val rentaId: Int? = null,
