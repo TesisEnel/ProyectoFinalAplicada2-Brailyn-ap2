@@ -148,7 +148,7 @@ fun ListaDeVehiculos(
                     ImageCard(
                         painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()),
                         contentDescription = "",
-                        title = vehiculoConMarca.nombreMarca?:"",
+                        title = vehiculoConMarca.nombreModelo?:"",
                     )
                 }
             }
