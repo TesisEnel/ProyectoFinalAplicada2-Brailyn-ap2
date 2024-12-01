@@ -16,6 +16,6 @@ data class ModeloUistate(
 
 data class ModeloConVehiculo(
     val nombreModelo: String,
-    val vehiculo: VehiculoEntity?,
+    val vehiculo: VehiculoEntity,
     val marca: MarcaEntity?
 )
