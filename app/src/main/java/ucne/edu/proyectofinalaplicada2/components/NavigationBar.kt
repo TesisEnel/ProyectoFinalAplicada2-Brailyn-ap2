@@ -44,7 +44,7 @@ fun NavigationBar(
                     title = "Vehiculo",
                     selectedIcon = ImageVector.vectorResource(id = R.drawable.car_back),
                     unSelectedIcon = Icons.Outlined.Call,
-                    screen = Screen.VehiculoRegistroScreen
+                    screen = Screen.VehiculoRegistroScreen()
                 ),
                 BottomNavigationItem(
                     title = "Historial",
