@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
 import ucne.edu.proyectofinalaplicada2.repository.ProveedorRepository
@@ -50,6 +51,7 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -57,11 +59,15 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Success -> {
                         _uistate.update {
+                            val vehiculos = result.data ?: emptyList()
+                            val vehiculoConMarcasYModelos = transformarVehiculosConMarcasYModelos(vehiculos)
                             it.copy(
-                                vehiculos = result.data ?: emptyList(),
-                                isLoading = false
+                                vehiculos = vehiculos,
+                                vehiculoConMarcas = vehiculoConMarcasYModelos,
+                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos,
                             )
                         }
                         getVehiculoConMarcas()
@@ -70,6 +76,7 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
+
     private fun getMarcas() {
         viewModelScope.launch {
             marcaRepository.getMarcas().collect { result ->
@@ -83,6 +90,7 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -90,6 +98,7 @@ class VehiculoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
@@ -103,7 +112,38 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
-    private fun getTipoCombustible(){
+
+    private suspend fun transformarVehiculosConMarcasYModelos(
+        vehiculos: List<VehiculoEntity>
+    ): List<VehiculoConMarca> {
+        return vehiculos.map { vehiculo ->
+            val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
+            val modelo = modeloRepository.getModelosById(vehiculo.modeloId ?: 0).data
+            VehiculoConMarca(
+                nombreMarca = marca?.nombreMarca,
+                nombreModelo = modelo?.modeloVehiculo,
+                vehiculo = vehiculo
+            )
+        }
+
+
+    }
+
+    private fun filterVehiculos(query: String) {
+        _uistate.update { state ->
+            val filteredList = state.filteredVehiculoConMarcas.filter { vehiculo ->
+                val marca = vehiculo.nombreMarca?.contains(query, ignoreCase = true) ?: false
+                val modelo = vehiculo.nombreModelo?.contains(query, ignoreCase = true) ?: false
+                marca || modelo
+            }
+            state.copy(
+                searchQuery = query,
+                vehiculoConMarcas = filteredList
+            )
+        }
+    }
+
+    private fun getTipoCombustible() {
         viewModelScope.launch {
             val tiposCombustibles = tipoCombustibleRepository.getTiposCombustibles().data
             _uistate.update {
@@ -113,34 +153,38 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
-    private fun getProveedores(){
+
+    private fun getProveedores() {
         viewModelScope.launch {
             val proveedores = proveedorRepository.getProveedores().data
             _uistate.update {
                 it.copy(
-                    proveedores = proveedores?: emptyList()
+                    proveedores = proveedores ?: emptyList()
                 )
             }
         }
     }
-    private fun getTipoVehiculos(){
+
+    private fun getTipoVehiculos() {
         viewModelScope.launch {
             val tipoVehiculos = tipoVehiculoRepository.getTiposVehiculos().data
             _uistate.update {
-                it.copy(tipoVehiculos = tipoVehiculos?: emptyList())
+                it.copy(tipoVehiculos = tipoVehiculos ?: emptyList())
             }
         }
     }
+
     private fun getModelosByMarcaId(id: Int) {
         viewModelScope.launch {
-           val modelos = modeloRepository.getListModelosByMarcaId(id).data
+            val modelos = modeloRepository.getListModelosByMarcaId(id).data
             _uistate.update {
                 it.copy(
-                    modelos = modelos?: emptyList()
+                    modelos = modelos ?: emptyList()
                 )
             }
         }
     }
+
     private fun save() {
         viewModelScope.launch {
 
@@ -201,6 +245,7 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeMarcaId(marcaId: Int) {
         getModelosByMarcaId(marcaId)
         _uistate.update {
@@ -242,6 +287,7 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeProveedorId(proveedorId: Int) {
         _uistate.update {
             it.copy(
@@ -251,7 +297,7 @@ class VehiculoViewModel @Inject constructor(
     }
 
     private fun onChangeImagePath(imagesPath: List<File>) {
-        val updatedImage = imagesPath.map { image->
+        val updatedImage = imagesPath.map { image ->
             image.absolutePath
         }
         _uistate.update {
@@ -260,6 +306,7 @@ class VehiculoViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeAnio(anio: Int) {
         _uistate.update {
             it.copy(
@@ -281,6 +328,7 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.GetVehiculos -> getVehiculos()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
+            is VehiculoEvent.OnFilterVehiculos -> filterVehiculos(event.query)
         }
     }
 }
