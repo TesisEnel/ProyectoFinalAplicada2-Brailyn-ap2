@@ -30,4 +30,13 @@ interface ModeloDao {
     """
     )
     suspend fun findByMarcaId(marcaId: Int): List<ModeloEntity>
+
+    @Query(
+        """
+    SELECT * 
+    FROM Modelos 
+    WHERE modeloId = :marcaId
+    """
+    )
+    suspend fun getModeloByMarcaId(marcaId: Int): ModeloEntity
 }
