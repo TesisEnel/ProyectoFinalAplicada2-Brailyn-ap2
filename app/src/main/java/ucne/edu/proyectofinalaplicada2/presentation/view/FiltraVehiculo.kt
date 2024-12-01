@@ -2,7 +2,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,19 +44,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
-
+import ucne.edu.proyectofinalaplicada2.components.VehicleCard
 @Composable
 fun FiltraVehiculo(
     viewModel: VehiculoViewModel = hiltViewModel(),
+    onGoRenta: (Int) -> Unit
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
     Column {
-        SearchBar()
+        SearchBar(
+            searchQuery = uiState.searchQuery,
+            onEvent = {event -> viewModel.onEvent(event)}
+        )
         FiltraVehiculoBody(
             uiState = uiState,
+            onGoRenta = onGoRenta
         )
     }
 
@@ -64,88 +71,67 @@ fun FiltraVehiculo(
 @Composable
 fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
+    onGoRenta: (Int) -> Unit,
 ) {
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ){
-        items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
-            val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
-            MostrarVehiculos(
-                url = Constant.URL_BLOBSTORAGE + painter,
-                vehiculoConMarca = vehiculoConMarca,
-            )
-        }
-    }
-
-}
-
-@Composable
-fun MostrarVehiculos(
-    url: String,
-    vehiculoConMarca: VehiculoConMarca,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .width(150.dp)
-                .height(180.dp),
-            // shape = CutCornerShape(20.dp)
-            elevation = CardDefaults.cardElevation(10.dp),
-            border = BorderStroke(3.dp,Color.Gray),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                val painter = rememberAsyncImagePainter(url)
-                Image(
-                    painter = painter,
-                    contentDescription = "null",
-                    modifier = Modifier,
-                    contentScale = ContentScale.Crop
-
-                )
-                Text(
-                    text = vehiculoConMarca.nombreMarca?:"",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(10.dp)
-                )
-                Text(
-                    text = "Precio: ${vehiculoConMarca.vehiculo.precio}\n Año: ${vehiculoConMarca.vehiculo.anio}",
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(6.dp),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Gray
-                )
+    when {
+        uiState.isLoading == true -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
+        }
+        uiState.filteredListIsEmpty-> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.TopCenter
+            )
+            {
+                Text(text = "No se encontraron vehiculos")
+            }
+        }
 
+        else -> {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
+                    val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                    VehicleCard(
+                        imageUrl = Constant.URL_BLOBSTORAGE + painter,
+                        vehicleName = vehiculoConMarca.nombreMarca?:"",
+                        vehicleDetails = "Precio: ${vehiculoConMarca.vehiculo.precio}\nAño: ${vehiculoConMarca.vehiculo.anio}\nModelo: ${vehiculoConMarca.nombreModelo}",
+                        vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
+                        onGoRenta = onGoRenta,
+                        modifier = Modifier
+                    )
+                }
+            }
         }
     }
 }
-
-
 
 @Composable
 fun SearchBar(
-    onGoSearch: () -> Unit = {},
+    searchQuery: String,
+    onEvent: (VehiculoEvent) -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
+
     TextField(
-        value = "" ,
-        onValueChange = {},
+        value = searchQuery,
+        onValueChange = { onEvent(VehiculoEvent.OnFilterVehiculos(it)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -163,7 +149,6 @@ fun SearchBar(
             .fillMaxWidth()
             .heightIn(min = 50.dp)
             .padding(15.dp)
-            .clickable(onClick = onGoSearch)
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
     )
 }

@@ -262,7 +262,9 @@ fun MainBodyNavHost(
                             modifier = Modifier
                                 .fillMaxSize()
                         ) {
-                            FiltraVehiculo()
+                            FiltraVehiculo(
+                                onGoRenta = {navHostController.navigate(Screen.RentaScreen(it))}
+                            )
                         }
                     }
                     composable<Screen.Settings> {

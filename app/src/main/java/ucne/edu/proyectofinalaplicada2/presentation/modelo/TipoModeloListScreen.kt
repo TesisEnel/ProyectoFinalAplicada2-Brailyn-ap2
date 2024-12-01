@@ -4,31 +4,24 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import ucne.edu.proyectofinalaplicada2.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
@@ -41,7 +34,7 @@ fun TipoModeloListListScreen(
     TipoModeloBodyListScreen(
         modeloUistate = uiState,
         marcaId = marcaId,
-        onGoVehiculePresentation = onGoVehiculePresentation,
+        onGoRenta = onGoVehiculePresentation,
         onEvent = { event -> modeloViewModel.onEvent(event) }
     )
 }
@@ -50,7 +43,7 @@ fun TipoModeloListListScreen(
 fun TipoModeloBodyListScreen(
     modeloUistate: ModeloUistate,
     marcaId: Int,
-    onGoVehiculePresentation: (Int) -> Unit,
+    onGoRenta: (Int) -> Unit,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
     if (modeloUistate.isLoading) {
@@ -75,7 +68,7 @@ fun TipoModeloBodyListScreen(
             )
             TipoModeloLazyColumn(
                 modeloUistate = modeloUistate,
-                onGoVehiculePresentation = onGoVehiculePresentation,
+                onGoRenta = onGoRenta,
                 marcaId = marcaId,
                 onEvent = onEvent
             )
@@ -88,7 +81,7 @@ fun TipoModeloBodyListScreen(
 @Composable
 fun TipoModeloLazyColumn(
     modeloUistate: ModeloUistate,
-    onGoVehiculePresentation: (Int) -> Unit,
+    onGoRenta: (Int) -> Unit,
     marcaId: Int,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
@@ -106,62 +99,21 @@ fun TipoModeloLazyColumn(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onGoVehiculePresentation(modelo.vehiculo.vehiculoId ?: 0) },
+                    .clickable { onGoRenta(modelo.vehiculo.vehiculoId ?: 0) },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 VehicleCard(
                     imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath.firstOrNull(),
                     vehicleName = modelo.nombreModelo,
                     vehicleDetails = "Precio: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    vehiculoId = modelo.vehiculo.vehiculoId ?: 0,
+                    onGoRenta = onGoRenta
                 )
             }
         }
     }
 }
 
-@Composable
-fun VehicleCard(
-    imageUrl: String,
-    vehicleName: String,
-    vehicleDetails: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.dp, vertical = 12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Column {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            )
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = vehicleName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = vehicleDetails,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
+
 
