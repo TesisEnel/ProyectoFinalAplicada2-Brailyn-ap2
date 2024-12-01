@@ -30,18 +30,17 @@ class ModeloRepository @Inject constructor(
         }
     }
 
-    fun getModelos(): Flow<Resource<List<ModeloEntity>>> = flow {
-        try {
-            emit(Resource.Loading())
+    suspend fun getModelos(): Resource<List<ModeloEntity>>  {
+        return try {
             val modelos = rentCarRemoteDataSource.getModelos()
             modelos.forEach { modelo -> modeloDao.save(modelo.toEntity())}
             val localModelos = modeloDao.getAll().firstOrNull()
-            emit(Resource.Success(localModelos?: emptyList()))
+            Resource.Success(localModelos?: emptyList())
         } catch (e: HttpException) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+           Resource.Error("Error desconocido ${e.message}")
         } catch (e: Exception) {
             val localModelos = modeloDao.getAll().firstOrNull()
-            emit(Resource.Success(localModelos?: emptyList()))
+            Resource.Success(localModelos?: emptyList())
         }
     }
 
