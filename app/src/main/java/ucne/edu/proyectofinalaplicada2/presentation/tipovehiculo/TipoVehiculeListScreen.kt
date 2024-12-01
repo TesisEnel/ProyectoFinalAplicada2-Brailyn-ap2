@@ -3,60 +3,62 @@ package ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.rememberAsyncImagePainter
-import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaEvent
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
+import coil3.compose.AsyncImage
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloConVehiculo
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloEvent
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloUistate
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloViewModel
+import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
 fun TipoVehiculeListScreen(
-    vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
-    marcaViewModel: MarcaViewModel= hiltViewModel(),
+    modeloViewModel: ModeloViewModel = hiltViewModel(),
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
 ) {
-    val uiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    val marcaUiState by marcaViewModel.uistate.collectAsStateWithLifecycle()
+    val uiState by modeloViewModel.uistate.collectAsStateWithLifecycle()
     TipoVehiculeBodyListScreen(
-        vehiculoUistate = uiState,
-        marcaUiState = marcaUiState,
+        modeloUistate = uiState,
         marcaId = marcaId,
-        onGoVehiculePresentation =
-        onGoVehiculePresentation,
-        onMarcaEvent = { event -> marcaViewModel.onEvent(event) },
+        onGoVehiculePresentation = onGoVehiculePresentation,
+        onEvent = { event -> modeloViewModel.onEvent(event) }
     )
-
 }
 
 @Composable
 fun TipoVehiculeBodyListScreen(
-    vehiculoUistate: VehiculoUistate,
-    marcaUiState: MarcaUiState,
+    modeloUistate: ModeloUistate,
     marcaId: Int,
     onGoVehiculePresentation: (Int) -> Unit,
-    onMarcaEvent: (MarcaEvent) -> Unit
+    onEvent: (ModeloEvent) -> Unit = {},
 ) {
-    LaunchedEffect(marcaId) {
-        onMarcaEvent(MarcaEvent.OnchangeMarcaId(marcaId))
-    }
     Column(
         modifier = Modifier
             .padding(bottom = 5.dp, top = 20.dp)
@@ -68,16 +70,15 @@ fun TipoVehiculeBodyListScreen(
             fontWeight = FontWeight.W700,
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
         )
-        if (vehiculoUistate.isLoading == true) {
+        if (modeloUistate.isLoading) {
             CircularProgressIndicator()
         } else {
-//            val newVehiculos = vehiculoUistate.vehiculos.filter { it.marcaId == marcaId }
-//            TipoVehiculeColumn(
-//                newVehiculos = vehiculoConMarca,
-//                onGoVehiculePresentation = onGoVehiculePresentation,
-//                onMarcaEvent = onMarcaEvent,
-//                marcaUiState = marcaUiState
-//            )
+            TipoVehiculeLazyColumn(
+                modelos = modeloUistate.modeloConVehiculos,
+                onGoVehiculePresentation = onGoVehiculePresentation,
+                marcaId = marcaId,
+                onEvent = onEvent
+            )
         }
     }
 
@@ -85,45 +86,89 @@ fun TipoVehiculeBodyListScreen(
 
 
 @Composable
-fun TipoVehiculeColumn(
-    newVehiculos: List<VehiculoEntity>,
-    marcaUiState: MarcaUiState,
+fun TipoVehiculeLazyColumn(
+    modelos: List<ModeloConVehiculo>,
     onGoVehiculePresentation: (Int) -> Unit,
-    onMarcaEvent: (MarcaEvent) -> Unit
+    marcaId: Int,
+    onEvent: (ModeloEvent) -> Unit = {},
 ) {
     val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    LaunchedEffect(Unit) {
+        onEvent(ModeloEvent.GetModeloConVehiculos(marcaId))
+    }
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
-            .padding(vertical = 5.dp)
-            .fillMaxWidth(),
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        newVehiculos.forEach { vehiculoDto ->
-            val image = vehiculoDto.imagePath.firstOrNull()
-            val painter = rememberAsyncImagePainter(url + image)
-            val marca = marcaUiState.marcas.find { it?.marcaId == vehiculoDto.marcaId }
-            Column(
+        items(modelos) { modelo ->
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(
-                        onClick = {
-
-                        }
-                    )
-                ,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .clickable { onGoVehiculePresentation(modelo.vehiculo?.vehiculoId ?: 0) },
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-//                TipoVehiculoList(
-//                    painter = painter,
-//                    marca = marca?.nombreMarca ?: "",
-//                    onGoRenta = {onGoVehiculePresentation(vehiculoDto.vehiculoId ?: 0)},
-//                    vehiculoConMarca = vehiculoDto,
-//                    onMarcaEvent = onMarcaEvent
-//                )
-            }
 
+
+                VehicleCard(
+                    imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo?.imagePath?.firstOrNull(),
+                    vehicleName = modelo.marca?.nombreMarca ?: "Vehículo Desconocido",
+                    vehicleDetails = "Detalles: ${modelo.vehiculo?.precio ?: "Sin detalles disponibles"}",
+                    modifier = Modifier.weight(1f) // Asegura que las tarjetas tengan el mismo ancho
+                )
+
+            }
         }
     }
 }
+
+@Composable
+fun VehicleCard(
+    imageUrl: String,
+    vehicleName: String,
+    vehicleDetails: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Column {
+            // Parte superior: Imagen
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+            )
+
+            // Parte inferior: Información del vehículo
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = vehicleName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = vehicleDetails,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
