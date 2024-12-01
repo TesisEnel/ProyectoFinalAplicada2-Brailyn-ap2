@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo
+package ucne.edu.proyectofinalaplicada2.presentation.modelo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,19 +30,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloEvent
-import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloUistate
-import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
-fun TipoVehiculeListScreen(
+fun TipoModeloListListScreen(
     modeloViewModel: ModeloViewModel = hiltViewModel(),
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
 ) {
     val uiState by modeloViewModel.uistate.collectAsStateWithLifecycle()
-    TipoVehiculeBodyListScreen(
+    TipoModeloBodyListScreen(
         modeloUistate = uiState,
         marcaId = marcaId,
         onGoVehiculePresentation = onGoVehiculePresentation,
@@ -51,7 +48,7 @@ fun TipoVehiculeListScreen(
 }
 
 @Composable
-fun TipoVehiculeBodyListScreen(
+fun TipoModeloBodyListScreen(
     modeloUistate: ModeloUistate,
     marcaId: Int,
     onGoVehiculePresentation: (Int) -> Unit,
@@ -71,7 +68,7 @@ fun TipoVehiculeBodyListScreen(
         if (modeloUistate.isLoading) {
             CircularProgressIndicator()
         } else {
-            TipoVehiculeLazyColumn(
+            TipoModeloLazyColumn(
                 modeloUistate = modeloUistate,
                 onGoVehiculePresentation = onGoVehiculePresentation,
                 marcaId = marcaId,
@@ -84,7 +81,7 @@ fun TipoVehiculeBodyListScreen(
 
 
 @Composable
-fun TipoVehiculeLazyColumn(
+fun TipoModeloLazyColumn(
     modeloUistate: ModeloUistate,
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
