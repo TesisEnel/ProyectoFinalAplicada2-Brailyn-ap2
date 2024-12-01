@@ -2,6 +2,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,10 +48,11 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
-
+import ucne.edu.proyectofinalaplicada2.components.VehicleCard
 @Composable
 fun FiltraVehiculo(
     viewModel: VehiculoViewModel = hiltViewModel(),
+    onGoRenta: (Int) -> Unit
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
     Column {
@@ -60,6 +62,7 @@ fun FiltraVehiculo(
         )
         FiltraVehiculoBody(
             uiState = uiState,
+            onGoRenta = onGoRenta
         )
     }
 
@@ -68,6 +71,7 @@ fun FiltraVehiculo(
 @Composable
 fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
+    onGoRenta: (Int) -> Unit,
 ) {
     when {
         uiState.isLoading == true -> {
@@ -93,72 +97,26 @@ fun FiltraVehiculoBody(
         else -> {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
                     val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
-                    MostrarVehiculos(
-                        url = Constant.URL_BLOBSTORAGE + painter,
-                        vehiculoConMarca = vehiculoConMarca,
+                    VehicleCard(
+                        imageUrl = Constant.URL_BLOBSTORAGE + painter,
+                        vehicleName = vehiculoConMarca.nombreMarca?:"",
+                        vehicleDetails = "Precio: ${vehiculoConMarca.vehiculo.precio}\nAño: ${vehiculoConMarca.vehiculo.anio}\nModelo: ${vehiculoConMarca.nombreModelo}",
+                        vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
+                        onGoRenta = onGoRenta,
+                        modifier = Modifier
                     )
                 }
             }
         }
     }
 }
-
-@Composable
-fun MostrarVehiculos(
-    url: String,
-    vehiculoConMarca: VehiculoConMarca,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .width(150.dp)
-                .height(180.dp),
-            // shape = CutCornerShape(20.dp)
-            elevation = CardDefaults.cardElevation(10.dp),
-            border = BorderStroke(3.dp,Color.Gray),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                val painter = rememberAsyncImagePainter(url)
-                Image(
-                    painter = painter,
-                    contentDescription = "null",
-                    modifier = Modifier,
-                    contentScale = ContentScale.Crop
-
-                )
-                Text(
-                    text = vehiculoConMarca.nombreMarca?:"",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(10.dp)
-                )
-                Text(
-                    text = "Precio: ${vehiculoConMarca.vehiculo.precio}\n Año: ${vehiculoConMarca.vehiculo.anio}",
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(6.dp),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Gray
-                )
-            }
-
-        }
-    }
-}
-
-
 
 @Composable
 fun SearchBar(
