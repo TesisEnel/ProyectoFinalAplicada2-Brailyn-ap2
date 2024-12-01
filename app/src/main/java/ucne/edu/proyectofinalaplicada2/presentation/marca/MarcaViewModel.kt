@@ -29,33 +29,11 @@ class MarcaViewModel @Inject constructor(
 
     private fun getMarcas() {
         viewModelScope.launch {
-            marcaRepository.getMarcas().collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marcas = result.data ?: emptyList()
-                            )
-                        }
-                    }
-                }
+            val result = marcaRepository.getMarcas().data
+            _uistate.update {
+                it.copy(
+                    marcas = result ?: emptyList(),
+                )
             }
         }
     }
