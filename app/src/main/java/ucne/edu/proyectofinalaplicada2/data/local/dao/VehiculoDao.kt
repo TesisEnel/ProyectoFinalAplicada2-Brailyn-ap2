@@ -28,6 +28,6 @@ interface VehiculoDao {
         """select * from Vehiculos where marcaId=:marcaId
         """
     )
-    suspend fun getVehiculoByMarcaId(marcaId: Int): VehiculoEntity
+    fun getListVehiculosByMarcaId(marcaId: Int): Flow<List<VehiculoEntity>>
 
 }
