@@ -22,22 +22,10 @@ class ModeloViewModel @Inject constructor(
     private val _uistate = MutableStateFlow(ModeloUistate())
     val uistate = _uistate.asStateFlow()
 
-    init {
-        getModelos()
-    }
-
-    private fun getModelos(){
+    private fun getListVehiculosByMarcaId(marcaId: Int) {
         viewModelScope.launch {
-            modeloRepository.getModelos().collect { result ->
+            vehiculoRepository.getListVehiculosByMarcaId(marcaId).collect { result ->
                 when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error"
-                            )
-                        }
-                    }
-
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
@@ -46,68 +34,42 @@ class ModeloViewModel @Inject constructor(
                         }
                     }
 
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                modelos = result.data ?: emptyList(),
-                                isLoading = false
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-    private fun getVehiculos(){
-        viewModelScope.launch {
-            vehiculoRepository.getVehiculos().collect { result ->
-                when (result) {
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                isLoading = false,
                             )
                         }
                     }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                    }
-
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                vehiculos = result.data ?: emptyList(),
-                                isLoading = false
+                                isLoading = false,
+                                vehiculos = result.data ?: emptyList()
                             )
                         }
+                        getModeloConVehiculos(marcaId)
                     }
                 }
             }
         }
-    }
 
+    }
 
     private fun getModeloConVehiculos(marcaId: Int) {
-        val contador:Int  = 0
         viewModelScope.launch {
-            val modeloConVehiculos = _uistate.value.vehiculos.map {
-                val vehiculo = vehiculoRepository.getVehiculoByMarcaId(marcaId).data
-                val marca = marcaRepository.getMarcaById(marcaId ).data
-                val modelo = modeloRepository.getModeloByMarcaId(marcaId).data
+            val marca = marcaRepository.getMarcaById(marcaId).data
+            val modeloConVehiculos = _uistate.value.vehiculos.map { vehiculoEntity ->
+                val modelo = modeloRepository.getModelosById(vehiculoEntity.modeloId?:0).data
                 ModeloConVehiculo(
                     nombreModelo = modelo?.modeloVehiculo?:"",
-                    vehiculo = vehiculo,
+                    vehiculo = vehiculoEntity,
                     marca = marca
                 )
             }
             _uistate.update {
                 it.copy(
-                    modeloConVehiculos = modeloConVehiculos
+                    modeloConVehiculos = modeloConVehiculos,
                 )
             }
         }
@@ -115,7 +77,12 @@ class ModeloViewModel @Inject constructor(
 
     fun onEvent(event: ModeloEvent) {
         when (event) {
-            is ModeloEvent.GetModeloConVehiculos -> { getModeloConVehiculos(event.marcaId) }
+            is ModeloEvent.GetModeloConVehiculos -> {
+                getModeloConVehiculos(event.marcaId)
+            }
+            is ModeloEvent.GetVehiculosByMarcaId -> {
+                getListVehiculosByMarcaId(event.marcaId)
+            }
         }
     }
 }
