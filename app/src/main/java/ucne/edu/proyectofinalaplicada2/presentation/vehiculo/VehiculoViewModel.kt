@@ -55,7 +55,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
+                               isLoading = true
                             )
                         }
                     }
@@ -68,6 +68,7 @@ class VehiculoViewModel @Inject constructor(
                                 vehiculos = vehiculos,
                                 vehiculoConMarcas = vehiculoConMarcasYModelos,
                                 filteredVehiculoConMarcas = vehiculoConMarcasYModelos,
+                                isLoading = false
                             )
                         }
                         getVehiculoConMarcas()
@@ -94,7 +95,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                                isLoading = true
+                                //isLoading = true
                             )
                         }
                     }
@@ -103,20 +104,18 @@ class VehiculoViewModel @Inject constructor(
                         _uistate.update {
                             it.copy(
                                 marcas = result.data ?: emptyList(),
-                                isLoading = false
+                               // isLoading = false
                             )
                         }
-                        getVehiculoConMarcas()
+                        //getVehiculoConMarcas()
                     }
                 }
             }
         }
     }
 
-    private suspend fun transformarVehiculosConMarcasYModelos(
-        vehiculos: List<VehiculoEntity>
-    ): List<VehiculoConMarca> {
-        return vehiculos.map { vehiculo ->
+    private suspend fun transformarVehiculosConMarcasYModelos(vehiculos: List<VehiculoEntity>): List<VehiculoConMarca> {
+        val vehiculoConMarcas = vehiculos.map { vehiculo ->
             val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
             val modelo = modeloRepository.getModelosById(vehiculo.modeloId ?: 0).data
             VehiculoConMarca(
@@ -125,21 +124,31 @@ class VehiculoViewModel @Inject constructor(
                 vehiculo = vehiculo
             )
         }
-
+        return vehiculoConMarcas
 
     }
 
     private fun filterVehiculos(query: String) {
         _uistate.update { state ->
+
             val filteredList = state.filteredVehiculoConMarcas.filter { vehiculo ->
                 val marca = vehiculo.nombreMarca?.contains(query, ignoreCase = true) ?: false
                 val modelo = vehiculo.nombreModelo?.contains(query, ignoreCase = true) ?: false
                 marca || modelo
             }
-            state.copy(
-                searchQuery = query,
-                vehiculoConMarcas = filteredList
-            )
+            if(filteredList.isEmpty()){
+                state.copy(
+                    filteredListIsEmpty = true,
+                    searchQuery = query,
+                )
+            }else{
+                state.copy(
+                    filteredListIsEmpty = false,
+                    searchQuery = query,
+                    vehiculoConMarcas = filteredList
+                )
+            }
+
         }
     }
 
