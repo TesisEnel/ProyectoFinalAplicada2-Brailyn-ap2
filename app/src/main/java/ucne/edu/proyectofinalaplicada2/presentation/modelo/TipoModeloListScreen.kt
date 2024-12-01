@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ucne.edu.proyectofinalaplicada2.components.VehicleCard
+import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable

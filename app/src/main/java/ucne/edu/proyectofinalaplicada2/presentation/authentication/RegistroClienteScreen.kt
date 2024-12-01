@@ -29,8 +29,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ucne.edu.proyectofinalaplicada2.components.CedulaVisualTransformation
-import ucne.edu.proyectofinalaplicada2.components.PhoneNumberVisualTransformation
+import ucne.edu.proyectofinalaplicada2.presentation.components.CedulaVisualTransformation
+import ucne.edu.proyectofinalaplicada2.presentation.components.PhoneNumberVisualTransformation
 
 
 @Composable

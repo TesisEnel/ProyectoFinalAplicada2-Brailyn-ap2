@@ -35,8 +35,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.components.ImageCard
-import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
+import ucne.edu.proyectofinalaplicada2.presentation.components.ImageCard
+import ucne.edu.proyectofinalaplicada2.presentation.components.TipoVehiculoList
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant

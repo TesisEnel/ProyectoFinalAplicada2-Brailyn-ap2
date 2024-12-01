@@ -54,7 +54,7 @@ import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import ucne.edu.proyectofinalaplicada2.components.NavigationBar
+import ucne.edu.proyectofinalaplicada2.presentation.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
@@ -222,7 +222,7 @@ fun MainBodyNavHost(
                                 .padding(12.dp)
                         ) {
                             VehiculoRegistroScreen(
-                                vehiculoId = id?:0
+                                vehiculoId = id?:0,
                             )
                         }
                     }
