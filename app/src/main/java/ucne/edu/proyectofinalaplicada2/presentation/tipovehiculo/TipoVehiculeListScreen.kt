@@ -19,10 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -33,8 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloConVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloEvent
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloUistate
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloViewModel
@@ -77,7 +72,7 @@ fun TipoVehiculeBodyListScreen(
             CircularProgressIndicator()
         } else {
             TipoVehiculeLazyColumn(
-                modeloConvehiculos = modeloUistate.modeloConVehiculos,
+                modeloUistate = modeloUistate,
                 onGoVehiculePresentation = onGoVehiculePresentation,
                 marcaId = marcaId,
                 onEvent = onEvent
@@ -90,17 +85,14 @@ fun TipoVehiculeBodyListScreen(
 
 @Composable
 fun TipoVehiculeLazyColumn(
-    modeloConvehiculos: List<ModeloConVehiculo>,
+    modeloUistate: ModeloUistate,
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
-    val isDataLoaded = remember { mutableStateOf(false) }
-    if (!isDataLoaded.value) {
+    if (!modeloUistate.isDataLoaded) {
         onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId))
-        isDataLoaded.value = true
     }
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
@@ -109,22 +101,19 @@ fun TipoVehiculeLazyColumn(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(modeloConvehiculos) { modelo ->
+        items(modeloUistate.modeloConVehiculos) { modelo ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onGoVehiculePresentation(modelo.vehiculo.vehiculoId ?: 0) },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-
                 VehicleCard(
                     imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath.firstOrNull(),
                     vehicleName = modelo.marca?.nombreMarca ?: "Vehículo Desconocido",
                     vehicleDetails = "Detalles: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
                     modifier = Modifier.weight(1f) // Asegura que las tarjetas tengan el mismo ancho
                 )
-
             }
         }
     }
@@ -145,7 +134,6 @@ fun VehicleCard(
         shape = MaterialTheme.shapes.medium
     ) {
         Column {
-            // Parte superior: Imagen
             AsyncImage(
                 model = imageUrl,
                 contentDescription = null,
@@ -154,8 +142,6 @@ fun VehicleCard(
                     .fillMaxWidth()
                     .height(150.dp)
             )
-
-            // Parte inferior: Información del vehículo
             Column(
                 modifier = Modifier
                     .padding(8.dp)
