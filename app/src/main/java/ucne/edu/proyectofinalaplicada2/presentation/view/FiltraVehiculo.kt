@@ -41,9 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
@@ -52,7 +50,8 @@ import ucne.edu.proyectofinalaplicada2.components.VehicleCard
 @Composable
 fun FiltraVehiculo(
     viewModel: VehiculoViewModel = hiltViewModel(),
-    onGoRenta: (Int) -> Unit
+    onGoRenta: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
     Column {
@@ -62,7 +61,8 @@ fun FiltraVehiculo(
         )
         FiltraVehiculoBody(
             uiState = uiState,
-            onGoRenta = onGoRenta
+            onGoRenta = onGoRenta,
+            onGoEdit = onGoEdit,
         )
     }
 
@@ -72,6 +72,7 @@ fun FiltraVehiculo(
 fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
     onGoRenta: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit,
 ) {
     when {
         uiState.isLoading == true -> {
@@ -110,7 +111,7 @@ fun FiltraVehiculoBody(
                         vehicleDetails = "Precio: ${vehiculoConMarca.vehiculo.precio}\nAño: ${vehiculoConMarca.vehiculo.anio}\nModelo: ${vehiculoConMarca.nombreModelo}",
                         vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
                         onGoRenta = onGoRenta,
-                        modifier = Modifier
+                        onGoEdit = onGoEdit,
                     )
                 }
             }
