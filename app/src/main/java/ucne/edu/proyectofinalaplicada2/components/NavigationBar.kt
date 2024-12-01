@@ -2,7 +2,6 @@ package ucne.edu.proyectofinalaplicada2.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Call
@@ -14,10 +13,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.Flow
-import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
+import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.BottomNavigationItem
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.Screen
 
@@ -40,8 +41,8 @@ fun NavigationBar(
                     screen = Screen.Home
                 ),
                 BottomNavigationItem(
-                    title = "Renta",
-                    selectedIcon = Icons.Filled.Call,
+                    title = "Vehiculo",
+                    selectedIcon = ImageVector.vectorResource(id = R.drawable.car_back),
                     unSelectedIcon = Icons.Outlined.Call,
                     screen = Screen.VehiculoRegistroScreen
                 ),

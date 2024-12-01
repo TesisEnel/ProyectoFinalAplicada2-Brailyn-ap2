@@ -27,14 +27,12 @@ fun ImageCard(
     painter: Painter,
     contentDescription: String,
     title: String,
-    height: Int,
-    width: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
-            .height(height.dp)
-            .width(width.dp),
+            .height(180.dp)
+            .width(150.dp),
         shape = RoundedCornerShape(15.dp)
     ) {
         Box {

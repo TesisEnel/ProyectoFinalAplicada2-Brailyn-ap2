@@ -50,7 +50,8 @@ class RentaViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoading = false
                             )
                         }
                     }
@@ -66,7 +67,8 @@ class RentaViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             it.copy(
-                                rentas = result.data ?: emptyList()
+                                rentas = result.data ?: emptyList(),
+                                isLoading = false
                             )
                         }
                         mostrarDatosVehiculo()

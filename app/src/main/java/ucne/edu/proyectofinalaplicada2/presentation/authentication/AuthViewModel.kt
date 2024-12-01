@@ -38,6 +38,9 @@ class AuthViewModel @Inject constructor(
     private val _uistate = MutableStateFlow(ClienteUiState())
     val uistate = _uistate.asStateFlow()
 
+    private val _isRoleVerified = MutableStateFlow(true)
+    val isRoleVerified = _isRoleVerified.asStateFlow()
+
     val roleFlow: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[PreferenceKeys.role] ?: false
     }
@@ -48,36 +51,43 @@ class AuthViewModel @Inject constructor(
         getClientes()
     }
 
-    private suspend fun saveRole(role: Boolean) {
+    private suspend fun saveUserData(email: String, role: Boolean) {
         dataStore.edit { preferences ->
+            preferences[PreferenceKeys.currentUser] = email
             preferences[PreferenceKeys.role] = role
         }
     }
 
-    private fun clearDataStore() {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences.clear()
-            }
+    private suspend fun clearDataStore() {
+        dataStore.edit { preferences ->
+            preferences.clear()
         }
+
     }
 
-    private suspend fun readRole(): Boolean? {
+    private suspend fun getUserData(): Pair<String?, Boolean?> {
         return dataStore.data.map { preferences ->
-            preferences[PreferenceKeys.role]
-        }.firstOrNull()
+            val email = preferences[PreferenceKeys.currentUser]
+            val role = preferences[PreferenceKeys.role]
+            Pair(email, role)
+        }.firstOrNull() ?: Pair(null, null)
     }
 
     private fun signInWithGoogle() {
         viewModelScope.launch {
+            clearDataStore()
             _uistate.update { it.copy(isLoading = true) }
 
             try {
+
                 val user = googleAuthClient.signInAndGetUser()
-                if (readRole() == null) {
-                    async { isAdminUser(user?.email ?: "") }.await()
-                }
+                _isRoleVerified.value = false
+
                 if (user != null) {
+
+                    val isAdmin = isAdminUser(user.email ?: "")
+                    async { saveUserData(user.email ?: "", isAdmin) }.await()
+                    _isRoleVerified.value = true
                     handleUserSignIn(user)
                 } else {
                     _uistate.update {
@@ -174,11 +184,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun isAdminUser(email: String): Boolean {
-        val userAdmin = uistate.value.clientes.any { it.isAdmin == true && it.email == email }
-        viewModelScope.launch {
-            async { saveRole(userAdmin) }.await()
-        }
-        return userAdmin
+        return uistate.value.clientes.any { it.isAdmin == true && it.email == email }
     }
 
 
@@ -313,8 +319,10 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun signout() {
-        auth.signOut()
-        _authState.value = AuthState.Unauthenticated
+        viewModelScope.launch {
+            auth.signOut()
+            _authState.value = AuthState.Unauthenticated
+        }
     }
 
     private fun validar(): Boolean {
@@ -544,6 +552,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
             is AuthEvent.UpdateClient -> uppdateClient()
+
         }
     }
 

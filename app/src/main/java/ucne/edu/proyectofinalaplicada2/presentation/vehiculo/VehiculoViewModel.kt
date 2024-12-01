@@ -133,7 +133,7 @@ class VehiculoViewModel @Inject constructor(
     }
     private fun getModelosByMarcaId(id: Int) {
         viewModelScope.launch {
-           val modelos = modeloRepository.getModelosByMarcaId(id).data
+           val modelos = modeloRepository.getListModelosByMarcaId(id).data
             _uistate.update {
                 it.copy(
                     modelos = modelos?: emptyList()

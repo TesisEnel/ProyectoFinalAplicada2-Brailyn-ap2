@@ -51,6 +51,18 @@ class VehiculoRepository @Inject constructor(
         }
     }
 
+    fun getListVehiculosByMarcaId(marcaId: Int): Flow<Resource<List<VehiculoEntity>>> = flow {
+        try{
+            emit(Resource.Loading())
+            val vehiculos = vehiculoDao.getListVehiculosByMarcaId(marcaId).firstOrNull()
+            emit(Resource.Success(vehiculos?: emptyList()))
+        }catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
     fun addVehiculo(
       vehiculoDto:VehiculoDto
     ): Flow<Resource<VehiculoDto>> =

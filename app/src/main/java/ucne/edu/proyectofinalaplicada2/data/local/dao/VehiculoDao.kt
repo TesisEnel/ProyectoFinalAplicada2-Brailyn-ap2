@@ -24,5 +24,10 @@ interface VehiculoDao {
     @Query("SELECT * FROM Vehiculos")
     fun getAll(): Flow<List<VehiculoEntity>>
 
+    @Query(
+        """select * from Vehiculos where marcaId=:marcaId
+        """
+    )
+    fun getListVehiculosByMarcaId(marcaId: Int): Flow<List<VehiculoEntity>>
 
 }

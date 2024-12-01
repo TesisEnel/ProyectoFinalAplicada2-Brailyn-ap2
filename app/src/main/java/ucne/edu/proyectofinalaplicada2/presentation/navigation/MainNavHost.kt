@@ -55,13 +55,12 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.components.NavigationBar
-import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthEvent
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.TipoModeloListListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.FiltraVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
@@ -76,6 +75,7 @@ fun MainNavHost(
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.uistate.collectAsStateWithLifecycle()
     val roleFlow = authViewModel.roleFlow
+    val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
 
     MainBodyNavHost(
         navHostController = navHostController,
@@ -83,6 +83,7 @@ fun MainNavHost(
         uiState = uiState,
         authUistate = authState,
         roleFlow = roleFlow,
+        isRoleVerified = isRoleVerified
     )
 }
 
@@ -94,13 +95,14 @@ fun MainBodyNavHost(
     onEvent: (MainEvent) -> Unit = {},
     uiState: MainUiState,
     authUistate: ClienteUiState,
-    roleFlow: Flow<Boolean>
+    roleFlow: Flow<Boolean>,
+    isRoleVerified: Boolean
 ) {
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
 
-    if (authUistate.isLoading) {
+    if (authUistate.isLoading || !isRoleVerified) {
 
         Box(
             modifier = Modifier
@@ -111,7 +113,7 @@ fun MainBodyNavHost(
 
             CircularProgressIndicator()
         }
-    }else{
+    } else {
         Scaffold(
             bottomBar = {
                 NavigationBar(
@@ -224,19 +226,15 @@ fun MainBodyNavHost(
 
                     composable<Screen.TipoVehiculoListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
-                            TipoVehiculeListScreen(
-                                onGoVehiculePresentation = { vehiculoId ->
-                                    navHostController.navigate(Screen.RentaScreen(vehiculoId))
-                                },
-                                marcaId = id,
-                            )
-                        }
+
+                        val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
+                        TipoModeloListListScreen(
+                            onGoVehiculePresentation = { vehiculoId ->
+                                navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                            },
+                            marcaId = id,
+                        )
+
                     }
 
                     composable<Screen.RentaScreen> {
@@ -254,13 +252,9 @@ fun MainBodyNavHost(
                     }
                     composable<Screen.RentaListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            RentaListSceen()
-                        }
+
+                        RentaListSceen()
+
                     }
                     composable<Screen.FiltraVehiculo> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
