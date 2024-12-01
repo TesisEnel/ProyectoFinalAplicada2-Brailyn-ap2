@@ -66,13 +66,12 @@ class VehiculoViewModel @Inject constructor(
                             val vehiculoConMarcasYModelos =
                                 transformarVehiculosConMarcasYModelos(vehiculos)
                             it.copy(
+                                isLoading = false,
                                 vehiculos = vehiculos,
                                 vehiculoConMarcas = vehiculoConMarcasYModelos,
-                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos,
-                                isLoading = false
+                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos
                             )
                         }
-                        //getVehiculoConMarcas()
                     }
                 }
             }
