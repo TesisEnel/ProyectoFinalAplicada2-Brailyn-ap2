@@ -18,7 +18,7 @@ data class VehiculoUistate(
     val precio: Int? = null,
     val descripcion: String = "",
     val anio: Int? = null,
-    val imagePath: List<String> = emptyList(),
+    val imagePath: List<String?> = emptyList(),
     var isLoading: Boolean? = null,
     var isLoadingData: Boolean? = null,
     val error: String = "",
@@ -33,12 +33,14 @@ data class VehiculoUistate(
     val tipoVehiculos: List<TipoVehiculoEntity>? = emptyList(),
     val filteredVehiculoConMarcas: List<VehiculoConMarca> = emptyList(),
     val searchQuery: String = "",
-    val filteredListIsEmpty: Boolean = false
+    val filteredListIsEmpty: Boolean = false,
+    val estaRentado: Boolean = false,
 )
 data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,
     val nombreMarca: String?,
-    val nombreModelo: String? = null
+    val nombreModelo: String? = null,
+    val estaRentado: Boolean? = null
 )
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
@@ -52,6 +54,8 @@ fun VehiculoUistate.toEntity()= VehiculoDto(
     anio = anio,
     imagePath = imagePath,
     proveedorId = proveedorId,
-    marca = marca
+    marca = marca,
+    estaRentado = estaRentado
+
 
 )
