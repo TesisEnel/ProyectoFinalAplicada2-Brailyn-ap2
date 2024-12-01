@@ -30,7 +30,9 @@ data class VehiculoUistate(
     val vehiculoConMarcas: List<VehiculoConMarca> = emptyList(),
     val tipoCombustibles: List<TipoCombustibleEntity>? = emptyList(),
     val proveedores: List<ProveedorEntity>? = emptyList(),
-    val tipoVehiculos: List<TipoVehiculoEntity>? = emptyList()
+    val tipoVehiculos: List<TipoVehiculoEntity>? = emptyList(),
+    val filteredVehiculoConMarcas: List<VehiculoConMarca> = emptyList(),
+    val searchQuery: String = ""
 )
 data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,
