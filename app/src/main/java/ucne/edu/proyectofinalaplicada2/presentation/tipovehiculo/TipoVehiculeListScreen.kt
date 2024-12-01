@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -74,7 +76,7 @@ fun TipoVehiculeBodyListScreen(
             CircularProgressIndicator()
         } else {
             TipoVehiculeLazyColumn(
-                modelos = modeloUistate.modeloConVehiculos,
+                modeloConvehiculos = modeloUistate.modeloConVehiculos,
                 onGoVehiculePresentation = onGoVehiculePresentation,
                 marcaId = marcaId,
                 onEvent = onEvent
@@ -87,13 +89,12 @@ fun TipoVehiculeBodyListScreen(
 
 @Composable
 fun TipoVehiculeLazyColumn(
-    modelos: List<ModeloConVehiculo>,
+    modeloConvehiculos: List<ModeloConVehiculo>,
     onGoVehiculePresentation: (Int) -> Unit,
     marcaId: Int,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
-    val url = "https://rentcarblobstorage.blob.core.windows.net/images/"
-    LaunchedEffect(Unit) {
+    LaunchedEffect (marcaId){
         onEvent(ModeloEvent.GetModeloConVehiculos(marcaId))
     }
     LazyVerticalGrid(
@@ -104,19 +105,19 @@ fun TipoVehiculeLazyColumn(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(modelos) { modelo ->
+        items(modeloConvehiculos) { modelo ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onGoVehiculePresentation(modelo.vehiculo?.vehiculoId ?: 0) },
+                    .clickable { onGoVehiculePresentation(modelo.vehiculo.vehiculoId ?: 0) },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
 
                 VehicleCard(
-                    imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo?.imagePath?.firstOrNull(),
+                    imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath.firstOrNull(),
                     vehicleName = modelo.marca?.nombreMarca ?: "Vehículo Desconocido",
-                    vehicleDetails = "Detalles: ${modelo.vehiculo?.precio ?: "Sin detalles disponibles"}",
+                    vehicleDetails = "Detalles: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
                     modifier = Modifier.weight(1f) // Asegura que las tarjetas tengan el mismo ancho
                 )
 
