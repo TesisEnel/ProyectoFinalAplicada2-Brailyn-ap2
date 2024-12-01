@@ -32,7 +32,7 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
         TipoVehiculoEntity::class,
         VehiculoEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 
