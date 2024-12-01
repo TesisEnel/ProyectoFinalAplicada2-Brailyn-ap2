@@ -28,8 +28,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
 fun TipoVehiculoList(
     painter: Painter,
     marca: String,
-    onGoVehiculeList: ((Int) -> Unit)? = null,
-    onGoRenta: ((Int) -> Unit)? = null,
+    onGoVehiculeList:(Int) -> Unit,
     vehiculoConMarca: VehiculoConMarca,
     onMarcaEvent: (MarcaEvent) -> Unit
 ) {
@@ -40,11 +39,8 @@ fun TipoVehiculoList(
             .clickable(onClick = {
                 onMarcaEvent(MarcaEvent.OnchangeMarcaId(vehiculoConMarca.vehiculo.marcaId ?: 0))
                 vehiculoConMarca.vehiculo.marcaId?.let { marcaId ->
-                    if (onGoVehiculeList != null) {
                         onGoVehiculeList(marcaId)
-                    } else {
-                        onGoRenta?.invoke(vehiculoConMarca.vehiculo.vehiculoId ?: 0)
-                    }
+
                 }
             }
             ),
