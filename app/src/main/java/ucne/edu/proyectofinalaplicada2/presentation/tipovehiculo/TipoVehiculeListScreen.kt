@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloConVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloEvent
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.ModeloUistate
@@ -94,9 +95,12 @@ fun TipoVehiculeLazyColumn(
     marcaId: Int,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
-    LaunchedEffect (marcaId){
-        onEvent(ModeloEvent.GetModeloConVehiculos(marcaId))
+    val isDataLoaded = remember { mutableStateOf(false) }
+    if (!isDataLoaded.value) {
+        onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId))
+        isDataLoaded.value = true
     }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
