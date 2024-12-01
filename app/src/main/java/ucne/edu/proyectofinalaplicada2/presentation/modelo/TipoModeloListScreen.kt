@@ -3,7 +3,6 @@ package ucne.edu.proyectofinalaplicada2.presentation.modelo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,20 +53,26 @@ fun TipoModeloBodyListScreen(
     onGoVehiculePresentation: (Int) -> Unit,
     onEvent: (ModeloEvent) -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .padding(bottom = 5.dp, top = 20.dp)
-    ) {
-        Text(
-            text = "Tipos de modelos",
-            fontFamily = FontFamily.Serif,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.W700,
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
-        )
-        if (modeloUistate.isLoading) {
-            CircularProgressIndicator()
-        } else {
+    if (modeloUistate.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        Column(
+            modifier = Modifier
+                .padding(bottom = 5.dp, top = 20.dp)
+        ) {
+            Text(
+                text = "Tipos de ${modeloUistate.marca?.nombreMarca?:""}",
+                fontFamily = FontFamily.Serif,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.W700,
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp)
+            )
+            Text(
+                text = "Aquí estarán todas las marcas de nuestros vehículos",
+                fontFamily = FontFamily.Serif,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(horizontal = 15.dp)
+            )
             TipoModeloLazyColumn(
                 modeloUistate = modeloUistate,
                 onGoVehiculePresentation = onGoVehiculePresentation,
@@ -92,11 +97,10 @@ fun TipoModeloLazyColumn(
     }
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         items(modeloUistate.modeloConVehiculos) { modelo ->
             Row(
@@ -107,9 +111,9 @@ fun TipoModeloLazyColumn(
             ) {
                 VehicleCard(
                     imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath.firstOrNull(),
-                    vehicleName = modelo.marca?.nombreMarca ?: "Vehículo Desconocido",
-                    vehicleDetails = "Detalles: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
-                    modifier = Modifier.weight(1f) // Asegura que las tarjetas tengan el mismo ancho
+                    vehicleName = modelo.nombreModelo,
+                    vehicleDetails = "Precio: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -126,7 +130,7 @@ fun VehicleCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(horizontal = 4.dp, vertical = 12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -137,7 +141,7 @@ fun VehicleCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(120.dp)
             )
             Column(
                 modifier = Modifier
@@ -147,7 +151,8 @@ fun VehicleCard(
                 Text(
                     text = vehicleName,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(

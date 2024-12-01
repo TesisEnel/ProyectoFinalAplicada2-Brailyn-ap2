@@ -37,8 +37,6 @@ import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.components.ImageCard
 import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaUiState
-import ucne.edu.proyectofinalaplicada2.presentation.marca.MarcaViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -71,7 +69,7 @@ fun Home(
                 )
             }
             item {
-                VehiculosMasDestacados(
+                ListaDeVehiculos(
                     vehiculoUistate = vehiculoUistate,
                 )
             }
@@ -121,22 +119,28 @@ fun FakeSearchBar(
 
 
 @Composable
-fun VehiculosMasDestacados(
+fun ListaDeVehiculos(
     vehiculoUistate: VehiculoUistate,
 ) {
     Column(
-        modifier = Modifier.padding(bottom = 5.dp, top = 20.dp),
+        modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
     ) {
         Text(
-            text = "Vehiculos destacados",
+            text = "Vehiculos",
             fontFamily = FontFamily.Serif,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 8.dp)
+        )
+        Text(
+            text = "Aquí encontrarás todos nuestros vehiculos",
+            fontFamily = FontFamily.Serif,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(horizontal = 15.dp)
         )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(18.dp),
-            modifier = Modifier.padding(vertical = 5.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
             items(vehiculoUistate.vehiculoConMarcas) { vehiculoConMarca ->
