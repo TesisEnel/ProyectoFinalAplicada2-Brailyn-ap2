@@ -113,7 +113,7 @@ fun MainBodyNavHost(
 
             CircularProgressIndicator()
         }
-    }else{
+    } else {
         Scaffold(
             bottomBar = {
                 NavigationBar(
@@ -226,19 +226,15 @@ fun MainBodyNavHost(
 
                     composable<Screen.TipoVehiculoListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
-                            TipoVehiculeListScreen(
-                                onGoVehiculePresentation = { vehiculoId ->
-                                    navHostController.navigate(Screen.RentaScreen(vehiculoId))
-                                },
-                                marcaId = id,
-                            )
-                        }
+
+                        val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
+                        TipoVehiculeListScreen(
+                            onGoVehiculePresentation = { vehiculoId ->
+                                navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                            },
+                            marcaId = id,
+                        )
+
                     }
 
                     composable<Screen.RentaScreen> {
