@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -68,22 +69,44 @@ fun FiltraVehiculo(
 fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
 ) {
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ){
-        items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
-            val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
-            MostrarVehiculos(
-                url = Constant.URL_BLOBSTORAGE + painter,
-                vehiculoConMarca = vehiculoConMarca,
+    when {
+        uiState.isLoading == true -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        uiState.filteredListIsEmpty-> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.TopCenter
             )
+            {
+                Text(text = "No se encontraron vehiculos")
+            }
+        }
+
+        else -> {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
+                    val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                    MostrarVehiculos(
+                        url = Constant.URL_BLOBSTORAGE + painter,
+                        vehiculoConMarca = vehiculoConMarca,
+                    )
+                }
+            }
         }
     }
-
 }
 
 @Composable
