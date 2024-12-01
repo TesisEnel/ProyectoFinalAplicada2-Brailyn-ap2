@@ -74,6 +74,7 @@ class ModeloViewModel @Inject constructor(
             _uistate.update {
                 it.copy(
                     modeloConVehiculos = modeloConVehiculos,
+                    marca = marca
                 )
             }
         }
