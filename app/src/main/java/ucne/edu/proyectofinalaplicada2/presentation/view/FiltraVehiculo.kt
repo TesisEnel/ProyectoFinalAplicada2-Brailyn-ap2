@@ -2,7 +2,6 @@ package ucne.edu.proyectofinalaplicada2.presentation.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoConMarca
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -53,7 +53,10 @@ fun FiltraVehiculo(
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
     Column {
-        SearchBar()
+        SearchBar(
+            searchQuery = uiState.searchQuery,
+            onEvent = {event -> viewModel.onEvent(event)}
+        )
         FiltraVehiculoBody(
             uiState = uiState,
         )
@@ -136,16 +139,18 @@ fun MostrarVehiculos(
 
 @Composable
 fun SearchBar(
-    onGoSearch: () -> Unit = {},
+    searchQuery: String,
+    onEvent: (VehiculoEvent) -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
+
     TextField(
-        value = "" ,
-        onValueChange = {},
+        value = searchQuery,
+        onValueChange = { onEvent(VehiculoEvent.OnFilterVehiculos(it)) },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
@@ -163,7 +168,6 @@ fun SearchBar(
             .fillMaxWidth()
             .heightIn(min = 50.dp)
             .padding(15.dp)
-            .clickable(onClick = onGoSearch)
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
     )
 }
