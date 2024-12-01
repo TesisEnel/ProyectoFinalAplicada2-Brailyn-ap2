@@ -2,7 +2,6 @@ package ucne.edu.proyectofinalaplicada2.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 
 @Entity(tableName = "Vehiculos")
 class VehiculoEntity(
@@ -16,6 +15,7 @@ class VehiculoEntity(
     val descripcion: String?,
     val anio: Int?,
     val imagePath: List<String?>,
-    val proveedorId: Int?
+    val proveedorId: Int?,
+    val estaRentado: Boolean?,
 
 )
