@@ -176,6 +176,9 @@ class VehiculoViewModel @Inject constructor(
     }
 
     private fun save() {
+        if(!validarVehiculo()){
+            return
+        }
         viewModelScope.launch {
 
             val vehiculo = vehiculoRepository.addVehiculo(
@@ -187,7 +190,8 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Error -> {
                         _uistate.update {
                             it.copy(
-                                error = result.message ?: "Error"
+                                error = result.message ?: "Error",
+                                isLoadingData = false
                             )
                         }
                     }
@@ -211,6 +215,110 @@ class VehiculoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun validarVehiculo(): Boolean {
+        var isValid = true
+
+        if (_uistate.value.tipoVehiculoId == null) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    tipoVehiculoError = "Seleccione un tipo de vehículo"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(tipoVehiculoError = "") }
+        }
+
+        if (_uistate.value.marcaId == 0) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    marcaError = "Seleccione una marca"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(marcaError = "") }
+        }
+
+        if (_uistate.value.modeloId == 0) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    modeloError = "Seleccione un modelo"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(modeloError = "") }
+        }
+
+        if (_uistate.value.precio == null || _uistate.value.precio!! < 1000 || _uistate.value.precio!! > 100000) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    precioError = "Ingrese un precio válido (>= 1000)"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(precioError = "") }
+        }
+
+        if (_uistate.value.descripcion.isEmpty()) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    descripcionError = "Ingrese una descripción"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(descripcionError = "") }
+        }
+
+        if (_uistate.value.anio == null || _uistate.value.anio!! < 2010) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    anioError = "Ingrese un año válido (>= 2010)"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(anioError = "") }
+        }
+
+        if (_uistate.value.imagePath.isEmpty()) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    imageError = "Seleccione una imagen"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(imageError = "") }
+        }
+
+        if (_uistate.value.tipoCombustibleId == null) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    tipoCombustibleError = "Seleccione un tipo de combustible"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(tipoCombustibleError = "") }
+        }
+        if (_uistate.value.proveedorId == null) {
+            isValid = false
+            _uistate.update {
+                it.copy(
+                    proveedorError = "Seleccione un proveedor"
+                )
+            }
+        } else {
+            _uistate.update { it.copy(tipoCombustibleError = "") }
+        }
+
+        return isValid
     }
 
     private fun updateVehiculo() {
@@ -364,7 +472,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangePrecio(precio: Int) {
         _uistate.update {
             it.copy(
-                precio = precio
+                precio = precio,
+                precioError = ""
             )
         }
     }
@@ -373,7 +482,8 @@ class VehiculoViewModel @Inject constructor(
         getModelosByMarcaId(marcaId)
         _uistate.update {
             it.copy(
-                marcaId = marcaId
+                marcaId = marcaId,
+                marcaError = ""
             )
         }
     }
@@ -381,7 +491,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeDescripcion(descripcion: String) {
         _uistate.update {
             it.copy(
-                descripcion = descripcion
+                descripcion = descripcion,
+                descripcionError = ""
             )
         }
     }
@@ -389,7 +500,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeTipoCombustibleId(tipoCombustibleId: Int) {
         _uistate.update {
             it.copy(
-                tipoCombustibleId = tipoCombustibleId
+                tipoCombustibleId = tipoCombustibleId,
+                tipoCombustibleError = ""
             )
         }
 
@@ -398,7 +510,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeTipoVehiculoId(tipoVehiculoId: Int) {
         _uistate.update {
             it.copy(
-                tipoVehiculoId = tipoVehiculoId
+                tipoVehiculoId = tipoVehiculoId,
+                tipoVehiculoError = ""
             )
         }
     }
@@ -406,7 +519,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeModeloId(modeloId: Int) {
         _uistate.update {
             it.copy(
-                modeloId = modeloId
+                modeloId = modeloId,
+                modeloError = ""
             )
         }
     }
@@ -414,7 +528,8 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeProveedorId(proveedorId: Int) {
         _uistate.update {
             it.copy(
-                proveedorId = proveedorId
+                proveedorId = proveedorId,
+                proveedorError = ""
             )
         }
     }
@@ -425,7 +540,8 @@ class VehiculoViewModel @Inject constructor(
         }
         _uistate.update {
             it.copy(
-                imagePath = updatedImage
+                imagePath = updatedImage,
+                imageError = ""
             )
         }
     }
@@ -433,11 +549,20 @@ class VehiculoViewModel @Inject constructor(
     private fun onChangeAnio(anio: Int) {
         _uistate.update {
             it.copy(
-                anio = anio
+                anio = anio,
+                anioError = ""
             )
         }
     }
 
+    private fun clearImageError() {
+        _uistate.value = _uistate.value.copy(imageError = "")
+    }
+    private fun clearError() {
+        _uistate.update {
+            it.copy(error = "")
+        }
+    }
     fun onEvent(event: VehiculoEvent) {
         when (event) {
             is VehiculoEvent.OnChangeDescripcion -> onChangeDescripcion(event.descripcion)
@@ -456,6 +581,8 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.SelectedVehiculo -> selectedVehiculo(event.vehiculoId)
             is VehiculoEvent.OnImagesSelected -> onImagesSelected(event.uris, event.context)
             is VehiculoEvent.DeleteVehiculo -> deleteVehiculo(event.id)
+            VehiculoEvent.ClearImageError -> clearImageError()
+            VehiculoEvent.ClearError -> clearError()
         }
     }
 }
