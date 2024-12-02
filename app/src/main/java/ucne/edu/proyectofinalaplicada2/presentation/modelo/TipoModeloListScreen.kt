@@ -20,11 +20,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 
 @Composable
 fun TipoModeloListListScreen(
     modeloViewModel: ModeloViewModel = hiltViewModel(),
+    vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     onGoRenta: (Int) -> Unit,
     marcaId: Int,
     onGoEdit: (Int) -> Unit,
@@ -36,6 +39,7 @@ fun TipoModeloListListScreen(
         onGoRenta = onGoRenta,
         onEvent = { event -> modeloViewModel.onEvent(event) },
         onGoEdit = onGoEdit,
+        onVehiculoEvent = { event -> vehiculoViewModel.onEvent(event) }
     )
 }
 
@@ -46,6 +50,7 @@ fun TipoModeloBodyListScreen(
     onGoRenta: (Int) -> Unit,
     onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
+    onVehiculoEvent: (VehiculoEvent) -> Unit
 ) {
     if (modeloUistate.isLoading) {
         CircularProgressIndicator()
@@ -73,6 +78,7 @@ fun TipoModeloBodyListScreen(
                 marcaId = marcaId,
                 onEvent = onEvent,
                 onGoEdit = onGoEdit,
+                onVehiculoEvent = onVehiculoEvent
             )
         }
     }
@@ -88,6 +94,8 @@ fun TipoModeloLazyColumn(
     onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
+    onVehiculoEvent: (VehiculoEvent) -> Unit
+
 
     ) {
     val uistate = authViewModel.uistate.collectAsStateWithLifecycle()
@@ -109,7 +117,8 @@ fun TipoModeloLazyColumn(
                 vehiculoId = modelo.vehiculo.vehiculoId ?: 0,
                 onGoRenta = onGoRenta,
                 onGoEdit = onGoEdit,
-                isAdmin = uistate.value.isAdmin
+                isAdmin = uistate.value.isAdmin,
+                onEvent = onVehiculoEvent
             )
         }
     }

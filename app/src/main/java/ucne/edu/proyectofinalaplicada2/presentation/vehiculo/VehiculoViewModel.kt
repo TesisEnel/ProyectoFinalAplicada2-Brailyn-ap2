@@ -246,6 +246,39 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
+
+    private fun deleteVehiculo(id: Int){
+        viewModelScope.launch {
+            vehiculoRepository.deleteVehiculo(id).collect{ result->
+                when(result){
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Vehiculo eliminado",
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+    }
     private fun onImagesSelected(uris: List<Uri>, context: Context) {
         viewModelScope.launch {
             val imageFiles = uris.mapNotNull { uri ->
@@ -422,6 +455,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnFilterVehiculos -> filterVehiculos(event.query)
             is VehiculoEvent.SelectedVehiculo -> selectedVehiculo(event.vehiculoId)
             is VehiculoEvent.OnImagesSelected -> onImagesSelected(event.uris, event.context)
+            is VehiculoEvent.DeleteVehiculo -> deleteVehiculo(event.id)
         }
     }
 }

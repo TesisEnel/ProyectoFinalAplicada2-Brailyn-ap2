@@ -131,4 +131,20 @@ class VehiculoRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
+    fun deleteVehiculo(vehiculoId: Int): Flow<Resource<VehiculoDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val vehiculoDeleted = rentCarRemoteDataSource.deleteVehiculo(vehiculoId)
+            vehiculoDao.delete(vehiculoDeleted.toEntity())
+            emit(Resource.Success(vehiculoDeleted))
+        }
+        catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        }
+        catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
+
 }

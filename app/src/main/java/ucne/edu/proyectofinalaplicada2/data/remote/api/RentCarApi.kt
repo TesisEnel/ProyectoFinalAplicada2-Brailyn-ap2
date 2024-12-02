@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.data.remote.api
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -44,6 +45,9 @@ interface RentCarApi {
     @GET("api/Vehiculos/{id}")
     suspend fun getVehiculoById(@Path("id") id: Int): VehiculoDto
 
+
+    @DELETE("api/Vehiculos/{id}")
+    suspend fun deleteVehiculo(@Path("id") id: Int): VehiculoDto
     @Multipart
     @POST("api/Vehiculos")
     suspend fun addVehiculo(

@@ -29,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
+
 
 @Composable
 fun VehicleCard(
@@ -38,9 +40,12 @@ fun VehicleCard(
     vehiculoId: Int,
     onGoRenta: (Int) -> Unit = {},
     onGoEdit: (Int) -> Unit = {},
-    isAdmin: Boolean
+    onEvent: (VehiculoEvent) -> Unit = {},
+    isAdmin: Boolean,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,7 +79,7 @@ fun VehicleCard(
                         fontWeight = FontWeight.Bold
                     )
                     Box {
-                        if (isAdmin){
+                        if (isAdmin) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Más opciones",
@@ -96,6 +101,7 @@ fun VehicleCard(
                             DropdownMenuItem(
                                 onClick = {
                                     expanded = false
+                                    showDeleteDialog = true // Muestra el modal de confirmación
                                 },
                                 text = { Text("Eliminar") }
                             )
@@ -109,4 +115,17 @@ fun VehicleCard(
             }
         }
     }
+
+    if (showDeleteDialog) {
+        ConfirmDeleteDialog(
+            onConfirm = {
+                onEvent(VehiculoEvent.DeleteVehiculo(vehiculoId))
+                showDeleteDialog = false
+            },
+            onDismiss = {
+                showDeleteDialog = false
+            }
+        )
+    }
 }
+

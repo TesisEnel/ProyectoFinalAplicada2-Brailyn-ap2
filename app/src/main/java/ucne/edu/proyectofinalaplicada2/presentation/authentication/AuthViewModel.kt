@@ -69,6 +69,7 @@ class AuthViewModel @Inject constructor(
     private fun loadUserRole() {
         viewModelScope.launch {
             val (_, role) = getUserData()
+            _isRoleVerified.value = true
             _uistate.update { it.copy(isAdmin = role ?: false) }
         }
     }
@@ -92,10 +93,10 @@ class AuthViewModel @Inject constructor(
 
                 if (user != null) {
 
+                    handleUserSignIn(user)
                     val isAdmin = isAdminUser(user.email ?: "")
                     async { saveUserData(user.email ?: "", isAdmin) }.await()
                     _isRoleVerified.value = true
-                    handleUserSignIn(user)
                 } else {
                     _uistate.update {
                         it.copy(

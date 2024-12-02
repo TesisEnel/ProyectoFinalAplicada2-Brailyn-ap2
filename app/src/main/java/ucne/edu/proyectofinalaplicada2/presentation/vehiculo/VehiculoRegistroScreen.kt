@@ -164,7 +164,7 @@ fun VehiculoBodyRegistroScreen(
                     modifier = Modifier
                         .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number // Configura el teclado numérico
+                        keyboardType = KeyboardType.Number
                     )
                 )
                 OutlinedTextField(
