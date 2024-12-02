@@ -224,9 +224,16 @@ fun MainBodyNavHost(
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                         val id = it.toRoute<Screen.RentaScreen>().id
 
-                        RentaScreen(
-                            vehiculoId = id
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            RentaScreen(
+                                vehiculoId = id
+                            )
+                        }
+
                     }
                     composable<Screen.RentaListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))

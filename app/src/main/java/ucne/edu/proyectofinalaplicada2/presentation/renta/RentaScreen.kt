@@ -119,7 +119,6 @@ fun RentaBodyScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagen del vehículo
         vehiculo?.imagePath?.let { imagePaths ->
             val pagerState = rememberPagerState()
             Box(
@@ -145,7 +144,6 @@ fun RentaBodyScreen(
             }
         }
 
-        // Contenedor principal con scroll
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -165,7 +163,6 @@ fun RentaBodyScreen(
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Título y descripción
                     Text(
                         text = "${rentaUiState.marca?.nombreMarca} ${rentaUiState.modelo?.modeloVehiculo}",
                         style = MaterialTheme.typography.titleLarge,
@@ -183,7 +180,6 @@ fun RentaBodyScreen(
                         fontWeight = FontWeight.Normal
                     )
 
-                    // Especificaciones técnicas
                     Text(
                         text = "Especificaciones Técnicas",
                         fontWeight = FontWeight.Medium,
@@ -202,7 +198,6 @@ fun RentaBodyScreen(
                         CardInfo("Tipo de Vehículo", rentaUiState.vehiculoConTipo ?: "N/A")
                     }
 
-                    // Selección de fechas
                     Text(
                         text = "Selecciona la fecha para rentar",
                         fontWeight = FontWeight.Medium
@@ -212,7 +207,6 @@ fun RentaBodyScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Fecha de Renta
                         Column(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
                                 value = rentaUiState.fechaRenta,
@@ -254,7 +248,6 @@ fun RentaBodyScreen(
                             )
                         }
 
-                        // Fecha de Entrega
                         Column(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
                                 value = rentaUiState.fechaEntrega ?: "",
@@ -288,7 +281,6 @@ fun RentaBodyScreen(
                         }
                     }
 
-                    // Botón de acción
                     Button(
                         onClick = {
                             onEvent(
@@ -308,8 +300,6 @@ fun RentaBodyScreen(
                 }
             }
         }
-
-        // Modal de confirmación
         if (rentaUiState.showModal) {
             ConfirmRentaDialog(
                 rentaUiState = rentaUiState,
@@ -425,7 +415,7 @@ fun ConfirmRentaDialog(
                     InfoRow(label = "Vehículo:", value = rentaUiState.vehiculoNombre ?: "N/A")
                     InfoRow(label = "Modelo:", value = rentaUiState.vehiculoModelo ?: "N/A")
                     InfoRow(label = "Año:", value = vehiculo?.anio?.toString() ?: "N/A")
-                    InfoRow(label = "Fecha de Salida:", value = rentaUiState.fechaRenta ?: "N/A")
+                    InfoRow(label = "Fecha de Salida:", value = rentaUiState.fechaRenta)
                     InfoRow(label = "Fecha de Entrada:", value = rentaUiState.fechaEntrega ?: "N/A")
                     InfoRow(label = "Precio/Día:", value = "${vehiculo?.precio ?: "N/A"} DOP")
                     InfoRow(label = "Días Totales:", value = rentaUiState.cantidadDias?.toString() ?: "N/A")
