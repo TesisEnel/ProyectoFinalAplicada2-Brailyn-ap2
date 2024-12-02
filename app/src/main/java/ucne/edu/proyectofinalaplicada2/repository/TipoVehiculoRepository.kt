@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.repository
 import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.TipoVehiculoDao
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
@@ -27,4 +28,21 @@ class TipoVehiculoRepository @Inject constructor(
             Resource.Success(tipoVehiculosLocal?: emptyList())
         }
     }
+
+    suspend fun getTipoVehiculoById(id: Int): Resource<TipoVehiculoEntity?> {
+        return try {
+            val tiposVehiculos = rentCarRemoteDataSource.getTiposVehiculos()
+            tiposVehiculos.forEach { tipoVehiculoDao.save(it.toEntity()) }
+            val tipoVehiculo = tipoVehiculoDao.find(id)
+            Resource.Success(tipoVehiculo)
+        } catch (e: HttpException) {
+            Resource.Error("Error de internet ${e.message}")
+        }
+        catch (e: Exception) {
+            val tipoVehiculo = tipoVehiculoDao.find(id)
+            Resource.Success(tipoVehiculo)
+        }
+    }
+
+
 }
