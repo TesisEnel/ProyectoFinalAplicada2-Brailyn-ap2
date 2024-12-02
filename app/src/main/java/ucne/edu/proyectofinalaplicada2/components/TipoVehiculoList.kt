@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +33,7 @@ fun TipoVehiculoList(
     marca: String,
     onGoVehiculeList:(Int) -> Unit,
     vehiculoConMarca: VehiculoConMarca,
-    onMarcaEvent: (MarcaEvent) -> Unit
+    onMarcaEvent: (MarcaEvent) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -39,7 +42,7 @@ fun TipoVehiculoList(
             .clickable(onClick = {
                 onMarcaEvent(MarcaEvent.OnchangeMarcaId(vehiculoConMarca.vehiculo.marcaId ?: 0))
                 vehiculoConMarca.vehiculo.marcaId?.let { marcaId ->
-                        onGoVehiculeList(marcaId)
+                    onGoVehiculeList(marcaId)
 
                 }
             }
@@ -53,21 +56,35 @@ fun TipoVehiculoList(
         )
 
     ) {
-        Row {
-            VehiculeImage(
-                painter = painter
-            )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Imagen del vehículo
+            VehiculeImage(painter = painter)
+
+            // Nombre de la marca
             Column(
                 modifier = Modifier
+                    .weight(1f)
                     .padding(16.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = marca, style = MaterialTheme.typography.bodyLarge,
+                    text = marca,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.W500
                 )
             }
+
+            // Flecha indicando clic
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Navegar",
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(24.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

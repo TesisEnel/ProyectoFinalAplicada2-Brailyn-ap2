@@ -24,6 +24,9 @@ class ModeloViewModel @Inject constructor(
 
     private fun getListVehiculosByMarcaId(marcaId: Int) {
         viewModelScope.launch {
+            if(_uistate.value.isDataLoaded){
+                return@launch
+            }
             vehiculoRepository.getListVehiculosByMarcaId(marcaId).collect { result ->
                 when (result) {
                     is Resource.Loading -> {
@@ -45,7 +48,8 @@ class ModeloViewModel @Inject constructor(
                         _uistate.update {
                             it.copy(
                                 isLoading = false,
-                                vehiculos = result.data ?: emptyList()
+                                vehiculos = result.data ?: emptyList(),
+                                isDataLoaded = true
                             )
                         }
                         getModeloConVehiculos(marcaId)
@@ -70,6 +74,7 @@ class ModeloViewModel @Inject constructor(
             _uistate.update {
                 it.copy(
                     modeloConVehiculos = modeloConVehiculos,
+                    marca = marca
                 )
             }
         }

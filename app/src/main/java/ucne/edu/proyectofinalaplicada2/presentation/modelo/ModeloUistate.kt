@@ -11,7 +11,9 @@ data class ModeloUistate(
     val error: String = "",
     val success: String = "",
     val vehiculos: List<VehiculoEntity> = emptyList(),
-    val modeloConVehiculos: List<ModeloConVehiculo> = emptyList()
+    val modeloConVehiculos: List<ModeloConVehiculo> = emptyList(),
+    val isDataLoaded: Boolean = false,
+    val marca: MarcaEntity? = null
 )
 
 data class ModeloConVehiculo(

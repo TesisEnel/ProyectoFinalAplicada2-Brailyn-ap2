@@ -60,7 +60,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiStat
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
-import ucne.edu.proyectofinalaplicada2.presentation.tipovehiculo.TipoVehiculeListScreen
+import ucne.edu.proyectofinalaplicada2.presentation.modelo.TipoModeloListListScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.view.FiltraVehiculo
 import ucne.edu.proyectofinalaplicada2.presentation.view.Home
@@ -228,7 +228,7 @@ fun MainBodyNavHost(
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
 
                         val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
-                        TipoVehiculeListScreen(
+                        TipoModeloListListScreen(
                             onGoVehiculePresentation = { vehiculoId ->
                                 navHostController.navigate(Screen.RentaScreen(vehiculoId))
                             },
