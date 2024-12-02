@@ -1,8 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.ModeloDao
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
@@ -56,18 +54,6 @@ class ModeloRepository @Inject constructor(
         catch (e: Exception){
             val localModelos = modeloDao.findByMarcaId(marcaId)
             Resource.Success(localModelos)
-        }
-    }
-
-    suspend fun getModeloByMarcaId(marcaId: Int): Resource<ModeloEntity> {
-        return try {
-            val modelos = modeloDao.getModeloByMarcaId(marcaId)
-            Resource.Success(modelos)
-        } catch (e: HttpException) {
-            Resource.Error("Error de internet ${e.message}")
-        } catch (e: Exception) {
-            Resource.Error("Error desconocido ${e.message}")
-
         }
     }
 

@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
-import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 @HiltViewModel
