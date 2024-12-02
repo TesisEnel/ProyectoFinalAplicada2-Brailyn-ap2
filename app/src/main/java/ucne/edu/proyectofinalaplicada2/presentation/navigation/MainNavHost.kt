@@ -70,7 +70,6 @@ fun MainNavHost(
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val roleFlow = authViewModel.roleFlow
-    val authState by authViewModel.uistate.collectAsStateWithLifecycle()
 
     MainBodyNavHost(
         navHostController = navHostController,
