@@ -267,7 +267,7 @@ fun MainBodyNavHost(
                         ) {
                             FiltraVehiculo(
                                 onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
-                                onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(0)) },
+                                onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
                             )
                         }
                     }
