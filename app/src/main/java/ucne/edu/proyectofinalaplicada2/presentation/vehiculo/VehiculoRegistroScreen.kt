@@ -313,7 +313,7 @@ fun VehiculoBodyRegistroScreen(
                         Text(text = if (vehiculoId > 0) "Actualizar" else "Guardar")
                     }
                 }
-                if (vehiculoUiState.imageError.isNotEmpty() && showDialog) {
+                if (vehiculoUiState.imageError.isNotEmpty()) {
                     CustomDialog(
                         message = vehiculoUiState.imageError,
                         isError = vehiculoUiState.imageError.isNotEmpty(),
@@ -322,10 +322,9 @@ fun VehiculoBodyRegistroScreen(
                             onVehiculoEnvent(VehiculoEvent.ClearImageError)
                         }
                     )
-                } else if (vehiculoUiState.imageError.isNotEmpty()) {
                     showDialog = true
                 }
-                if (vehiculoUiState.success.isNotEmpty() && showDialog) {
+                if (vehiculoUiState.success.isNotEmpty() ) {
                     CustomDialog(
                         message = vehiculoUiState.success,
                         isError = vehiculoUiState.success.isEmpty(),
@@ -333,6 +332,7 @@ fun VehiculoBodyRegistroScreen(
                             showDialog = false
                         }
                     )
+                    showDialog = true
                 }
                 if(vehiculoUiState.error.isNotEmpty()) {
                     CustomDialog(
@@ -343,8 +343,6 @@ fun VehiculoBodyRegistroScreen(
                             onVehiculoEnvent(VehiculoEvent.ClearError)
                         }
                     )
-                }
-                else if (vehiculoUiState.error.isNotEmpty()) {
                     showDialog = true
                 }
             }
