@@ -38,6 +38,7 @@ fun VehicleCard(
     vehiculoId: Int,
     onGoRenta: (Int) -> Unit = {},
     onGoEdit: (Int) -> Unit = {},
+    isAdmin: Boolean
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
@@ -73,11 +74,14 @@ fun VehicleCard(
                         fontWeight = FontWeight.Bold
                     )
                     Box {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Más opciones",
-                            modifier = Modifier.clickable { expanded = true }
-                        )
+                        if (isAdmin){
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Más opciones",
+                                modifier = Modifier.clickable { expanded = true }
+                            )
+                        }
+
                         DropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
