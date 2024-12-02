@@ -100,9 +100,10 @@ fun ExpandableCard(
     onEvent: (RentaEvent) -> Unit = {}
 ) {
     val rentaUiState by authViewModel.uistate.collectAsStateWithLifecycle()
+    val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf<Int?>(null)  }
-    LaunchedEffect(Unit) {
-        if(!rentaUiState.isAdmin){
+    LaunchedEffect(isRoleVerified) {
+        if(!rentaUiState.isAdmin ){
             onEvent(RentaEvent.MostraDatosVehiculoByRole(false))
         }
         else{
