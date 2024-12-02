@@ -1,5 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import android.content.Context
+import android.net.Uri
 import java.io.File
 
 sealed interface VehiculoEvent {
@@ -17,5 +19,6 @@ sealed interface VehiculoEvent {
     data class OnFilterVehiculos(val query: String): VehiculoEvent
     data class SelectedVehiculo(val vehiculoId: Int): VehiculoEvent
     data object UpdateVehiculo : VehiculoEvent
+    data class OnImagesSelected(val uris: List<Uri>, val context: Context) : VehiculoEvent
 
 }
