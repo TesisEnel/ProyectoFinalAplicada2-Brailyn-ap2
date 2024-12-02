@@ -215,13 +215,7 @@ fun MainBodyNavHost(
                             navHostController.navigate(Screen.RentaScreen(vehiculoId))
                         },
                         marcaId = id,
-                        onGoEdit = { vehiculoId ->
-                            navHostController.navigate(
-                                Screen.VehiculoRegistroScreen(
-                                    vehiculoId
-                                )
-                            )
-                        },
+                        onGoEdit = {vehiculoId -> navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId)) },
                     )
 
                 }
