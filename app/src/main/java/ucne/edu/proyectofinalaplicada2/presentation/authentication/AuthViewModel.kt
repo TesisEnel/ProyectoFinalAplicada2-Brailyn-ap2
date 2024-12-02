@@ -49,6 +49,7 @@ class AuthViewModel @Inject constructor(
     init {
         checkAuthStatus()
         getClientes()
+        loadUserRole()
     }
 
     private suspend fun saveUserData(email: String, role: Boolean) {
@@ -65,6 +66,12 @@ class AuthViewModel @Inject constructor(
 
     }
 
+    private fun loadUserRole() {
+        viewModelScope.launch {
+            val (_, role) = getUserData()
+            _uistate.update { it.copy(isAdmin = role ?: false) }
+        }
+    }
     private suspend fun getUserData(): Pair<String?, Boolean?> {
         return dataStore.data.map { preferences ->
             val email = preferences[PreferenceKeys.currentUser]
