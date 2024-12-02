@@ -211,6 +211,40 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
+    private fun updateVehiculo() {
+        viewModelScope.launch {
+            val vehiculo = vehiculoRepository.updateVehiculo(
+                uistate.value.toEntity()
+            )
+            vehiculo.collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Vehiculo actualizado",
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun getVehiculoConMarcas() {
         val vehiculoConMarcas = _uistate.value.vehiculos.map { vehiculo ->
             val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
@@ -230,6 +264,11 @@ class VehiculoViewModel @Inject constructor(
     }
 
     private fun selectedVehiculo(vehiculoId: Int) {
+        _uistate.update {
+            it.copy(
+                isLoadingData = true
+            )
+        }
         viewModelScope.launch {
             val vehiculo = vehiculoRepository.getVehiculoById(vehiculoId).data
             val marcas = marcaRepository.getMarcas().data
@@ -248,12 +287,13 @@ class VehiculoViewModel @Inject constructor(
                         modeloId = vehiculo.modeloId ?: 0,
                         proveedorId = vehiculo.proveedorId,
                         anio = vehiculo.anio,
-                        imagePath = vehiculo.imagePath,
+                        imagePath = vehiculo.imagePath?: emptyList(),
 
                         marcas = marcas ?: emptyList(),
                         tipoCombustibles = tipoCombustibles,
                         tipoVehiculos = tipoVehiculos,
                         modelos = modelos ?: emptyList(),
+                        isLoadingData = false
                     )
                 }
 
@@ -349,6 +389,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
             VehiculoEvent.GetVehiculos -> getVehiculos()
+            VehiculoEvent.UpdateVehiculo -> updateVehiculo()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             is VehiculoEvent.OnFilterVehiculos -> filterVehiculos(event.query)
