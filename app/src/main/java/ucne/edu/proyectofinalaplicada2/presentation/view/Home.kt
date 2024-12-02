@@ -146,7 +146,7 @@ fun ListaDeVehiculos(
             items(vehiculoUistate.vehiculoConMarcas) { vehiculoConMarca ->
                 Box {
                     ImageCard(
-                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()),
+                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()),
                         contentDescription = "",
                         title = vehiculoConMarca.nombreModelo?:"",
                     )
@@ -185,7 +185,7 @@ fun TiposDeVehiculos(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val painter = rememberAsyncImagePainter(
-                        Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                        Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()
                     )
 
                     TipoVehiculoList(
