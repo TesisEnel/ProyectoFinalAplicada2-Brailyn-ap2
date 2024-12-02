@@ -27,4 +27,21 @@ class TipoVehiculoRepository @Inject constructor(
             Resource.Success(tipoVehiculosLocal?: emptyList())
         }
     }
+
+    suspend fun getTipoVehiculoById(id: Int): Resource<TipoVehiculoEntity?> {
+        return try {
+            val tiposVehiculos = rentCarRemoteDataSource.getTiposVehiculos()
+            tiposVehiculos.forEach { tipoVehiculoDao.save(it.toEntity()) }
+            val tipoVehiculo = tipoVehiculoDao.find(id)
+            Resource.Success(tipoVehiculo)
+        } catch (e: HttpException) {
+            Resource.Error("Error de internet ${e.message}")
+        }
+        catch (e: Exception) {
+            val tipoVehiculo = tipoVehiculoDao.find(id)
+            Resource.Success(tipoVehiculo)
+        }
+    }
+
+
 }
