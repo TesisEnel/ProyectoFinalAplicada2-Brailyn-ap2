@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.renta
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -74,7 +75,7 @@ class RentaViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
-                        mostrarDatosVehiculo()
+                       // mostrarDatosVehiculo()
                     }
                 }
             }
@@ -117,6 +118,7 @@ class RentaViewModel @Inject constructor(
     private fun mostrarDatosVehiculo() {
         viewModelScope.launch {
             val rentaConVehiculo = _uistate.value.rentas.map { rentaEntity ->
+
                 val vehiculo = getVehiculoById(rentaEntity.vehiculoId ?: 0)
                 val marca = getMarcaById(vehiculo?.marcaId ?: 0)
                 val modelo = getModeloById(vehiculo?.modeloId ?: 0)
@@ -134,6 +136,35 @@ class RentaViewModel @Inject constructor(
             }
 
         }
+    }
+    private fun mostrarDatosVehiculoByRole(isAdmin: Boolean) {
+        if(!isAdmin){
+            val email = FirebaseAuth.getInstance().currentUser?.email
+
+            viewModelScope.launch {
+                val user = getClienteByEmail(email ?: "")
+                val rentaConVehiculo = _uistate.value.rentas.filter { rentaEntity ->
+                    rentaEntity.clienteId == user?.clienteId
+                }.map { rentaEntity ->
+                    val vehiculo = getVehiculoById(rentaEntity.vehiculoId ?: 0)
+                    val marca = getMarcaById(vehiculo?.marcaId ?: 0)
+                    val modelo = getModeloById(vehiculo?.modeloId ?: 0)
+                    RentaConVehiculo(
+                        marca = marca,
+                        renta = rentaEntity,
+                        nombreModelo = modelo?.modeloVehiculo,
+                        anio = vehiculo?.anio
+                    )
+                }
+
+                _uistate.update {
+                    it.copy(
+                        rentaConVehiculos = rentaConVehiculo
+                    )
+                }
+            }
+        }
+
     }
 
     private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
@@ -389,6 +420,8 @@ class RentaViewModel @Inject constructor(
             is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
             RentaEvent.ConfirmRenta -> createRenta()
             RentaEvent.CloseModal -> closeModal()
+            is RentaEvent.MostraDatosVehiculoByRole -> mostrarDatosVehiculoByRole(event.isAdmin)
+            RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()
         }
     }
 }
