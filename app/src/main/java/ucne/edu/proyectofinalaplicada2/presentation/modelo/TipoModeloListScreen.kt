@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.utils.Constant
 
@@ -86,8 +87,10 @@ fun TipoModeloLazyColumn(
     marcaId: Int,
     onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel(),
 
-) {
+    ) {
+    val uistate = authViewModel.uistate.collectAsStateWithLifecycle()
     if (!modeloUistate.isDataLoaded) {
         onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId))
     }
@@ -106,6 +109,7 @@ fun TipoModeloLazyColumn(
                 vehiculoId = modelo.vehiculo.vehiculoId ?: 0,
                 onGoRenta = onGoRenta,
                 onGoEdit = onGoEdit,
+                isAdmin = uistate.value.isAdmin
             )
         }
     }
