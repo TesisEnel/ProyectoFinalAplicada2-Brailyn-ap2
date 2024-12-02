@@ -563,6 +563,11 @@ class VehiculoViewModel @Inject constructor(
             it.copy(error = "")
         }
     }
+    private fun clearSuccess() {
+        _uistate.update {
+            it.copy(success = "")
+        }
+    }
     fun onEvent(event: VehiculoEvent) {
         when (event) {
             is VehiculoEvent.OnChangeDescripcion -> onChangeDescripcion(event.descripcion)
@@ -583,6 +588,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.DeleteVehiculo -> deleteVehiculo(event.id)
             VehiculoEvent.ClearImageError -> clearImageError()
             VehiculoEvent.ClearError -> clearError()
+            VehiculoEvent.ClearSuccess -> clearSuccess()
         }
     }
 }
