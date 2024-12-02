@@ -1,9 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,7 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +47,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -145,15 +140,6 @@ fun MainBodyNavHost(
                             modifier = Modifier
 
                         ) {
-                            Image(
-                                painter = rememberAsyncImagePainter(uiState.userPhotoUrl),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .padding(end = 8.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, Color.White, CircleShape)
-                            )
                             AnimatedText(
                                 text = uiState.currentTitle,
                                 modifier = Modifier
@@ -205,6 +191,9 @@ fun MainBodyNavHost(
                             },
                             onGoSearch = {
                                 navHostController.navigate(Screen.FiltraVehiculo)
+                            },
+                            onGoRenta = {
+                                navHostController.navigate(Screen.RentaScreen(it))
                             }
                         )
                     }
@@ -304,8 +293,9 @@ fun AnimatedText(text: String, modifier: Modifier = Modifier) {
         text = displayedText,
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 16.sp,
-        modifier = modifier
+        fontSize = 20.sp,
+        modifier = modifier,
+        fontFamily = FontFamily.Serif
     )
 }
 
@@ -315,6 +305,5 @@ private fun NavHostController() {
     ProyectoFinalAplicada2Theme {
         val navController = rememberNavController()
         MainNavHost(navHostController = navController)
-
     }
 }
