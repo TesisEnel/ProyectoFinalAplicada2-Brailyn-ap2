@@ -1,5 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -244,6 +246,31 @@ class VehiculoViewModel @Inject constructor(
             }
         }
     }
+    private fun onImagesSelected(uris: List<Uri>, context: Context) {
+        viewModelScope.launch {
+            val imageFiles = uris.mapNotNull { uri ->
+                uriToFile(uri, context)
+            }
+
+            _uistate.update {
+                it.copy(imagePath = imageFiles.map { file -> file.absolutePath })
+            }
+        }
+    }
+
+    private fun uriToFile(uri: Uri, context: Context): File? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val tempFile = File.createTempFile("selected_image", ".jpg", context.cacheDir)
+            tempFile.outputStream().use { outputStream ->
+                inputStream?.copyTo(outputStream)
+            }
+            tempFile
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
 
     private suspend fun getVehiculoConMarcas() {
         val vehiculoConMarcas = _uistate.value.vehiculos.map { vehiculo ->
@@ -394,6 +421,7 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             is VehiculoEvent.OnFilterVehiculos -> filterVehiculos(event.query)
             is VehiculoEvent.SelectedVehiculo -> selectedVehiculo(event.vehiculoId)
+            is VehiculoEvent.OnImagesSelected -> onImagesSelected(event.uris, event.context)
         }
     }
 }
