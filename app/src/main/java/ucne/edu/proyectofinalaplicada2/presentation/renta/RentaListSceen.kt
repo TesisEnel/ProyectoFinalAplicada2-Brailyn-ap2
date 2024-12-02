@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable
@@ -50,6 +52,7 @@ fun RentaListSceen(
     }else{
         RentaListBodyScreen(
             uiState = uiState,
+            onEvent = {event -> viewModel.onEvent(event)}
         )
     }
 }
@@ -57,6 +60,7 @@ fun RentaListSceen(
 @Composable
 fun RentaListBodyScreen(
     uiState: RentaUistate,
+    onEvent: (RentaEvent) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -81,16 +85,30 @@ fun RentaListBodyScreen(
             )
         }
         item {
-            ExpandableCard(uiState = uiState)
+            ExpandableCard(
+                uiState = uiState,
+                onEvent =  onEvent
+            )
         }
     }
 }
 
 @Composable
 fun ExpandableCard(
-    uiState: RentaUistate
+    uiState: RentaUistate,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    onEvent: (RentaEvent) -> Unit = {}
 ) {
+    val rentaUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf<Int?>(null)  }
+    LaunchedEffect(Unit) {
+        if(!rentaUiState.isAdmin){
+            onEvent(RentaEvent.MostraDatosVehiculoByRole(false))
+        }
+        else{
+            onEvent(RentaEvent.MostraDatosVehiculo)
+        }
+    }
     uiState.rentaConVehiculos.forEachIndexed{ index, renta ->
         ExpandableBodyCard(
             isExpanded = isExpanded == index,
