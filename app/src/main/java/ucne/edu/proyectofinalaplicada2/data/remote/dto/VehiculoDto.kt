@@ -12,9 +12,10 @@ data class VehiculoDto(
     val precio: Int?,
     val descripcion: String?,
     val anio: Int?,
-    val imagePath: List<String?>,
+    val imagePath: List<String?>?,
     val proveedorId: Int?,
-    val marca: MarcaEntity?
+    val marca: MarcaEntity?,
+    val estaRentado: Boolean?,
 )
 
 fun VehiculoDto.toEntity() = VehiculoEntity(
@@ -27,5 +28,6 @@ fun VehiculoDto.toEntity() = VehiculoEntity(
     descripcion,
     anio,
     imagePath,
-    proveedorId
+    proveedorId,
+    estaRentado
 )

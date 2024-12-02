@@ -1,8 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.MarcaDao
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
@@ -15,22 +13,20 @@ class MarcaRepository @Inject constructor(
     private val rentCarRemoteDataSource: RentCarRemoteDataSource,
     private val marcaDao: MarcaDao
 ) {
-    fun getMarcas(): Flow<Resource<List<MarcaEntity>>> = flow{
-        emit(Resource.Loading())
+    suspend fun getMarcas(): Resource<List<MarcaEntity>> {
         val localVehiculos = marcaDao.getAll().firstOrNull()
         if(!localVehiculos.isNullOrEmpty()){
-            emit(Resource.Success(localVehiculos))
+            return Resource.Success(localVehiculos)
         }
-        try {
-            emit(Resource.Loading())
+        return try {
             val marcas = rentCarRemoteDataSource.getMarcas()
             marcas.forEach{marca -> marcaDao.save(marca.toEntity())}
             val updatedLocalMarcas = marcaDao.getAll().firstOrNull()
-            emit(Resource.Success(updatedLocalMarcas?: emptyList()))
+            Resource.Success(updatedLocalMarcas?: emptyList())
         } catch (e: HttpException) {
-            emit(Resource.Error("Error de internet ${e.message}"))
+            Resource.Error("Error de internet ${e.message}")
         } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            Resource.Error("Error desconocido ${e.message}")
         }
     }
 

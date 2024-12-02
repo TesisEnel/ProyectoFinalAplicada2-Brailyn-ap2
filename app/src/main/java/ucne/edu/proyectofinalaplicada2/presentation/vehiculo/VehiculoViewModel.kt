@@ -31,11 +31,11 @@ class VehiculoViewModel @Inject constructor(
     val uistate = _uistate.asStateFlow()
 
     init {
-        getVehiculos()
         getMarcas()
         getTipoCombustible()
         getProveedores()
         getTipoVehiculos()
+        getVehiculos()
     }
 
     private fun getVehiculos() {
@@ -55,7 +55,7 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _uistate.update {
                             it.copy(
-                               isLoading = true
+                                isLoading = true
                             )
                         }
                     }
@@ -63,56 +63,21 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             val vehiculos = result.data ?: emptyList()
-                            val vehiculoConMarcasYModelos = transformarVehiculosConMarcasYModelos(vehiculos)
+                            val vehiculoConMarcasYModelos =
+                                transformarVehiculosConMarcasYModelos(vehiculos)
                             it.copy(
+                                isLoading = false,
                                 vehiculos = vehiculos,
                                 vehiculoConMarcas = vehiculoConMarcasYModelos,
-                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos,
-                                isLoading = false
+                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos
                             )
                         }
-                        getVehiculoConMarcas()
                     }
                 }
             }
         }
     }
 
-    private fun getMarcas() {
-        viewModelScope.launch {
-            marcaRepository.getMarcas().collect { result ->
-
-                when (result) {
-                    is Resource.Error -> {
-                        _uistate.update {
-                            it.copy(
-                                error = result.message ?: "Error",
-                                isLoading = false
-                            )
-                        }
-                    }
-
-                    is Resource.Loading -> {
-                        _uistate.update {
-                            it.copy(
-                                //isLoading = true
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _uistate.update {
-                            it.copy(
-                                marcas = result.data ?: emptyList(),
-                               // isLoading = false
-                            )
-                        }
-                        //getVehiculoConMarcas()
-                    }
-                }
-            }
-        }
-    }
 
     private suspend fun transformarVehiculosConMarcasYModelos(vehiculos: List<VehiculoEntity>): List<VehiculoConMarca> {
         val vehiculoConMarcas = vehiculos.map { vehiculo ->
@@ -121,7 +86,8 @@ class VehiculoViewModel @Inject constructor(
             VehiculoConMarca(
                 nombreMarca = marca?.nombreMarca,
                 nombreModelo = modelo?.modeloVehiculo,
-                vehiculo = vehiculo
+                vehiculo = vehiculo,
+                estaRentado = vehiculo.estaRentado
             )
         }
         return vehiculoConMarcas
@@ -136,12 +102,12 @@ class VehiculoViewModel @Inject constructor(
                 val modelo = vehiculo.nombreModelo?.contains(query, ignoreCase = true) ?: false
                 marca || modelo
             }
-            if(filteredList.isEmpty()){
+            if (filteredList.isEmpty()) {
                 state.copy(
                     filteredListIsEmpty = true,
                     searchQuery = query,
                 )
-            }else{
+            } else {
                 state.copy(
                     filteredListIsEmpty = false,
                     searchQuery = query,
@@ -152,12 +118,23 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun getTipoCombustible() {
+    private fun getMarcas() {
         viewModelScope.launch {
-            val tiposCombustibles = tipoCombustibleRepository.getTiposCombustibles().data
+            val result = marcaRepository.getMarcas().data
             _uistate.update {
                 it.copy(
-                    tipoCombustibles = tiposCombustibles
+                    marcas = result ?: emptyList(),
+                )
+            }
+        }
+    }
+
+    private fun getTipoCombustible() {
+        viewModelScope.launch {
+            val result = tipoCombustibleRepository.getTiposCombustibles().data
+            _uistate.update {
+                it.copy(
+                    tipoCombustibles = result ?: emptyList(),
                 )
             }
         }
@@ -165,10 +142,10 @@ class VehiculoViewModel @Inject constructor(
 
     private fun getProveedores() {
         viewModelScope.launch {
-            val proveedores = proveedorRepository.getProveedores().data
+            val result = proveedorRepository.getProveedores().data
             _uistate.update {
                 it.copy(
-                    proveedores = proveedores ?: emptyList()
+                    proveedores = result ?: emptyList(),
                 )
             }
         }
@@ -176,9 +153,11 @@ class VehiculoViewModel @Inject constructor(
 
     private fun getTipoVehiculos() {
         viewModelScope.launch {
-            val tipoVehiculos = tipoVehiculoRepository.getTiposVehiculos().data
+            val result = tipoVehiculoRepository.getTiposVehiculos().data
             _uistate.update {
-                it.copy(tipoVehiculos = tipoVehiculos ?: emptyList())
+                it.copy(
+                    tipoVehiculos = result ?: emptyList(),
+                )
             }
         }
     }
@@ -232,6 +211,40 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
+    private fun updateVehiculo() {
+        viewModelScope.launch {
+            val vehiculo = vehiculoRepository.updateVehiculo(
+                uistate.value.toEntity()
+            )
+            vehiculo.collect { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error"
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Vehiculo actualizado",
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private suspend fun getVehiculoConMarcas() {
         val vehiculoConMarcas = _uistate.value.vehiculos.map { vehiculo ->
             val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
@@ -239,13 +252,52 @@ class VehiculoViewModel @Inject constructor(
             VehiculoConMarca(
                 nombreModelo = modelo?.modeloVehiculo,
                 nombreMarca = marca?.nombreMarca,
-                vehiculo = vehiculo
+                vehiculo = vehiculo,
+                estaRentado = vehiculo.estaRentado
             )
         }
         _uistate.update {
             it.copy(
                 vehiculoConMarcas = vehiculoConMarcas
             )
+        }
+    }
+
+    private fun selectedVehiculo(vehiculoId: Int) {
+        _uistate.update {
+            it.copy(
+                isLoadingData = true
+            )
+        }
+        viewModelScope.launch {
+            val vehiculo = vehiculoRepository.getVehiculoById(vehiculoId).data
+            val marcas = marcaRepository.getMarcas().data
+            val tipoCombustibles = tipoCombustibleRepository.getTiposCombustibles().data
+            val tipoVehiculos = tipoVehiculoRepository.getTiposVehiculos().data
+            val modelos = modeloRepository.getModelos().data
+            if (vehiculo != null) {
+                _uistate.update {
+                    it.copy(
+                        vehiculoId = vehiculo.vehiculoId,
+                        marcaId = vehiculo.marcaId?:0,
+                        precio = vehiculo.precio,
+                        tipoVehiculoId = vehiculo.tipoVehiculoId,
+                        descripcion = vehiculo.descripcion ?: "",
+                        tipoCombustibleId = vehiculo.tipoCombustibleId,
+                        modeloId = vehiculo.modeloId ?: 0,
+                        proveedorId = vehiculo.proveedorId,
+                        anio = vehiculo.anio,
+                        imagePath = vehiculo.imagePath?: emptyList(),
+
+                        marcas = marcas ?: emptyList(),
+                        tipoCombustibles = tipoCombustibles,
+                        tipoVehiculos = tipoVehiculos,
+                        modelos = modelos ?: emptyList(),
+                        isLoadingData = false
+                    )
+                }
+
+            }
         }
     }
 
@@ -307,9 +359,9 @@ class VehiculoViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeImagePath(imagesPath: List<File>) {
+    private fun onChangeImagePath(imagesPath: List<File?>) {
         val updatedImage = imagesPath.map { image ->
-            image.absolutePath
+            image?.absolutePath
         }
         _uistate.update {
             it.copy(
@@ -337,9 +389,11 @@ class VehiculoViewModel @Inject constructor(
             is VehiculoEvent.OnChangeProveedorId -> onChangeProveedorId(event.proveedorId)
             VehiculoEvent.Save -> save()
             VehiculoEvent.GetVehiculos -> getVehiculos()
+            VehiculoEvent.UpdateVehiculo -> updateVehiculo()
             is VehiculoEvent.OnChangeAnio -> onChangeAnio(event.anio)
             is VehiculoEvent.OnChangeMarcaId -> onChangeMarcaId(event.marcaId)
             is VehiculoEvent.OnFilterVehiculos -> filterVehiculos(event.query)
+            is VehiculoEvent.SelectedVehiculo -> selectedVehiculo(event.vehiculoId)
         }
     }
 }

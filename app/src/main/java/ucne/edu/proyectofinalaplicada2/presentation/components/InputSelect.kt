@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.components
+package ucne.edu.proyectofinalaplicada2.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
@@ -19,12 +19,13 @@ import androidx.compose.ui.Modifier
 @Composable
 fun <T> InputSelect(
     label: String = "",
-    options: List<T>,  // Lista genérica de opciones
-    labelSelector: (T) -> String,  // Función para obtener el texto de cada opción
-    onOptionSelected: (T) -> Unit  // Acción a ejecutar cuando se selecciona una opción
+    options: List<T>,
+    selectedOption: T?,
+    labelSelector: (T) -> String,
+    onOptionSelected: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("") }
+    var selectedOptionText by remember { mutableStateOf(selectedOption?.let { labelSelector(it) } ?: "") }
 
     ExposedDropdownMenuBox(
         expanded = expanded,

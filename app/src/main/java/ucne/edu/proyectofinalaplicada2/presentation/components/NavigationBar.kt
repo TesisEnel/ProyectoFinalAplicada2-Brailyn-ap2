@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.components
+package ucne.edu.proyectofinalaplicada2.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -30,9 +31,9 @@ fun NavigationBar(
     onSelectItem: (Int) -> Unit,
     roleFlow: Flow<Boolean>
 ) {
-    val isAdmin = roleFlow.collectAsStateWithLifecycle(false)
+    val isAdmin by roleFlow.collectAsStateWithLifecycle(false)
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        val items = if (isAdmin.value) {
+        val items = if (isAdmin) {
             listOf(
                 BottomNavigationItem(
                     title = "Home",
@@ -44,7 +45,7 @@ fun NavigationBar(
                     title = "Vehiculo",
                     selectedIcon = ImageVector.vectorResource(id = R.drawable.car_back),
                     unSelectedIcon = Icons.Outlined.Call,
-                    screen = Screen.VehiculoRegistroScreen
+                    screen = Screen.VehiculoRegistroScreen()
                 ),
                 BottomNavigationItem(
                     title = "Historial",

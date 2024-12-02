@@ -18,9 +18,8 @@ class Converter {
         return Gson().toJson(value)
     }
 
-    // Convierte una cadena JSON a una lista de Strings
     @TypeConverter
-    fun toStringList(value: String): List<String?> {
+    fun toStringList(value: String): List<String?>? {
         val listType = object : TypeToken<List<String?>>() {}.type
         return Gson().fromJson(value, listType)
     }

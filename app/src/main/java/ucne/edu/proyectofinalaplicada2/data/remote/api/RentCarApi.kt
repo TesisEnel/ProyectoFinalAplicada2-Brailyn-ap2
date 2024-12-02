@@ -54,13 +54,12 @@ interface RentCarApi {
         @Part("descripcion") descripcion: RequestBody?,
         @Part("marcaId") marcaId: RequestBody,
         @Part("modeloId") modeloId: RequestBody,
-        @Part images: List<MultipartBody.Part>,
+        @Part images: List<MultipartBody.Part>?,
         @Part("anio") anio: RequestBody,
     ): VehiculoDto
 
-    @PUT("api/Vehiculos/{id}")
+    @PUT("update/{id}")
     suspend fun updateVehiculo(@Path ("id") id: Int ,@Body vehiculoDto: VehiculoDto): VehiculoDto
-
     // Marca
     @GET("api/Marcas")
     suspend fun getMarcas(): List<MarcaDto>

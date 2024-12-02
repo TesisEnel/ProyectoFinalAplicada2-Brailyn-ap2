@@ -35,8 +35,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.components.ImageCard
-import ucne.edu.proyectofinalaplicada2.components.TipoVehiculoList
+import ucne.edu.proyectofinalaplicada2.presentation.components.ImageCard
+import ucne.edu.proyectofinalaplicada2.presentation.components.TipoVehiculoList
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -146,7 +146,7 @@ fun ListaDeVehiculos(
             items(vehiculoUistate.vehiculoConMarcas) { vehiculoConMarca ->
                 Box {
                     ImageCard(
-                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()),
+                        painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()),
                         contentDescription = "",
                         title = vehiculoConMarca.nombreModelo?:"",
                     )
@@ -185,7 +185,7 @@ fun TiposDeVehiculos(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val painter = rememberAsyncImagePainter(
-                        Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                        Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()
                     )
 
                     TipoVehiculoList(

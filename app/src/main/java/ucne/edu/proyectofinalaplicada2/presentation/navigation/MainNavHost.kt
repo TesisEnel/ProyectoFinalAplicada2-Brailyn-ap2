@@ -54,7 +54,7 @@ import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import ucne.edu.proyectofinalaplicada2.components.NavigationBar
+import ucne.edu.proyectofinalaplicada2.presentation.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
@@ -153,7 +153,7 @@ fun MainBodyNavHost(
                                 painter = rememberAsyncImagePainter(uiState.userPhotoUrl),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(40.dp) // Tamaño de la imagen
+                                    .size(40.dp)
                                     .padding(end = 8.dp)
                                     .clip(CircleShape)
                                     .border(2.dp, Color.White, CircleShape)
@@ -214,25 +214,28 @@ fun MainBodyNavHost(
 
                     composable<Screen.VehiculoRegistroScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                        val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .verticalScroll(rememberScrollState())
                                 .padding(12.dp)
                         ) {
-                            VehiculoRegistroScreen()
+                            VehiculoRegistroScreen(
+                                vehiculoId = id?:0,
+                            )
                         }
                     }
-
                     composable<Screen.TipoVehiculoListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
 
                         val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
                         TipoModeloListListScreen(
-                            onGoVehiculePresentation = { vehiculoId ->
+                            onGoRenta = { vehiculoId ->
                                 navHostController.navigate(Screen.RentaScreen(vehiculoId))
                             },
                             marcaId = id,
+                            onGoEdit = {vehiculoId -> navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId)) },
                         )
 
                     }
@@ -263,7 +266,8 @@ fun MainBodyNavHost(
                                 .fillMaxSize()
                         ) {
                             FiltraVehiculo(
-                                onGoRenta = {navHostController.navigate(Screen.RentaScreen(it))}
+                                onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
+                                onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
                             )
                         }
                     }

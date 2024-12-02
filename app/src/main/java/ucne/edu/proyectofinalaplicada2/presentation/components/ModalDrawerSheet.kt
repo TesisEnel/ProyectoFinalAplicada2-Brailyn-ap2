@@ -1,4 +1,4 @@
-package ucne.edu.proyectofinalaplicada2.components
+package ucne.edu.proyectofinalaplicada2.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
