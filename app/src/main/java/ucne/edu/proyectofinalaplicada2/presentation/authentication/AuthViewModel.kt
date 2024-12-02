@@ -38,7 +38,7 @@ class AuthViewModel @Inject constructor(
     private val _uistate = MutableStateFlow(ClienteUiState())
     val uistate = _uistate.asStateFlow()
 
-    private val _isRoleVerified = MutableStateFlow(true)
+    private val _isRoleVerified = MutableStateFlow(false)
     val isRoleVerified = _isRoleVerified.asStateFlow()
 
     val roleFlow: Flow<Boolean> = dataStore.data.map { preferences ->
@@ -59,18 +59,19 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private suspend fun clearDataStore() {
-        dataStore.edit { preferences ->
-            preferences.clear()
+    private fun clearDataStore() {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences.clear()
+            }
         }
-
     }
 
     private fun loadUserRole() {
         viewModelScope.launch {
             val (_, role) = getUserData()
-            _isRoleVerified.value = true
             _uistate.update { it.copy(isAdmin = role ?: false) }
+            _isRoleVerified.value = true
         }
     }
     private suspend fun getUserData(): Pair<String?, Boolean?> {
@@ -83,20 +84,16 @@ class AuthViewModel @Inject constructor(
 
     private fun signInWithGoogle() {
         viewModelScope.launch {
-            clearDataStore()
             _uistate.update { it.copy(isLoading = true) }
 
             try {
 
-                val user = googleAuthClient.signInAndGetUser()
                 _isRoleVerified.value = false
-
+                val user = googleAuthClient.signInAndGetUser()
+                handleUserSignIn(user)
+                val isAdmin =isAdminUser(user?.email ?: "")
                 if (user != null) {
-
-                    handleUserSignIn(user)
-                    val isAdmin = isAdminUser(user.email ?: "")
-                    async { saveUserData(user.email ?: "", isAdmin) }.await()
-                    _isRoleVerified.value = true
+                    async { saveUserData(user.email?:"", isAdmin) }.await()
                 } else {
                     _uistate.update {
                         it.copy(
@@ -137,9 +134,9 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun handleUserSignIn(user: FirebaseUser) {
+    private fun handleUserSignIn(user: FirebaseUser?) {
         viewModelScope.launch {
-            val clienteExiste = clienteExist(user.email ?: "")
+            val clienteExiste = clienteExist(user?.email ?: "")
             if (clienteExiste) {
                 _uistate.update { it.copy(success = "Bienvenido de nuevo.") }
                 return@launch
@@ -148,11 +145,11 @@ class AuthViewModel @Inject constructor(
             val clienteDto = ClienteDto(
                 clienteId = null,
                 cedula = "",
-                nombre = user.displayName ?: "Usuario de Google",
+                nombre = user?.displayName ?: "Usuario de Google",
                 apellido = "",
                 direccion = "",
                 celular = "",
-                email = user.email ?: "",
+                email = user?.email ?: "",
                 isAdmin = true
             )
             clienteRepository.addCliente(clienteDto).collect { resource ->
@@ -193,6 +190,7 @@ class AuthViewModel @Inject constructor(
 
     private fun isAdminUser(email: String): Boolean {
         return uistate.value.clientes.any { it.isAdmin == true && it.email == email }
+
     }
 
 
@@ -277,6 +275,7 @@ class AuthViewModel @Inject constructor(
 
                         is Resource.Success -> {
                             _uistate.update {
+
                                 it.copy(isLoading = false, error = null)
                             }
                         }
@@ -558,6 +557,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.OnchangeNombre -> onChangeNombre(event.nombre)
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
             is AuthEvent.UpdateClient -> uppdateClient()
+            AuthEvent.ClearData -> clearDataStore()
 
         }
     }
