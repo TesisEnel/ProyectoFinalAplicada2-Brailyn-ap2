@@ -54,6 +54,7 @@ fun FiltraVehiculo(
             uiState = uiState,
             onGoRenta = onGoRenta,
             onGoEdit = onGoEdit,
+            onEvent = {event -> viewModel.onEvent(event)}
         )
     }
 
@@ -65,6 +66,7 @@ fun FiltraVehiculoBody(
     onGoRenta: (Int) -> Unit,
     onGoEdit: (Int) -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
+    onEvent: (VehiculoEvent) -> Unit = {},
 ) {
     val authState = authViewModel.uistate.collectAsStateWithLifecycle()
 
@@ -106,7 +108,8 @@ fun FiltraVehiculoBody(
                         vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
                         onGoRenta = onGoRenta,
                         onGoEdit = onGoEdit,
-                        isAdmin = authState.value.isAdmin
+                        isAdmin = authState.value.isAdmin,
+                        onEvent = { event -> onEvent(event)}
                     )
                 }
             }
