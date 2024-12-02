@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.R
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -63,7 +64,10 @@ fun FiltraVehiculoBody(
     uiState: VehiculoUistate,
     onGoRenta: (Int) -> Unit,
     onGoEdit: (Int) -> Unit,
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
+    val authState = authViewModel.uistate.collectAsStateWithLifecycle()
+
     when {
         uiState.isLoading == true -> {
             Box(
@@ -102,6 +106,7 @@ fun FiltraVehiculoBody(
                         vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
                         onGoRenta = onGoRenta,
                         onGoEdit = onGoEdit,
+                        isAdmin = authState.value.isAdmin
                     )
                 }
             }
