@@ -21,5 +21,8 @@ sealed interface VehiculoEvent {
     data object UpdateVehiculo : VehiculoEvent
     data class OnImagesSelected(val uris: List<Uri>, val context: Context) : VehiculoEvent
     data class DeleteVehiculo(val id: Int): VehiculoEvent
+    data object ClearImageError: VehiculoEvent
+    data object ClearError: VehiculoEvent
+    data object ClearSuccess: VehiculoEvent
 
 }

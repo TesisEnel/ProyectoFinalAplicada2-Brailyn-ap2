@@ -109,12 +109,13 @@ class VehiculoRepository @Inject constructor(
                 updatedImages,
                 requestoBodyanio
             )
+            vehiculoDao.save(vehiculoDto.toEntity())
             emit(Resource.Success(vehiculo))
 
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            emit(Resource.Error("Error, no tienes conexión a internet para realizar esta operación"))
         }
     }
 
@@ -142,7 +143,7 @@ class VehiculoRepository @Inject constructor(
             emit(Resource.Error("Error de internet ${e.message}"))
         }
         catch (e: Exception) {
-            emit(Resource.Error("Error desconocido ${e.message}"))
+            emit(Resource.Error("Error, no tienes conexión a internet para realizar esta operación"))
         }
     }
 

@@ -67,7 +67,7 @@ fun TipoModeloBodyListScreen(
                 modifier = Modifier.padding(horizontal = 15.dp, vertical = 6.dp)
             )
             Text(
-                text = "Aquí estarán todas las marcas de nuestros vehículos",
+                text = "Aquí estarán todas los modelos de nuestras marcas",
                 fontFamily = FontFamily.Serif,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 15.dp)

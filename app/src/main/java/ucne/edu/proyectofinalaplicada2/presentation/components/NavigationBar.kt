@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
@@ -44,7 +43,7 @@ fun NavigationBar(
                 BottomNavigationItem(
                     title = "Vehiculo",
                     selectedIcon = ImageVector.vectorResource(id = R.drawable.car_back),
-                    unSelectedIcon = Icons.Outlined.Call,
+                    unSelectedIcon = ImageVector.vectorResource(id = R.drawable.car_back),
                     screen = Screen.VehiculoRegistroScreen()
                 ),
                 BottomNavigationItem(

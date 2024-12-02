@@ -45,7 +45,8 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 fun Home(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     onGoVehiculeList:(Int)-> Unit,
-    onGoSearch: () -> Unit
+    onGoSearch: () -> Unit,
+    onGoRenta: (Int) -> Unit = {}
 ) {
     val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
     if (vehiculoUistate.isLoading == true) {
@@ -71,6 +72,7 @@ fun Home(
             item {
                 ListaDeVehiculos(
                     vehiculoUistate = vehiculoUistate,
+                    onGoRenta = onGoRenta
                 )
             }
             item {
@@ -121,6 +123,7 @@ fun FakeSearchBar(
 @Composable
 fun ListaDeVehiculos(
     vehiculoUistate: VehiculoUistate,
+    onGoRenta: (Int) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
@@ -144,11 +147,16 @@ fun ListaDeVehiculos(
             contentPadding = PaddingValues(horizontal = 15.dp)
         ) {
             items(vehiculoUistate.vehiculoConMarcas) { vehiculoConMarca ->
-                Box {
+                Box(
+                    modifier = Modifier
+                        .heightIn(max = 150.dp)
+                ) {
                     ImageCard(
                         painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()),
                         contentDescription = "",
                         title = vehiculoConMarca.nombreModelo?:"",
+                        vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
+                        onGoRenta = onGoRenta
                     )
                 }
             }

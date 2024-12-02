@@ -15,9 +15,9 @@ data class VehiculoUistate(
     val proveedorId: Int? = null,
     val marcaId: Int = 0,
     val modeloId: Int = 0,
-    val precio: Int? = null,
+    val precio: Int? = 0,
     val descripcion: String = "",
-    val anio: Int? = null,
+    val anio: Int? = 0,
     val imagePath: List<String?> = emptyList(),
     var isLoading: Boolean? = null,
     var isLoadingData: Boolean? = null,
@@ -35,6 +35,16 @@ data class VehiculoUistate(
     val searchQuery: String = "",
     val filteredListIsEmpty: Boolean = false,
     val estaRentado: Boolean = false,
+    val tipoCombustibleError: String = "",
+    val tipoVehiculoError: String = "",
+    val proveedorError: String = "",
+    val marcaError: String = "",
+    val modeloError: String = "",
+    val anioError: String = "",
+    val precioError: String = "",
+    val descripcionError: String = "",
+    val apiError: String = "",
+    val imageError: String = ""
 )
 data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,

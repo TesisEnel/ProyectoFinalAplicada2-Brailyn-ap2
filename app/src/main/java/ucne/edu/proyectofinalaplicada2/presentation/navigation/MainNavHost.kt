@@ -1,9 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,13 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,10 +47,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import coil3.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthEvent
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
 import ucne.edu.proyectofinalaplicada2.presentation.components.NavigationBar
@@ -78,6 +76,7 @@ fun MainNavHost(
         onEvent = { event -> mainViewModel.onEvent(event) },
         uiState = uiState,
         roleFlow = roleFlow,
+        onAuthEvent = { event -> authViewModel.onEvent(event) },
     )
 }
 
@@ -89,136 +88,142 @@ fun MainBodyNavHost(
     onEvent: (MainEvent) -> Unit = {},
     uiState: MainUiState,
     roleFlow: Flow<Boolean>,
+    onAuthEvent: (AuthEvent) -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+    val isRoleVerified by viewModel.isRoleVerified.collectAsState()
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar(
-                navHostController = navHostController,
-                selectedItemIndex = selectedItemIndex,
-                onSelectItem = { selectedIndex -> selectedItemIndex = selectedIndex },
-                roleFlow = roleFlow
-            )
-        },
-        topBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            bottomEnd = 45.dp,
-                            bottomStart = 45.dp
-                        )
-                    )
-                    .background(MaterialTheme.colorScheme.primary),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+    if(!isRoleVerified){
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator()
+        }
+    }else{
+        Scaffold(
+            bottomBar = {
+                NavigationBar(
+                    navHostController = navHostController,
+                    selectedItemIndex = selectedItemIndex,
+                    onSelectItem = { selectedIndex -> selectedItemIndex = selectedIndex },
+                    roleFlow = roleFlow
+                )
+            },
+            topBar = {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 40.dp, end = 16.dp, start = 16.dp)
+                        .height(150.dp)
+                        .clip(
+                            RoundedCornerShape(
+                                bottomEnd = 45.dp,
+                                bottomStart = 45.dp
+                            )
+                        )
+                        .background(MaterialTheme.colorScheme.primary),
+                    contentAlignment = Alignment.Center
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-
+                            .fillMaxWidth()
+                            .padding(top = 40.dp, end = 16.dp, start = 16.dp)
                     ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(uiState.userPhotoUrl),
-                            contentDescription = null,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(40.dp)
-                                .padding(end = 8.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, Color.White, CircleShape)
-                        )
-                        AnimatedText(
-                            text = uiState.currentTitle,
-                            modifier = Modifier
-                        )
-                    }
-                    Row {
-                        IconButton(onClick = { showMenu = !showMenu }) {
-                            Icon(Icons.Filled.Person, contentDescription = "Sign Out")
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Sign Out") },
-                                onClick = {
-                                    FirebaseAuth.getInstance().signOut()
-                                }
+                            AnimatedText(
+                                text = uiState.currentTitle,
+                                modifier = Modifier
                             )
-                            DropdownMenuItem(
-                                text = { Text("Settings") },
-                                onClick = {
-                                    navHostController.navigate(Screen.Settings)
-                                }
-                            )
+                        }
+                        Row {
+                            IconButton(onClick = { showMenu = !showMenu }) {
+                                Icon(Icons.Filled.Person, contentDescription = "Sign Out")
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Sign Out") },
+                                    onClick = {
+                                        onAuthEvent(AuthEvent.ClearData)
+                                        FirebaseAuth.getInstance().signOut()
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Settings") },
+                                    onClick = {
+                                        navHostController.navigate(Screen.Settings)
+                                    }
+                                )
 
+                            }
                         }
                     }
                 }
-            }
-        },
+            },
 
-        ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            NavHost(
-                navController = navHostController,
-                startDestination = Screen.Home
+            ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             ) {
-                composable<Screen.Home> {
-                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                    Home(
-                        onGoVehiculeList = {
-                            navHostController.navigate(Screen.TipoVehiculoListScreen(it))
-                        },
-                        onGoSearch = {
-                            navHostController.navigate(Screen.FiltraVehiculo)
-                        }
-                    )
-                }
-
-                composable<Screen.VehiculoRegistroScreen> {
-                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                    val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(12.dp)
-                    ) {
-                        VehiculoRegistroScreen(
-                            vehiculoId = id ?: 0,
+                NavHost(
+                    navController = navHostController,
+                    startDestination = Screen.Home
+                ) {
+                    composable<Screen.Home> {
+                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                        Home(
+                            onGoVehiculeList = {
+                                navHostController.navigate(Screen.TipoVehiculoListScreen(it))
+                            },
+                            onGoSearch = {
+                                navHostController.navigate(Screen.FiltraVehiculo)
+                            },
+                            onGoRenta = {
+                                navHostController.navigate(Screen.RentaScreen(it))
+                            }
                         )
                     }
-                }
-                composable<Screen.TipoVehiculoListScreen> {
-                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
 
-                    val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
-                    TipoModeloListListScreen(
-                        onGoRenta = { vehiculoId ->
-                            navHostController.navigate(Screen.RentaScreen(vehiculoId))
-                        },
-                        marcaId = id,
-                        onGoEdit = {vehiculoId -> navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId)) },
-                    )
+                    composable<Screen.VehiculoRegistroScreen> {
+                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                        val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(12.dp)
+                        ) {
+                            VehiculoRegistroScreen(
+                                vehiculoId = id ?: 0,
+                            )
+                        }
+                    }
+                    composable<Screen.TipoVehiculoListScreen> {
+                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
 
-                }
+                        val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
+                        TipoModeloListListScreen(
+                            onGoRenta = { vehiculoId ->
+                                navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                            },
+                            marcaId = id,
+                            onGoEdit = {vehiculoId -> navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId)) },
+                        )
+
+                    }
 
                     composable<Screen.RentaScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
@@ -240,35 +245,37 @@ fun MainBodyNavHost(
 
                         RentaListSceen()
 
-                }
-                composable<Screen.FiltraVehiculo> {
-                    onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        FiltraVehiculo(
-                            onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
-                            onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
-                        )
                     }
-                }
-                composable<Screen.Settings> {
+                    composable<Screen.FiltraVehiculo> {
+                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            FiltraVehiculo(
+                                onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
+                                onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
+                            )
+                        }
+                    }
+                    composable<Screen.Settings> {
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        SettingUser(
-                            goToBack = { navHostController.popBackStack() }
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            SettingUser(
+                                goToBack = { navHostController.popBackStack() }
+                            )
+                        }
                     }
                 }
             }
-        }
 
         }
     }
+    }
+
 
 
 @Composable
@@ -285,8 +292,9 @@ fun AnimatedText(text: String, modifier: Modifier = Modifier) {
         text = displayedText,
         style = MaterialTheme.typography.titleLarge,
         color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 16.sp,
-        modifier = modifier
+        fontSize = 20.sp,
+        modifier = modifier,
+        fontFamily = FontFamily.Serif
     )
 }
 
@@ -296,6 +304,5 @@ private fun NavHostController() {
     ProyectoFinalAplicada2Theme {
         val navController = rememberNavController()
         MainNavHost(navHostController = navController)
-
     }
 }

@@ -99,14 +99,22 @@ fun VehiculoBodyRegistroScreen(
         ) {
 
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(vertical = 10.dp, horizontal = 25.dp)
             ) {
-                AsyncImage(
-                    model = "https://rentcarblobstorage.blob.core.windows.net/images/carlogo.png",
-                    contentDescription = "Imagen"
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
+                ) {
+                    AsyncImage(
+                        model = "https://rentcarblobstorage.blob.core.windows.net/images/carlogo.png",
+                        contentDescription = "Imagen"
+                    )
+                }
+
                 InputSelect(
                     label = "Marca",
                     options = vehiculoUiState.marcas,
@@ -114,8 +122,17 @@ fun VehiculoBodyRegistroScreen(
                     onOptionSelected = {
                         onVehiculoEnvent(VehiculoEvent.OnChangeMarcaId(it.marcaId))
                     },
-                    labelSelector = { it.nombreMarca }
+                    labelSelector = { it.nombreMarca },
+                    errorMessage = vehiculoUiState.marcaError
                 )
+                if (vehiculoUiState.marcaError != "") {
+                    Text(
+                        text = vehiculoUiState.marcaError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 InputSelect(
                     label = "Tipo Combustible",
@@ -124,8 +141,17 @@ fun VehiculoBodyRegistroScreen(
                     onOptionSelected = {
                         onVehiculoEnvent(VehiculoEvent.OnChangeTipoCombustibleId(it.tipoCombustibleId))
                     },
-                    labelSelector = { it.nombreTipoCombustible }
+                    labelSelector = { it.nombreTipoCombustible },
+                    errorMessage = vehiculoUiState.tipoCombustibleError
                 )
+                if (vehiculoUiState.tipoCombustibleError != "") {
+                    Text(
+                        text = vehiculoUiState.tipoCombustibleError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 InputSelect(
                     label = "Tipo Vehiculo",
@@ -134,8 +160,17 @@ fun VehiculoBodyRegistroScreen(
                     onOptionSelected = {
                         onVehiculoEnvent(VehiculoEvent.OnChangeTipoVehiculoId(it.tipoVehiculoId))
                     },
-                    labelSelector = { it.nombreTipoVehiculo }
+                    labelSelector = { it.nombreTipoVehiculo },
+                    errorMessage = vehiculoUiState.tipoVehiculoError
                 )
+                if (vehiculoUiState.tipoVehiculoError != "") {
+                    Text(
+                        text = vehiculoUiState.tipoVehiculoError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 InputSelect(
                     label = "Modelo",
@@ -144,8 +179,17 @@ fun VehiculoBodyRegistroScreen(
                     onOptionSelected = {
                         onVehiculoEnvent(VehiculoEvent.OnChangeModeloId(it.modeloId))
                     },
-                    labelSelector = { it.modeloVehiculo }
+                    labelSelector = { it.modeloVehiculo },
+                    errorMessage = vehiculoUiState.modeloError
                 )
+                if (vehiculoUiState.modeloError != "") {
+                    Text(
+                        text = vehiculoUiState.modeloError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 InputSelect(
                     label = "Proveedor",
@@ -154,49 +198,87 @@ fun VehiculoBodyRegistroScreen(
                     onOptionSelected = {
                         onVehiculoEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId))
                     },
-                    labelSelector = { it.nombre }
+                    labelSelector = { it.nombre },
+                    errorMessage = vehiculoUiState.proveedorError
                 )
+                if (vehiculoUiState.proveedorError != "") {
+                    Text(
+                        text = vehiculoUiState.proveedorError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 OutlinedTextField(
                     value = vehiculoUiState.precio?.toString() ?: "",
-                    onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangePrecio(it.toInt())) },
+                    onValueChange = {
+                        onVehiculoEnvent(
+                            VehiculoEvent.OnChangePrecio(
+                                it.toIntOrNull() ?: 0
+                            )
+                        )
+                    },
                     label = { Text(text = "Precio") },
                     modifier = Modifier
                         .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
-                    )
+                    ),
+                    isError = vehiculoUiState.precioError.isNotEmpty()
                 )
+                if (vehiculoUiState.precioError != "") {
+                    Text(
+                        text = vehiculoUiState.precioError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
                 OutlinedTextField(
                     value = vehiculoUiState.anio?.toString() ?: "",
-                    onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangeAnio(it.toInt())) },
+                    onValueChange = {
+                        onVehiculoEnvent(
+                            VehiculoEvent.OnChangeAnio(
+                                it.toIntOrNull() ?: 0
+                            )
+                        )
+                    },
                     label = { Text(text = "Año") },
                     modifier = Modifier
                         .fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
-                    )
-                )
+                    ),
+                    isError = vehiculoUiState.anioError.isNotEmpty()
 
+                )
+                if (vehiculoUiState.anioError != "") {
+                    Text(
+                        text = vehiculoUiState.anioError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
 
                 OutlinedTextField(
                     value = vehiculoUiState.descripcion,
                     onValueChange = { onVehiculoEnvent(VehiculoEvent.OnChangeDescripcion(it)) },
                     label = { Text(text = "Descripcion") },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    isError = vehiculoUiState.descripcionError.isNotEmpty()
                 )
-
-
-                OutlinedButton(onClick = {
-                    if (vehiculoId > 0) {
-                        onVehiculoEnvent(VehiculoEvent.UpdateVehiculo)
-                    } else {
-                        onVehiculoEnvent(VehiculoEvent.Save)
-                    }
-                }) {
-                    Text(text = if (vehiculoId > 0) "Actualizar" else "Guardar")
+                if (vehiculoUiState.descripcionError.isNotEmpty()) {
+                    Text(
+                        text = vehiculoUiState.descripcionError,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
                 }
+
                 if (vehiculoId > 0) {
                     LazyRow(
                         modifier = Modifier
@@ -217,16 +299,51 @@ fun VehiculoBodyRegistroScreen(
                 } else {
                     PermisoGallery()
                 }
-
-                Text(text = vehiculoUiState.error, color = Color.Red)
-                if (vehiculoUiState.success.isNotEmpty()) {
-                    if (!showDialog) {
-                        CustomDialog(
-                            message = vehiculoUiState.success,
-                            isError = vehiculoUiState.success.isEmpty(),
-                            onDismiss = { showDialog = true }
-                        )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedButton(onClick = {
+                        if (vehiculoId > 0) {
+                            onVehiculoEnvent(VehiculoEvent.UpdateVehiculo)
+                        } else {
+                            onVehiculoEnvent(VehiculoEvent.Save)
+                        }
+                    }) {
+                        Text(text = if (vehiculoId > 0) "Actualizar" else "Guardar")
                     }
+                }
+                if (vehiculoUiState.imageError.isNotEmpty()) {
+                    CustomDialog(
+                        message = vehiculoUiState.imageError,
+                        isError = vehiculoUiState.imageError.isNotEmpty(),
+                        onDismiss = {
+                            showDialog = false
+                            onVehiculoEnvent(VehiculoEvent.ClearImageError)
+                        }
+                    )
+                    showDialog = true
+                }
+                if (vehiculoUiState.success.isNotEmpty() ) {
+                    CustomDialog(
+                        message = vehiculoUiState.success,
+                        isError = vehiculoUiState.success.isEmpty(),
+                        onDismiss = {
+                            showDialog = false
+                        }
+                    )
+                    showDialog = true
+                }
+                if(vehiculoUiState.error.isNotEmpty()) {
+                    CustomDialog(
+                        message = vehiculoUiState.error,
+                        isError = vehiculoUiState.error.isNotEmpty(),
+                        onDismiss = {
+                            showDialog = false
+                            onVehiculoEnvent(VehiculoEvent.ClearError)
+                        }
+                    )
+                    showDialog = true
                 }
             }
         }
@@ -254,7 +371,9 @@ fun CustomDialog(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.check),
+                    painter = if (isError) painterResource(id = R.drawable.nocheck) else painterResource(
+                        id = R.drawable.check
+                    ),
                     contentDescription = null,
                     modifier = Modifier.size(80.dp)
                 )

@@ -64,9 +64,6 @@ fun LoginScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (uiState.isLoading|| !isRoleVerified) {
-            CircularProgressIndicator()
-        } else {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -182,7 +179,7 @@ fun LoginScreen(
                     }
                 }
             }
-        }
+
     }
 }
 

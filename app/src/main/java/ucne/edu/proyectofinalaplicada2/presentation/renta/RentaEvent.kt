@@ -13,4 +13,7 @@ sealed interface RentaEvent {
     data class PrepareRentaData(val emailCliente: String?, val vehiculoId: Int) : RentaEvent
     data object ConfirmRenta : RentaEvent
     data object CloseModal : RentaEvent
+    data class MostraDatosVehiculoByRole(val isAdmin: Boolean) : RentaEvent
+    data object MostraDatosVehiculo : RentaEvent
+
 }

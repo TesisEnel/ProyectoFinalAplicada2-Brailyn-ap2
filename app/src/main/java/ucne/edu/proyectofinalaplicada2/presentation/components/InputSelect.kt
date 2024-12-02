@@ -22,7 +22,8 @@ fun <T> InputSelect(
     options: List<T>,
     selectedOption: T?,
     labelSelector: (T) -> String,
-    onOptionSelected: (T) -> Unit
+    onOptionSelected: (T) -> Unit,
+    errorMessage: String? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(selectedOption?.let { labelSelector(it) } ?: "") }
@@ -42,7 +43,8 @@ fun <T> InputSelect(
             trailingIcon = {
                 TrailingIcon(expanded = expanded)
             },
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            isError = errorMessage != ""
         )
         ExposedDropdownMenu(
             expanded = expanded,
