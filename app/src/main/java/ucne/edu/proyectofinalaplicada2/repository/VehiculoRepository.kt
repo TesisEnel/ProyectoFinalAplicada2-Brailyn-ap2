@@ -21,96 +21,114 @@ import javax.inject.Inject
 class VehiculoRepository @Inject constructor(
     private val rentCarRemoteDataSource: RentCarRemoteDataSource,
     private val vehiculoDao: VehiculoDao
-){
+) {
     fun getVehiculos(): Flow<Resource<List<VehiculoEntity>>> = flow {
         try {
             emit(Resource.Loading())
             val vehiculos = rentCarRemoteDataSource.getVehiculos()
-            vehiculos.forEach{vehiculo -> vehiculoDao.save(vehiculo.toEntity())}
-            val updatedLocalVehiculos = vehiculoDao.getAll().firstOrNull()
-            emit(Resource.Success(updatedLocalVehiculos?: emptyList()))
+            vehiculos.forEach { vehiculo ->
+                vehiculoDao.save(
+                    vehiculo.copy(imagePath = vehiculo.imagePath ?: emptyList()).toEntity()
+                )
+            }
+            val updatedLocalVehiculos = vehiculoDao.getAll()
+
+            emit(Resource.Success(updatedLocalVehiculos))
+
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
-            val localVehiculos = vehiculoDao.getAll().firstOrNull()
-            if(!localVehiculos.isNullOrEmpty()){
-                emit(Resource.Success(localVehiculos))
-            }
+            val localVehiculos = vehiculoDao.getAll()
+            emit(Resource.Success(localVehiculos))
+
         }
     }
 
-    suspend fun getVehiculoById(id: Int): Resource<VehiculoEntity?>  {
+    suspend fun getVehiculoById(id: Int): Resource<VehiculoEntity?> {
         return try {
             val vehiculo = vehiculoDao.find(id)
             Resource.Success(vehiculo)
         } catch (e: HttpException) {
             Resource.Error("Error de internet ${e.message}")
-        }
-        catch (e: Exception) {
-           Resource.Error("Error desconocido ${e.message}")
+        } catch (e: Exception) {
+            Resource.Error("Error desconocido ${e.message}")
         }
     }
 
     fun getListVehiculosByMarcaId(marcaId: Int): Flow<Resource<List<VehiculoEntity>>> = flow {
-        try{
+        try {
             emit(Resource.Loading())
             val vehiculos = vehiculoDao.getListVehiculosByMarcaId(marcaId).firstOrNull()
-            emit(Resource.Success(vehiculos?: emptyList()))
-        }catch (e: HttpException) {
+            emit(Resource.Success(vehiculos ?: emptyList()))
+        } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
 
-    fun addVehiculo(
-      vehiculoDto:VehiculoDto
-    ): Flow<Resource<VehiculoDto>> =
-        flow {
-            try {
-                emit(Resource.Loading())
-                val requestoBodyTipoCombustibleId =
-                    vehiculoDto.tipoCombustibleId.toString().toRequestBody(Constant.TEXT_PLAIN .toMediaTypeOrNull())
-                val requestoBodyTipoVehiculoId =
-                    vehiculoDto.tipoVehiculoId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodyProveedorId =
-                    vehiculoDto.proveedorId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodyPrecio =
-                    vehiculoDto.precio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodyDescripcion =
-                    vehiculoDto.descripcion?.toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodymarcaId =
-                    vehiculoDto.marcaId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodymodeloId =
-                    vehiculoDto.modeloId.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
-                val requestoBodyanio =
-                    vehiculoDto.anio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+    fun addVehiculo(vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val requestoBodyTipoCombustibleId =
+                vehiculoDto.tipoCombustibleId.toString()
+                    .toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodyTipoVehiculoId =
+                vehiculoDto.tipoVehiculoId.toString()
+                    .toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodyProveedorId =
+                vehiculoDto.proveedorId.toString()
+                    .toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodyPrecio =
+                vehiculoDto.precio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodyDescripcion =
+                vehiculoDto.descripcion?.toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodymarcaId =
+                vehiculoDto.marcaId.toString()
+                    .toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodymodeloId =
+                vehiculoDto.modeloId.toString()
+                    .toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
+            val requestoBodyanio =
+                vehiculoDto.anio.toString().toRequestBody(Constant.TEXT_PLAIN.toMediaTypeOrNull())
 
-                val updatedImages=vehiculoDto.imagePath.map {imagen ->
-                    val img = File(imagen?:"")
-                    val requestBodyFile = img.asRequestBody("image/jpeg".toMediaTypeOrNull())
-                    MultipartBody.Part.createFormData("images", img.name, requestBodyFile)
-                }
-
-
-                val vehiculo = rentCarRemoteDataSource.addVehiculo(
-                    requestoBodyTipoCombustibleId,
-                    requestoBodyTipoVehiculoId,
-                    requestoBodyProveedorId,
-                    requestoBodyPrecio,
-                    requestoBodyDescripcion,
-                    requestoBodymarcaId,
-                    requestoBodymodeloId,
-                    updatedImages,
-                    requestoBodyanio
-                )
-                emit(Resource.Success(vehiculo))
-
-            } catch (e: HttpException) {
-                emit(Resource.Error("Error de internet ${e.message}"))
-            } catch (e: Exception) {
-                emit(Resource.Error("Error desconocido ${e.message}"))
+            val updatedImages = vehiculoDto.imagePath?.map { imagen ->
+                val img = File(imagen ?: "")
+                val requestBodyFile = img.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("images", img.name, requestBodyFile)
             }
-        }
 
+            val vehiculo = rentCarRemoteDataSource.addVehiculo(
+                requestoBodyTipoCombustibleId,
+                requestoBodyTipoVehiculoId,
+                requestoBodyProveedorId,
+                requestoBodyPrecio,
+                requestoBodyDescripcion,
+                requestoBodymarcaId,
+                requestoBodymodeloId,
+                updatedImages,
+                requestoBodyanio
+            )
+            emit(Resource.Success(vehiculo))
+
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
+
+    fun updateVehiculo(vehiculoDto: VehiculoDto): Flow<Resource<VehiculoDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val vehiculoUpdated =
+                rentCarRemoteDataSource.updateVehiculo(vehiculoDto.vehiculoId ?: 0, vehiculoDto)
+            vehiculoDao.updateVehiculo(vehiculoUpdated.toEntity())
+            emit(Resource.Success(vehiculoUpdated))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
+        }
+    }
 }
