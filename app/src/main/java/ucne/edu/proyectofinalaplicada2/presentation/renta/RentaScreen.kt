@@ -118,7 +118,10 @@ fun RentaBodyScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         vehiculo?.imagePath?.let { imagePaths ->
             val pagerState = rememberPagerState()
             Box(
