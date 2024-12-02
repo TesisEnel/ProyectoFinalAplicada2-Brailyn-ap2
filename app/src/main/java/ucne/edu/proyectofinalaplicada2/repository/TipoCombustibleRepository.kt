@@ -27,4 +27,20 @@ class TipoCombustibleRepository @Inject constructor(
         }
     }
 
+    suspend fun getTipoCombustibleById(id: Int): Resource<TipoCombustibleEntity?> {
+        return try {
+            val tipoCombustibles = rentCarRemoteDataSource.getTiposCombustibles()
+            tipoCombustibles.forEach{ tipoCombustible -> tipoCombustibleDao.save(tipoCombustible.toEntity()) }
+            val tipoCombustible = tipoCombustibleDao.find(id)
+            Resource.Success(tipoCombustible)
+        } catch (e: HttpException) {
+            Resource.Error("Error de internet ${e.message}")
+        } catch (e: Exception) {
+            val tipoCombustible = tipoCombustibleDao.find(id)
+            Resource.Success(tipoCombustible)
+        }
+    }
+
+
+
 }
