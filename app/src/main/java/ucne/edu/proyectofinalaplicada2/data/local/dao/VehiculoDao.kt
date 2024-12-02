@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.data.local.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
@@ -11,6 +12,8 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 interface VehiculoDao {
     @Upsert
     suspend fun save(vehiculo: VehiculoEntity)
+    @Update
+    suspend fun updateVehiculo(vehiculo: VehiculoEntity)
 
     @Query(
         """select * from Vehiculos where vehiculoId=:id
@@ -22,7 +25,7 @@ interface VehiculoDao {
     suspend fun delete(vehiculo: VehiculoEntity)
 
     @Query("SELECT * FROM Vehiculos")
-    fun getAll(): Flow<List<VehiculoEntity>>
+    suspend fun getAll(): List<VehiculoEntity>
 
     @Query(
         """select * from Vehiculos where marcaId=:marcaId
