@@ -14,8 +14,7 @@ class VehiculoEntity(
     val precio: Int?,
     val descripcion: String?,
     val anio: Int?,
-    val imagePath: List<String?>,
+    val imagePath: List<String?>?  ,
     val proveedorId: Int?,
     val estaRentado: Boolean?,
-
 )
