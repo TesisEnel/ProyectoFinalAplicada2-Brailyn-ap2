@@ -91,7 +91,7 @@ fun ExpandableCard(
     uiState: RentaUistate
 ) {
     var isExpanded by remember { mutableStateOf<Int?>(null)  }
-    uiState.rentaConVehiculo.forEachIndexed{ index, renta ->
+    uiState.rentaConVehiculos.forEachIndexed{ index, renta ->
         ExpandableBodyCard(
             isExpanded = isExpanded == index,
             onCardArrowClick = { isExpanded = if (isExpanded == index) null else index },

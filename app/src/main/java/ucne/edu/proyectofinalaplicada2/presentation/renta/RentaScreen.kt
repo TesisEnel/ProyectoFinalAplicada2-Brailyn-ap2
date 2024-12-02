@@ -1,7 +1,10 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,16 +15,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,12 +41,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -51,8 +56,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.Converter
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -85,9 +90,14 @@ fun RentaBodyScreen(
     val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
-    var showModal by remember { mutableStateOf(false) }
     var showDatePickerRenta by remember { mutableStateOf(false) }
     val datePickerStateRenta = rememberDatePickerState()
+
+
+    LaunchedEffect(Unit) {
+        val emailCliente = FirebaseAuth.getInstance().currentUser?.email
+        onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId))
+    }
 
 
     LaunchedEffect(datePickerStateRenta.selectedDateMillis) {
@@ -108,242 +118,289 @@ fun RentaBodyScreen(
         }
     }
 
-    Column{
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Imagen del vehículo
         vehiculo?.imagePath?.let { imagePaths ->
             val pagerState = rememberPagerState()
-            val coroutineScope = rememberCoroutineScope()
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .height(250.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column {
-                    HorizontalPager(
-                        count = imagePaths.size,
-                        state = pagerState,
-                        modifier = Modifier.fillMaxWidth()
-                    ) { page ->
-                        val painter = rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + imagePaths[page])
-                        ImageCard(
-                            contentDescription = "Vehículo Imagen $page",
-                            painter = painter,
-                        )
-                    }
+                HorizontalPager(
+                    count = imagePaths.size,
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ) { page ->
+                    val painter =
+                        rememberAsyncImagePainter(Constant.URL_BLOBSTORAGE + imagePaths[page])
+                    Image(
+                        painter = painter,
+                        contentDescription = "Vehículo Imagen $page",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
+
+        // Contenedor principal con scroll
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = 220.dp)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(510.dp)
+                    .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp))
+                    .verticalScroll(rememberScrollState()),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Título y descripción
+                    Text(
+                        text = "${rentaUiState.marca?.nombreMarca} ${rentaUiState.modelo?.modeloVehiculo}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Información del vehículo",
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = vehiculo?.descripcion ?: "",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    // Especificaciones técnicas
+                    Text(
+                        text = "Especificaciones Técnicas",
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
 
                     Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    val newPage = (pagerState.currentPage - 1).coerceAtLeast(0)
-                                    pagerState.scrollToPage(newPage)
-                                }
-                            },
-                            enabled = pagerState.currentPage > 0
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Página Anterior"
+                        CardInfo("Precio/Día", "${vehiculo?.precio ?: "N/A"} DOP")
+                        CardInfo("Tipo de Combustible", rentaUiState.vehiculoConCombustible ?: "N/A")
+                        CardInfo("Año", vehiculo?.anio.toString())
+                        CardInfo("Tipo de Vehículo", rentaUiState.vehiculoConTipo ?: "N/A")
+                    }
+
+                    // Selección de fechas
+                    Text(
+                        text = "Selecciona la fecha para rentar",
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Fecha de Renta
+                        Column(modifier = Modifier.weight(1f)) {
+                            OutlinedTextField(
+                                value = rentaUiState.fechaRenta,
+                                onValueChange = {},
+                                label = { Text("Renta") },
+                                trailingIcon = {
+                                    IconButton(onClick = { showDatePickerRenta = !showDatePickerRenta }) {
+                                        Icon(
+                                            Icons.Default.DateRange,
+                                            contentDescription = "Select date"
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            rentaUiState.errorFechaRenta?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                                )
+                            }
+                            rentaUiState.error?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                                )
+                            }
+
+                        }
+
+                        if (showDatePickerRenta) {
+                            DatePickerPopup(
+                                onDismissRequest = { showDatePickerRenta = false },
+                                state = datePickerStateRenta
                             )
                         }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            repeat(imagePaths.size) { index ->
-                                val isSelected = pagerState.currentPage == index
-                                Box(
-                                    modifier = Modifier
-                                        .size(if (isSelected) 14.dp else 8.dp)
-                                        .background(
-                                            color = if (isSelected) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                            shape = MaterialTheme.shapes.small
+
+                        // Fecha de Entrega
+                        Column(modifier = Modifier.weight(1f)) {
+                            OutlinedTextField(
+                                value = rentaUiState.fechaEntrega ?: "",
+                                onValueChange = { onEvent(RentaEvent.OnchangeFechaEntrega(it)) },
+                                label = { Text("Entrega") },
+                                trailingIcon = {
+                                    IconButton(onClick = { showDatePickerEntrega = !showDatePickerEntrega }) {
+                                        Icon(
+                                            Icons.Default.DateRange,
+                                            contentDescription = "Select date"
                                         )
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            rentaUiState.errorFechaEntrega?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                                 )
                             }
                         }
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    val newPage =
-                                        (pagerState.currentPage + 1).coerceAtMost(imagePaths.size - 1)
-                                    pagerState.scrollToPage(newPage)
-                                }
-                            },
-                            enabled = pagerState.currentPage < imagePaths.size - 1
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = "Página Siguiente"
+
+                        if (showDatePickerEntrega) {
+                            DatePickerPopup(
+                                onDismissRequest = { showDatePickerEntrega = false },
+                                state = datePickerStateEntrega
                             )
                         }
                     }
-                }
 
-            }
-        }
-        Text(
-            text = "Selecciona la fecha para rentar",
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally),
-            fontWeight = FontWeight.W700
-        )
-        Column(
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxWidth(),
-        ) {
-            Row {
-                OutlinedTextField(
-                    value = rentaUiState.fechaRenta,
-                    onValueChange = {},
-                    label = { Text("Renta") },
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePickerRenta = !showDatePickerRenta }) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select date"
+                    // Botón de acción
+                    Button(
+                        onClick = {
+                            onEvent(
+                                RentaEvent.CalculeTotal(
+                                    fechaRenta = rentaUiState.fechaRenta,
+                                    fechaEntrega = rentaUiState.fechaEntrega ?: "",
+                                    costoDiario = vehiculo?.precio ?: 0
+                                )
                             )
-                        }
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp)
-                        .padding(end = 15.dp)
-                    )
-
-                if (showDatePickerRenta) {
-                    Popup(
-                        onDismissRequest = { showDatePickerRenta = false },
-                        alignment = Alignment.Center
+                        },
+                        enabled = rentaUiState.errorFechaRenta.isNullOrEmpty() &&
+                                rentaUiState.errorFechaEntrega.isNullOrEmpty(),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .offset(y = 10.dp)
-                                .shadow(elevation = 4.dp)
-                                .background(MaterialTheme.colorScheme.surface)
-                                .padding(16.dp)
-                        ) {
-                            DatePicker(
-                                state = datePickerStateRenta,
-                                showModeToggle = false,
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = rentaUiState.fechaEntrega?:"",
-                    onValueChange = {},
-                    label = { Text("Entrega") },
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePickerEntrega = !showDatePickerEntrega }) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select date"
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp)
-
-                )
-                if (showDatePickerEntrega) {
-                    Popup(
-                        onDismissRequest = { showDatePickerEntrega = false },
-                        alignment = Alignment.Center,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .offset(y = 10.dp)
-                                .shadow(elevation = 4.dp)
-                                .background(MaterialTheme.colorScheme.surface)
-                                .padding(16.dp)
-                        ) {
-                            DatePicker(
-                                state = datePickerStateEntrega,
-                                showModeToggle = false
-                            )
-                        }
+                        Text("Rentar Ahora")
                     }
                 }
             }
         }
-        LaunchedEffect(Unit) {
-            val emailCliente = FirebaseAuth.getInstance().currentUser?.email
-            onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId))
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                onEvent(RentaEvent.CalculeTotal(rentaUiState.fechaRenta,rentaUiState.fechaEntrega?:"",vehiculo?.precio?:0))
-                showModal = true
-              },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
-        ) {
-            Text(text = "Rentar Ahora")
-        }
-        if (showModal) {
+
+        // Modal de confirmación
+        if (rentaUiState.showModal) {
             ConfirmRentaDialog(
-                vehiculoName = rentaUiState.vehiculoNombre,
-                fechaRenta = rentaUiState.fechaRenta,
-                fechaEntrega = rentaUiState.fechaEntrega,
-                costoTotal = rentaUiState.total,
+                rentaUiState = rentaUiState,
+                vehiculo = vehiculo,
                 onConfirm = {
                     onEvent(RentaEvent.ConfirmRenta)
-                    showModal = false
+                    onEvent(RentaEvent.CloseModal)
                 },
-                onDismiss = { showModal = false },
+                onDismiss = { onEvent(RentaEvent.CloseModal) },
             )
-            Text(rentaUiState.error ?: "", color = MaterialTheme.colorScheme.error)
         }
     }
 }
 
 @Composable
-fun ImageCard(
-    contentDescription: String,
-    painter: Painter,
-) {
+fun CardInfo(title: String, value: String) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(8.dp),
+            .width(120.dp)
+            .height(80.dp),
         shape = RoundedCornerShape(8.dp),
-
+        border = BorderStroke(1.dp, Color.LightGray)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-        Box {
-            Image(
-                painter = painter,
-                contentDescription = contentDescription,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerPopup(onDismissRequest: () -> Unit, state: DatePickerState) {
+    Popup(
+        onDismissRequest = onDismissRequest,
+        alignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .clickable(onClick = onDismissRequest),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .width(380.dp)
+                    .height(500.dp)
+                    .shadow(elevation = 8.dp, shape = RoundedCornerShape(16.dp)),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color.LightGray)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DatePicker(
+                        state = state,
+                        showModeToggle = false,
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 fun ConfirmRentaDialog(
-    vehiculoName: String?,
-    fechaRenta: String?,
-    fechaEntrega: String?,
+    rentaUiState: RentaUistate,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    costoTotal: Double?,
+    vehiculo: VehiculoEntity?,
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -351,16 +408,74 @@ fun ConfirmRentaDialog(
             Text(text = "Confirmar Renta")
         },
         text = {
-            Column {
-                Text("Vehículo: ${vehiculoName ?: "No disponible"}")
-                Text("Fecha de Salida: ${fechaRenta ?: "No seleccionada"}")
-                Text("Fecha de Entrada: ${fechaEntrega ?: "No seleccionada"}")
-                Text("El costo total es: ${costoTotal ?: ""}")
+            Card(
+                modifier = Modifier.padding(20.dp),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, Color.LightGray),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    InfoRow(label = "Vehículo:", value = rentaUiState.vehiculoNombre ?: "N/A")
+                    InfoRow(label = "Modelo:", value = rentaUiState.vehiculoModelo ?: "N/A")
+                    InfoRow(label = "Año:", value = vehiculo?.anio?.toString() ?: "N/A")
+                    InfoRow(label = "Fecha de Salida:", value = rentaUiState.fechaRenta ?: "N/A")
+                    InfoRow(label = "Fecha de Entrada:", value = rentaUiState.fechaEntrega ?: "N/A")
+                    InfoRow(label = "Precio/Día:", value = "${vehiculo?.precio ?: "N/A"} DOP")
+                    InfoRow(label = "Días Totales:", value = rentaUiState.cantidadDias?.toString() ?: "N/A")
+
+                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Costo Total:",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "${rentaUiState.total ?: "N/A"} DOP",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Equivalente a:",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "${rentaUiState.total?.div(60) ?: "N/A"} USD",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+
+                }
             }
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm()
+                onClick = {
+                    onConfirm()
                 }) {
                 Text("Confirmar")
             }
@@ -373,9 +488,28 @@ fun ConfirmRentaDialog(
     )
 }
 
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
 fun handleDatePickerResult(
     selectedDateMillis: Long?,
-    onDateSelected: (String) -> Unit
+    onDateSelected: (String) -> Unit,
 ) {
     selectedDateMillis?.let { millis ->
         val selectedDate = Converter().convertToDate(millis)
