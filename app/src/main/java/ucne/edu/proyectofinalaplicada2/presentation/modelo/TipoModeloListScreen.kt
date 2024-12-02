@@ -100,7 +100,7 @@ fun TipoModeloLazyColumn(
     ) {
         items(modeloUistate.modeloConVehiculos) { modelo ->
             VehicleCard(
-                imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath.firstOrNull(),
+                imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath?.firstOrNull(),
                 vehicleName = modelo.nombreModelo,
                 vehicleDetails = "Precio: ${modelo.vehiculo.precio ?: "Sin detalles disponibles"}",
                 vehiculoId = modelo.vehiculo.vehiculoId ?: 0,
