@@ -3,7 +3,6 @@ package ucne.edu.proyectofinalaplicada2.repository
 import kotlinx.coroutines.flow.firstOrNull
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.TipoVehiculoDao
-import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
