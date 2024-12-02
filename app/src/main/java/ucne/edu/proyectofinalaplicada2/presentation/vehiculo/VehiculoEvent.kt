@@ -23,5 +23,6 @@ sealed interface VehiculoEvent {
     data class DeleteVehiculo(val id: Int): VehiculoEvent
     data object ClearImageError: VehiculoEvent
     data object ClearError: VehiculoEvent
+    data object ClearSuccess: VehiculoEvent
 
 }
