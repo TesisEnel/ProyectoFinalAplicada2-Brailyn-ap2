@@ -94,7 +94,7 @@ fun FiltraVehiculoBody(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 items(uiState.vehiculoConMarcas) { vehiculoConMarca ->
-                    val painter = vehiculoConMarca.vehiculo.imagePath.firstOrNull()
+                    val painter = vehiculoConMarca.vehiculo.imagePath?.firstOrNull()
                     VehicleCard(
                         imageUrl = Constant.URL_BLOBSTORAGE + painter,
                         vehicleName = vehiculoConMarca.nombreMarca?:"",
