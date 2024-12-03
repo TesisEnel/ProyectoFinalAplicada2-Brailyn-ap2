@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ClienteEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.repository.AuthRepository
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
@@ -249,7 +250,7 @@ class AuthViewModel @Inject constructor(
 
     }
 
-    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+    private suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
 
