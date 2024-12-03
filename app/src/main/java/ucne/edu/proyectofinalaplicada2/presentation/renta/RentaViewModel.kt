@@ -46,7 +46,7 @@ class RentaViewModel @Inject constructor(
         getRentas()
     }
 
-    private fun getRentas() {
+    fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
 
@@ -82,7 +82,7 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun save(rentaDto: RentaDto) {
+    fun save(rentaDto: RentaDto) {
         viewModelScope.launch {
             val renta = rentaRepository.addRenta(rentaDto)
             renta.collect { result ->
@@ -230,10 +230,10 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
-    private suspend fun getVehiculoById(id: Int): VehiculoEntity? {
+    suspend fun getVehiculoById(id: Int): VehiculoEntity? {
         return vehiculoRepository.getVehiculoById(id).data
     }
-    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+    suspend fun getClienteByEmail(email: String): ClienteDto? {
         return clienteRepository.getClienteByEmail(email).data
     }
 
