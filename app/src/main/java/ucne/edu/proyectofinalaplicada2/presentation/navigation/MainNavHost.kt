@@ -243,7 +243,9 @@ fun MainBodyNavHost(
                     composable<Screen.RentaListScreen> {
                         onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
 
-                        RentaListSceen()
+                        RentaListSceen(
+                            onGoEdit = { navHostController.navigate(Screen.RentaScreen(it)) }
+                        )
 
                     }
                     composable<Screen.FiltraVehiculo> {
