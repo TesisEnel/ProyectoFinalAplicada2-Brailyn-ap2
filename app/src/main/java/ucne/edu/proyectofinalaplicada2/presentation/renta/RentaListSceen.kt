@@ -1,6 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,11 +41,12 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable
 fun RentaListSceen(
-    viewModel: RentaViewModel = hiltViewModel()
+    viewModel: RentaViewModel = hiltViewModel(),
+    onGoEdit: (Int) -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
 
-    if(uiState.isLoading){
+    if (uiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -49,10 +54,12 @@ fun RentaListSceen(
         ) {
             CircularProgressIndicator()
         }
-    }else{
+    } else {
         RentaListBodyScreen(
             uiState = uiState,
-            onEvent = {event -> viewModel.onEvent(event)}
+            onEvent = { event -> viewModel.onEvent(event) },
+            onGoEdit = onGoEdit
+
         )
     }
 }
@@ -60,7 +67,8 @@ fun RentaListSceen(
 @Composable
 fun RentaListBodyScreen(
     uiState: RentaUistate,
-    onEvent: (RentaEvent) -> Unit = {}
+    onEvent: (RentaEvent) -> Unit = {},
+    onGoEdit: (Int) -> Unit = {},
 ) {
     LazyColumn(
         modifier = Modifier
@@ -87,7 +95,9 @@ fun RentaListBodyScreen(
         item {
             ExpandableCard(
                 uiState = uiState,
-                onEvent =  onEvent
+                onEvent = onEvent,
+                onGoEdit = onGoEdit
+
             )
         }
     }
@@ -97,36 +107,40 @@ fun RentaListBodyScreen(
 fun ExpandableCard(
     uiState: RentaUistate,
     authViewModel: AuthViewModel = hiltViewModel(),
-    onEvent: (RentaEvent) -> Unit = {}
+    onEvent: (RentaEvent) -> Unit = {},
+    onGoEdit: (Int) -> Unit = {},
 ) {
     val rentaUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
-    var isExpanded by remember { mutableStateOf<Int?>(null)  }
+    var isExpanded by remember { mutableStateOf<Int?>(null) }
     LaunchedEffect(isRoleVerified) {
-        if(!rentaUiState.isAdmin ){
+        if (!rentaUiState.isAdmin) {
             onEvent(RentaEvent.MostraDatosVehiculoByRole(false))
-        }
-        else{
+        } else {
             onEvent(RentaEvent.MostraDatosVehiculo)
         }
     }
-    uiState.rentaConVehiculos.forEachIndexed{ index, renta ->
+    uiState.rentaConVehiculos.forEachIndexed { index, renta ->
         ExpandableBodyCard(
             isExpanded = isExpanded == index,
             onCardArrowClick = { isExpanded = if (isExpanded == index) null else index },
             rentaConVehiculo = renta,
+            onGoEdit = onGoEdit
         )
     }
 }
 
 @Composable
 fun ExpandableBodyCard(
+    authViewModel: AuthViewModel = hiltViewModel(),
     isExpanded: Boolean,
     onCardArrowClick: () -> Unit,
     rentaConVehiculo: RentaConVehiculo,
-    authViewModel: AuthViewModel = hiltViewModel()
+    onGoEdit: (Int) -> Unit = {},
 ) {
+    var menuExpanded by remember { mutableStateOf(false) } // Control para el menú desplegable
     val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -146,16 +160,52 @@ fun ExpandableBodyCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = rentaConVehiculo.marca?.nombreMarca?:"",
+                    text = rentaConVehiculo.marca?.nombreMarca ?: "",
                     modifier = Modifier.weight(1f),
                     fontWeight = FontWeight.W500,
                     fontSize = 20.sp
                 )
-                IconButton(onClick = onCardArrowClick) {
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (isExpanded) "Colapsar" else "Expandir"
-                    )
+                Row(
+                    modifier = Modifier.padding(end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onCardArrowClick,
+                    ) {
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = if (isExpanded) "Colapsar" else "Expandir"
+                        )
+                    }
+                    Box {
+                        IconButton(
+                            onClick = { menuExpanded = true },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Más opciones"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = menuExpanded,
+                            onDismissRequest = { menuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    menuExpanded = false
+                                    onGoEdit(rentaConVehiculo.renta?.vehiculoId ?: 0)
+                                },
+                                text = { Text("Editar") }
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    menuExpanded = false
+
+                                },
+                                text = { Text("Eliminar") }
+                            )
+                        }
+                    }
                 }
             }
             if (isExpanded) {
@@ -165,10 +215,10 @@ fun ExpandableBodyCard(
                 ) {
                     Text(
                         text = "Modelo:${rentaConVehiculo.nombreModelo} \nAño:${rentaConVehiculo.anio} \nTotal: ${rentaConVehiculo.renta?.total}",
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp, end = 18.dp)
                     )
                     Text(
-                        text = "Renta: ${rentaConVehiculo.renta?.fechaRenta} \nEntrega: ${rentaConVehiculo.renta?.fechaEntrega} ${if(authUiState.isAdmin) " Cliente: ${rentaConVehiculo.clienteEntity?.nombre} ${rentaConVehiculo.clienteEntity?.apellido}" else ""}",
+                        text = "Renta: ${rentaConVehiculo.renta?.fechaRenta}   \nEntrega: ${rentaConVehiculo.renta?.fechaEntrega} ${if (authUiState.isAdmin) "   Cliente: ${rentaConVehiculo.clienteEntity?.nombre} ${rentaConVehiculo.clienteEntity?.apellido}" else ""}",
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
@@ -176,7 +226,6 @@ fun ExpandableBodyCard(
         }
     }
 }
-
 @Preview(showSystemUi = true)
 @Composable
 private fun RentaListBodyScreenPreview() {
