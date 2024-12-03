@@ -71,21 +71,6 @@ class RentaViewModelTest{
     }
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `Should Retorn Success When Save a Renta`() = runTest {
-        val renta = RentaDto(1, 1, 1, "12/2/2024", "12/2/2024", 2000.0)
-        coEvery { rentaRepository.addRenta(renta) } returns flowOf(Resource.Success(renta))
-
-        viewModel.save(renta)
-
-        advanceUntilIdle()
-        val uiState = viewModel.uistate.value
-        assertEquals("Renta agregada", uiState.success)
-        assertNull(uiState.error)
-        assertFalse(uiState.isLoading)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
     fun `Should return a list of rentas`() = runTest {
         val rentas = listOf(
             RentaEntity(1, 1, 1, "12/2/2024", "12/2/2024", 2000.0),

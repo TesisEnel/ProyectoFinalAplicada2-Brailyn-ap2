@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.R
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
 import ucne.edu.proyectofinalaplicada2.ui.theme.Gradiend
 
 @Composable
@@ -61,6 +62,7 @@ fun LoginScreen(
         viewModel.onEvent(event)
     }
     var passwordVisibility by remember { mutableStateOf(false) }
+    var onDismiss by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -112,7 +114,10 @@ fun LoginScreen(
                 onTogglePasswordVisibility = { passwordVisibility = !passwordVisibility }
             )
             OutlinedButton(
-                onClick = { onEvent(AuthEvent.Login) },
+                onClick = {
+                    onEvent(AuthEvent.ClearError)
+                    onEvent(AuthEvent.Login)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
@@ -120,12 +125,6 @@ fun LoginScreen(
                 ) {
                 Text("Iniciar sesión", color = Color.White)
             }
-            Text(
-                text = uiState.error ?: "",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
 
             Row(
                 modifier = Modifier
@@ -197,6 +196,18 @@ fun LoginScreen(
                         )
                     )
                 }
+            }
+
+            if(uiState.error?.isNotBlank() == true){
+                CustomDialog(
+                    message = uiState.error!!,
+                    isError = uiState.error?.isNotBlank() ==true,
+                    onDismiss = {
+                        onDismiss = true
+                        onEvent(AuthEvent.ClearError)
+                    }
+                )
+                onDismiss = false
             }
         }
 

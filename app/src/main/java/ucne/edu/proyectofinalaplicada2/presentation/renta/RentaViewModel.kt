@@ -81,11 +81,11 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    fun save(rentaDto: RentaDto) {
+    fun save() {
         viewModelScope.launch {
             var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
             vehiculo = vehiculo?.copy(estaRentado = true)
-            val renta = rentaRepository.addRenta(rentaDto, vehiculo)
+            val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)
             renta.collect { result ->
                 when (result) {
                     is Resource.Error -> {
@@ -110,7 +110,6 @@ class RentaViewModel @Inject constructor(
                                 success = "Renta agregada"
                             )
                         }
-                        nuevo()
                     }
                 }
             }
@@ -124,7 +123,7 @@ class RentaViewModel @Inject constructor(
                 val vehiculo = getVehiculoById(rentaEntity.vehiculoId ?: 0)
                 val marca = getMarcaById(vehiculo?.marcaId ?: 0)
                 val modelo = getModeloById(vehiculo?.modeloId ?: 0)
-                val cliente = clienteRepository.getClienteById(rentaEntity.clienteId ?: 0)
+                val cliente = clienteRepository.getClienteById(rentaEntity.clienteId?:0)
                 RentaConVehiculo(
                     marca = marca,
                     renta = rentaEntity,
@@ -141,9 +140,8 @@ class RentaViewModel @Inject constructor(
 
         }
     }
-
     private fun mostrarDatosVehiculoByRole(isAdmin: Boolean) {
-        if (!isAdmin) {
+        if(!isAdmin){
             val email = FirebaseAuth.getInstance().currentUser?.email
 
             viewModelScope.launch {
@@ -282,17 +280,6 @@ class RentaViewModel @Inject constructor(
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
 
-    private fun createRenta() {
-        val renta = RentaDto(
-            clienteId = uistate.value.clienteId,
-            vehiculoId = uistate.value.vehiculo?.vehiculoId,
-            fechaRenta = uistate.value.fechaRenta,
-            fechaEntrega = uistate.value.fechaEntrega,
-            total = uistate.value.total
-        )
-        save(renta)
-
-    }
 
     private fun updateRenta() {
         viewModelScope.launch {
@@ -587,14 +574,15 @@ class RentaViewModel @Inject constructor(
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
-            is RentaEvent.Save -> save(event.renta)
+            RentaEvent.Save -> save()
             is RentaEvent.CalculeTotal -> calculateTotal(
                 event.fechaRenta,
                 event.fechaEntrega,
                 event.costoDiario
             )
-
-            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId, event.rentaId)
+            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId,event.rentaId)
+            RentaEvent.ConfirmRenta -> save()
+            RentaEvent.CloseModal -> closeModal()
             is RentaEvent.MostraDatosVehiculoByRole -> mostrarDatosVehiculoByRole(event.isAdmin)
             is RentaEvent.HandleDatePickerResult -> handleDatePickerResult(
                 event.dateMillis,
