@@ -5,16 +5,21 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.RentaDao
+import ucne.edu.proyectofinalaplicada2.data.local.dao.VehiculoDao
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.toVehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 class RentaRepository @Inject constructor(
     private val rentCarRemoteDataSource: RentCarRemoteDataSource,
-    private val rentaDao: RentaDao
+    private val rentaDao: RentaDao,
+    private val vehiculoDao: VehiculoDao
 ) {
      fun getRentas(): Flow<Resource<List<RentaEntity>>> = flow {
         try {
@@ -32,10 +37,12 @@ class RentaRepository @Inject constructor(
             }
         }
     }
-    fun addRenta(rentaDto: RentaDto): Flow<Resource<RentaDto>> = flow {
+    fun addRenta(rentaDto: RentaDto, vehiculoEntity: VehiculoEntity?): Flow<Resource<RentaDto>> = flow {
         try {
             emit(Resource.Loading())
             val renta = rentCarRemoteDataSource.addRenta(rentaDto)
+            vehiculoDao.updateVehiculo(vehiculoEntity!!)
+            rentCarRemoteDataSource.updateVehiculo(vehiculoEntity.vehiculoId?:0, vehiculoEntity.toVehiculoDto())
             emit(Resource.Success(renta))
             } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))

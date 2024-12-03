@@ -109,7 +109,9 @@ fun FiltraVehiculoBody(
                         onGoRenta = onGoRenta,
                         onGoEdit = onGoEdit,
                         isAdmin = authState.value.isAdmin,
-                        onEvent = { event -> onEvent(event)}
+                        onEvent = { event -> onEvent(event)},
+                        estado = if (vehiculoConMarca.vehiculo.estaRentado == true) "No disponible" else "Disponible",
+                        isRentado = vehiculoConMarca.vehiculo.estaRentado ?: false
                     )
                 }
             }
