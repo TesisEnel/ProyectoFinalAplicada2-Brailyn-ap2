@@ -75,7 +75,6 @@ class RentaViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
-                       // mostrarDatosVehiculo()
                     }
                 }
             }
@@ -84,7 +83,9 @@ class RentaViewModel @Inject constructor(
 
     fun save(rentaDto: RentaDto) {
         viewModelScope.launch {
-            val renta = rentaRepository.addRenta(rentaDto)
+            var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
+            vehiculo = vehiculo?.copy(estaRentado = true)
+            val renta = rentaRepository.addRenta(rentaDto,vehiculo)
             renta.collect { result ->
                 when (result) {
                     is Resource.Error -> {
@@ -239,19 +240,18 @@ class RentaViewModel @Inject constructor(
         return clienteRepository.getClienteByEmail(email).data
     }
 
-     suspend fun getMarcaById(id: Int): MarcaEntity? {
+    suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
-     suspend fun getModeloById(id: Int): ModeloEntity? {
+    suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
-     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
+    suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
-     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
+    suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
-
     private fun createRenta() {
         val renta = RentaDto(
             clienteId = uistate.value.clienteId,
@@ -353,11 +353,12 @@ class RentaViewModel @Inject constructor(
             }
             return
         }
-
         try {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-            val rentaDate: Date = dateFormat.parse(fechaRenta) ?: throw Exception("Fecha de renta inválida")
-            val entregaDate: Date = dateFormat.parse(fechaEntrega) ?: throw Exception("Fecha de entrega inválida")
+            val rentaDate: Date =
+                dateFormat.parse(fechaRenta) ?: throw Exception("Fecha de renta inválida")
+            val entregaDate: Date =
+                dateFormat.parse(fechaEntrega) ?: throw Exception("Fecha de entrega inválida")
 
             if (entregaDate.before(rentaDate)) {
                 _uistate.update {
@@ -395,11 +396,11 @@ class RentaViewModel @Inject constructor(
     }
 
     private fun closeModal() {
-            _uistate.update {
-                it.copy(
-                    showModal = false
-                )
-            }
+        _uistate.update {
+            it.copy(
+                showModal = false
+            )
+        }
     }
 
     fun onEvent(event: RentaEvent) {
