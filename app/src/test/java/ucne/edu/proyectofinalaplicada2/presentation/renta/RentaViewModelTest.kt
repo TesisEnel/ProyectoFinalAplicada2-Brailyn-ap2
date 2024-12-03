@@ -13,7 +13,11 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
+import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
@@ -47,6 +51,11 @@ class RentaViewModelTest{
 
         coEvery { vehiculoRepository.getVehiculoById(any()) } returns Resource.Success(null)
         coEvery { clienteRepository.getClienteByEmail(any()) } returns Resource.Success(null)
+        coEvery { marcaRepository.getMarcaById(any()) } returns Resource.Success(null)
+        coEvery { modeloRepository.getModelosById(any()) } returns Resource.Success(null)
+        coEvery { tipoCombustibleRepository.getTipoCombustibleById(any()) } returns Resource.Success(null)
+        coEvery { tipoVehiculoRepository.getTipoVehiculoById(any()) } returns Resource.Success(null)
+
 
 
           viewModel = RentaViewModel(
@@ -99,9 +108,8 @@ class RentaViewModelTest{
         val vehiculo = VehiculoEntity( 1, 1, 1, 1, 1, 200, "Hol", 2012, emptyList(), 1, false )
 
         coEvery { vehiculoRepository.getVehiculoById(1) } returns Resource.Success(vehiculo)
-        viewModel.getVehiculoById(1)
+        val result =viewModel.getVehiculoById(1)
         advanceUntilIdle()
-        val result = vehiculoRepository.getVehiculoById(1).data
         assertEquals(vehiculo,result )
 
     }
@@ -111,9 +119,42 @@ class RentaViewModelTest{
         val cliente = ClienteDto(1, "12122", "Enmanuel", "Vasquez", "calle mencia", "12121", "braylin@gmail.com", true )
         coEvery { clienteRepository.getClienteByEmail("braylin@gmail.com") } returns Resource.Success(cliente)
 
-        viewModel.getClienteByEmail("braylin@gmail.com")
-        val result = clienteRepository.getClienteByEmail("braylin@gmail.com").data
+        val result =viewModel.getClienteByEmail("braylin@gmail.com")
         assertEquals(cliente, result)
+    }
+
+    @Test
+    fun `Should return a marca entity by id`()= runTest {
+        val marca = MarcaEntity(1,"Toyota")
+
+        coEvery { marcaRepository.getMarcaById(1) } returns Resource.Success(marca)
+        val result = viewModel.getMarcaById(1)
+        assertEquals(marca, result)
+    }
+
+    @Test
+    fun `Should return a modelo entity by id`()= runTest {
+        val modelo = ModeloEntity(1,1,"Camry")
+        coEvery { modeloRepository.getModelosById(1) } returns Resource.Success(modelo)
+        val result = viewModel.getModeloById(1)
+        assertEquals(modelo, result)
+
+    }
+
+    @Test
+    fun `Should return a tipo combustible entity by id`()= runTest {
+        val tipoCombustible = TipoCombustibleEntity(1,"Gasolina")
+        coEvery { tipoCombustibleRepository.getTipoCombustibleById(1) } returns Resource.Success(tipoCombustible)
+        val result = viewModel.getCombustibleById(1)
+        assertEquals(tipoCombustible, result)
+    }
+    @Test
+    fun `Should return a tipo vehiculo entity by id`()= runTest {
+        val tipoVehiculo = TipoVehiculoEntity(1,"Carro")
+        coEvery { tipoVehiculoRepository.getTipoVehiculoById(1) } returns Resource.Success(tipoVehiculo)
+        val result = viewModel.getTipoVehiculoById(1)
+        assertEquals(tipoVehiculo, result)
+
 
     }
 

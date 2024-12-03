@@ -178,7 +178,7 @@ class RentaViewModel @Inject constructor(
                     )
                 }
             }
-            val vehiculo = getvehiculoById(vehiculoId)
+            val vehiculo = getVehiculoById(vehiculoId)
             if (vehiculo != null) {
                 _uistate.update {
                     it.copy(
@@ -237,20 +237,18 @@ class RentaViewModel @Inject constructor(
         return clienteRepository.getClienteByEmail(email).data
     }
 
-    private suspend fun getvehiculoById(id: Int): VehiculoEntity? {
-        return vehiculoRepository.getVehiculoById(id).data
-    }
 
-    private suspend fun getMarcaById(id: Int): MarcaEntity? {
+
+     suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
-    private suspend fun getModeloById(id: Int): ModeloEntity? {
+     suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
-    private suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
+     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
-    private suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
+     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
 
