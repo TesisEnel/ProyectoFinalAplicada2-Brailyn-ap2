@@ -70,6 +70,10 @@ fun RentaScreen(
 ) {
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
+    val cliente = FirebaseAuth.getInstance().currentUser?.email
+    LaunchedEffect(Unit) {
+        rentaViewModel.onEvent(RentaEvent.PrepareRentaData(cliente,vehiculoId))
+    }
 
     RentaBodyScreen(
         rentaUiState = rentaUiState,
