@@ -51,5 +51,20 @@ class RentaRepository @Inject constructor(
         }
     }
 
+    fun updateRenta(rentaDto: RentaDto): Flow<Resource<RentaDto>> = flow {
+        try {
+            emit(Resource.Loading())
+            val renta = rentCarRemoteDataSource.updateRenta(rentaDto.rentaId?:0,rentaDto)
+            rentaDao.update(renta.toEntity())
+            emit(Resource.Success(renta))
+        }
+        catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        }
+        catch (e: Exception) {
+            emit(Resource.Error("Error, favor verificar conexión a internet"))
+        }
+    }
+
 
 }
