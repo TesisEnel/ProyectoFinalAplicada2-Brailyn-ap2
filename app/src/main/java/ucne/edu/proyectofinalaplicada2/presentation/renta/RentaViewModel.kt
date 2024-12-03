@@ -221,13 +221,18 @@ class RentaViewModel @Inject constructor(
                     )
                 }
             }
+            val renta = _uistate.value.rentas.find { it.vehiculoId == vehiculoId }
             _uistate.update {
                 it.copy(
                     vehiculoNombre = uistate.value.marca?.nombreMarca,
                     vehiculoId = uistate.value.vehiculo?.vehiculoId,
                     vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
                     vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
-                    vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo
+                    vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo,
+                    fechaRenta = renta?.fechaRenta?:"",
+                    fechaEntrega = renta?.fechaEntrega,
+                    total = renta?.total
+
                 )
             }
         }
