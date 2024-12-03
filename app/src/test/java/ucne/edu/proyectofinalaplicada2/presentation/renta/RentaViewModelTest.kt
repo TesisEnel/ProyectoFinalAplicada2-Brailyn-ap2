@@ -155,7 +155,42 @@ class RentaViewModelTest{
         val result = viewModel.getTipoVehiculoById(1)
         assertEquals(tipoVehiculo, result)
 
+    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `Should prepare data for rent`() = runTest {
+        val emailCliente = "test@example.com"
+        val vehiculoId = 1
+
+        val cliente = ClienteDto(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
+        val vehiculo = VehiculoEntity(vehiculoId, 1, 1, 1, 1, 2000, "Vehículo Test", 2022, emptyList(), 1, false)
+        val marca = MarcaEntity(1, "Toyota")
+        val modelo = ModeloEntity(1, 1,"Corolla")
+        val tipoCombustible = TipoCombustibleEntity(1, "Gasolina")
+        val tipoVehiculo = TipoVehiculoEntity(1, "Sedán")
+
+        coEvery { clienteRepository.getClienteByEmail(emailCliente) } returns Resource.Success(cliente)
+        coEvery { vehiculoRepository.getVehiculoById(vehiculoId) } returns Resource.Success(vehiculo)
+        coEvery { marcaRepository.getMarcaById(1) } returns Resource.Success(marca)
+        coEvery { modeloRepository.getModelosById(1) } returns Resource.Success(modelo)
+        coEvery { tipoCombustibleRepository.getTipoCombustibleById(1) } returns Resource.Success(tipoCombustible)
+        coEvery { tipoVehiculoRepository.getTipoVehiculoById(1) } returns Resource.Success(tipoVehiculo)
+
+        viewModel.prepareRentaData(emailCliente, vehiculoId)
+        advanceUntilIdle()
+
+        val uiState = viewModel.uistate.value
+        assertEquals(cliente.clienteId, uiState.clienteId)
+        assertEquals(vehiculo, uiState.vehiculo)
+        assertEquals(marca, uiState.marca)
+        assertEquals(modelo, uiState.modelo)
+        assertEquals(tipoCombustible, uiState.tipoCombustibleEntity)
+        assertEquals(tipoVehiculo, uiState.tipoVehiculoEntity)
+        assertEquals(marca.nombreMarca, uiState.vehiculoNombre)
+        assertEquals(modelo.modeloVehiculo, uiState.vehiculoModelo)
+        assertEquals(tipoCombustible.nombreTipoCombustible, uiState.vehiculoConCombustible)
+        assertEquals(tipoVehiculo.nombreTipoVehiculo, uiState.vehiculoConTipo)
     }
 
 }

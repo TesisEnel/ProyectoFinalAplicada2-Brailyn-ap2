@@ -167,7 +167,7 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
+    fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
         viewModelScope.launch {
 
             val cliente = getClienteByEmail(emailCliente ?: "")
