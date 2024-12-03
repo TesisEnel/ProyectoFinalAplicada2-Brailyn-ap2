@@ -14,7 +14,6 @@ data class VehiculoDto(
     val anio: Int?,
     val imagePath: List<String?>?,
     val proveedorId: Int?,
-    val marca: MarcaEntity?,
     val estaRentado: Boolean?,
 )
 
