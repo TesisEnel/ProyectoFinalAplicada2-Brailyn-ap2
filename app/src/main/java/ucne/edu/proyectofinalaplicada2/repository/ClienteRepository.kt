@@ -74,8 +74,13 @@ class ClienteRepository @Inject constructor(
         }
     }
 
-    suspend fun isAdminUser(email: String): Boolean? {
-        return getClienteByEmail(email).data?.isAdmin
+    suspend fun getClienteById(id: Int): Resource<ClienteEntity?> {
+        return try {
+            val cliente = clienteDao.find(id)
+            Resource.Success(cliente)
+        } catch (e: Exception) {
+            Resource.Error("Error desconocido ${e.message}")
+        }
     }
 
 }
