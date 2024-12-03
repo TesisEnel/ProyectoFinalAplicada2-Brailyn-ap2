@@ -1,7 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-
 sealed interface RentaEvent {
     data object Save : RentaEvent
     data class OnchangeClienteId(val clienteId: Int) : RentaEvent
