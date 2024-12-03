@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ClienteEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
@@ -49,5 +50,6 @@ data class RentaConVehiculo(
     val renta: RentaEntity? = null,
     val marca: MarcaEntity? = null,
     val anio: Int? = null,
-    val vehiculoEntity: VehiculoEntity? = null
+    val vehiculoEntity: VehiculoEntity? = null,
+    val clienteEntity: ClienteEntity? = null
 )

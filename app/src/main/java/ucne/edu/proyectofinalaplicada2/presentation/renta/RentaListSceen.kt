@@ -114,7 +114,7 @@ fun ExpandableCard(
         ExpandableBodyCard(
             isExpanded = isExpanded == index,
             onCardArrowClick = { isExpanded = if (isExpanded == index) null else index },
-            rentaConVehiculo = renta
+            rentaConVehiculo = renta,
         )
     }
 }
@@ -123,8 +123,10 @@ fun ExpandableCard(
 fun ExpandableBodyCard(
     isExpanded: Boolean,
     onCardArrowClick: () -> Unit,
-    rentaConVehiculo: RentaConVehiculo
+    rentaConVehiculo: RentaConVehiculo,
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
+    val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -166,7 +168,7 @@ fun ExpandableBodyCard(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                     Text(
-                        text = "Renta: ${rentaConVehiculo.renta?.fechaRenta} \nEntrega: ${rentaConVehiculo.renta?.fechaEntrega} ",
+                        text = "Renta: ${rentaConVehiculo.renta?.fechaRenta} \nEntrega: ${rentaConVehiculo.renta?.fechaEntrega} ${if(authUiState.isAdmin) " Cliente: ${rentaConVehiculo.clienteEntity?.nombre} ${rentaConVehiculo.clienteEntity?.apellido}" else ""}",
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
