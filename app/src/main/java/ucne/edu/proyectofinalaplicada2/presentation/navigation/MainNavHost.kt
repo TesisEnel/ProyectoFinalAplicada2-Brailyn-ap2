@@ -275,7 +275,9 @@ fun NavHostContent(
             }
             composable<Screen.RentaListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                RentaListSceen()
+                RentaListSceen(
+                    onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
+                )
             }
             composable<Screen.FiltraVehiculo> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
