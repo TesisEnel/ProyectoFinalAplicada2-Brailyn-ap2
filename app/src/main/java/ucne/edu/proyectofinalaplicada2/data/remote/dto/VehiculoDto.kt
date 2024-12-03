@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.data.remote.dto
 
-import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 
 data class VehiculoDto(
