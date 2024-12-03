@@ -181,7 +181,7 @@ fun TopBar(
                 Text(
                     text = currentTitle,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontFamily = FontFamily.Serif,
                     modifier = Modifier.padding(top = 20.dp)
                 )
@@ -191,7 +191,7 @@ fun TopBar(
                         Icon(
                             Icons.Filled.Person,
                             contentDescription = "Perfil",
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = Color.White,
                             modifier = Modifier.padding(top = 20.dp)
                         )
                     }
@@ -243,7 +243,7 @@ fun NavHostContent(
                         navHostController.navigate(Screen.FiltraVehiculo)
                     },
                     onGoRenta = {
-                        navHostController.navigate(Screen.RentaScreen(it))
+                        navHostController.navigate(Screen.RentaScreen(it,0))
                     }
                 )
             }
@@ -268,7 +268,7 @@ fun NavHostContent(
                 val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
                 TipoModeloListListScreen(
                     onGoRenta = { vehiculoId ->
-                        navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                        navHostController.navigate(Screen.RentaScreen(vehiculoId,0))
                     },
                     marcaId = id,
                     onGoEdit = { vehiculoId ->
@@ -278,21 +278,23 @@ fun NavHostContent(
             }
             composable<Screen.RentaScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                val id = it.toRoute<Screen.RentaScreen>().id
+                val (vehiculoId, rentaId) = it.toRoute<Screen.RentaScreen>()
+
                 RentaScreen(
-                    vehiculoId = id
+                    vehiculoId = vehiculoId,
+                    rentaId = rentaId,
                 )
             }
             composable<Screen.RentaListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 RentaListSceen(
-                    onGoEdit = { navHostController.navigate(Screen.RentaScreen(it)) },
+                    onGoEdit = {vehiculoId, rentaId -> navHostController.navigate(Screen.RentaScreen(vehiculoId, rentaId)) },
                 )
             }
             composable<Screen.FiltraVehiculo> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 FiltraVehiculo(
-                    onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
+                    onGoRenta = { navHostController.navigate(Screen.RentaScreen(it, 0)) },
                     onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
                 )
             }
