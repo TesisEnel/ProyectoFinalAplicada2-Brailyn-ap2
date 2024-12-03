@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ClienteEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
@@ -46,7 +46,7 @@ class RentaViewModel @Inject constructor(
         getRentas()
     }
 
-    private fun getRentas() {
+    fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
 
@@ -82,7 +82,7 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    private fun save(rentaDto: RentaDto) {
+    fun save(rentaDto: RentaDto) {
         viewModelScope.launch {
             val renta = rentaRepository.addRenta(rentaDto)
             renta.collect { result ->
@@ -167,7 +167,7 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
+    fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
         viewModelScope.launch {
 
             val cliente = getClienteByEmail(emailCliente ?: "")
@@ -178,7 +178,7 @@ class RentaViewModel @Inject constructor(
                     )
                 }
             }
-            val vehiculo = getvehiculoById(vehiculoId)
+            val vehiculo = getVehiculoById(vehiculoId)
             if (vehiculo != null) {
                 _uistate.update {
                     it.copy(
@@ -230,27 +230,25 @@ class RentaViewModel @Inject constructor(
             }
         }
     }
-    private suspend fun getVehiculoById(id: Int): VehiculoEntity? {
+    suspend fun getVehiculoById(id: Int): VehiculoEntity? {
         return vehiculoRepository.getVehiculoById(id).data
     }
-    private suspend fun getClienteByEmail(email: String): ClienteDto? {
+    suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
 
-    private suspend fun getvehiculoById(id: Int): VehiculoEntity? {
-        return vehiculoRepository.getVehiculoById(id).data
-    }
 
-    private suspend fun getMarcaById(id: Int): MarcaEntity? {
+
+     suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
-    private suspend fun getModeloById(id: Int): ModeloEntity? {
+     suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
-    private suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
+     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
-    private suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
+     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
 

@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.authentication
 
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ClienteEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
 
 
@@ -16,7 +17,7 @@ data class ClienteUiState(
     val apellidos: String = "",
     val direccion: String = "",
     val celular: String = "",
-    val clientes: List<ClienteDto> = emptyList(),
+    val clientes: List<ClienteEntity> = emptyList(),
     val errorNombre: String = "",
     val errorCedula: String = "",
     val errorApellidos: String = "",
