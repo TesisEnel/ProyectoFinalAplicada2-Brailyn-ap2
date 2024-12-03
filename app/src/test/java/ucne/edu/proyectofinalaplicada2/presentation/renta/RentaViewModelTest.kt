@@ -13,6 +13,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import ucne.edu.proyectofinalaplicada2.data.local.entities.ClienteEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.MarcaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
@@ -116,7 +117,7 @@ class RentaViewModelTest{
 
     @Test
     fun `Should return a client entity by email`() = runTest {
-        val cliente = ClienteDto(1, "12122", "Enmanuel", "Vasquez", "calle mencia", "12121", "braylin@gmail.com", true )
+        val cliente = ClienteEntity(1, "12122", "Enmanuel", "Vasquez", "calle mencia", "12121", "braylin@gmail.com", true )
         coEvery { clienteRepository.getClienteByEmail("braylin@gmail.com") } returns Resource.Success(cliente)
 
         val result =viewModel.getClienteByEmail("braylin@gmail.com")
@@ -163,7 +164,7 @@ class RentaViewModelTest{
         val emailCliente = "braylin@gmail.com"
         val vehiculoId = 1
 
-        val cliente = ClienteDto(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
+        val cliente = ClienteEntity(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
         val vehiculo = VehiculoEntity(vehiculoId, 1, 1, 1, 1, 2000, "Vehículo Test", 2022, emptyList(), 1, false)
         val marca = MarcaEntity(1, "Toyota")
         val modelo = ModeloEntity(1, 1,"Corolla")
