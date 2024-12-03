@@ -1,18 +1,18 @@
 package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
@@ -34,13 +34,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,7 +69,7 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 fun MainNavHost(
     navHostController: NavHostController,
     mainViewModel: NavHostViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val roleFlow = authViewModel.roleFlow
@@ -79,7 +82,6 @@ fun MainNavHost(
         onAuthEvent = { event -> authViewModel.onEvent(event) },
     )
 }
-
 
 @SuppressLint("NewApi")
 @Composable
@@ -96,15 +98,18 @@ fun MainBodyNavHost(
     var showMenu by remember { mutableStateOf(false) }
     val backStackEntry by navHostController.currentBackStackEntryAsState()
 
-    if(!isRoleVerified){
+    if (!isRoleVerified) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator()
         }
-    }else{
+    } else {
         Scaffold(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background), // Fondo general
             bottomBar = {
                 NavigationBar(
                     navHostController = navHostController,
@@ -114,189 +119,183 @@ fun MainBodyNavHost(
                 )
             },
             topBar = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .clip(
-                            RoundedCornerShape(
-                                bottomEnd = 45.dp,
-                                bottomStart = 45.dp
-                            )
-                        )
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp, end = 16.dp, start = 16.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-
-                        ) {
-                            AnimatedText(
-                                text = uiState.currentTitle,
-                                modifier = Modifier
-                            )
-                        }
-                        Row {
-                            IconButton(onClick = { showMenu = !showMenu }) {
-                                Icon(Icons.Filled.Person, contentDescription = "Sign Out")
-                            }
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Sign Out") },
-                                    onClick = {
-                                        onAuthEvent(AuthEvent.ClearData)
-                                        FirebaseAuth.getInstance().signOut()
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Settings") },
-                                    onClick = {
-                                        navHostController.navigate(Screen.Settings)
-                                    }
-                                )
-
-                            }
-                        }
-                    }
-                }
+                TopBar(
+                    currentTitle = uiState.currentTitle,
+                    showMenu = showMenu,
+                    onToggleMenu = { showMenu = !showMenu },
+                    onSignOut = {
+                        onAuthEvent(AuthEvent.ClearData)
+                        FirebaseAuth.getInstance().signOut()
+                    },
+                    onNavigateSettings = { navHostController.navigate(Screen.Settings) }
+                )
             },
-
-            ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                NavHost(
-                    navController = navHostController,
-                    startDestination = Screen.Home
-                ) {
-                    composable<Screen.Home> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Home(
-                            onGoVehiculeList = {
-                                navHostController.navigate(Screen.TipoVehiculoListScreen(it))
-                            },
-                            onGoSearch = {
-                                navHostController.navigate(Screen.FiltraVehiculo)
-                            },
-                            onGoRenta = {
-                                navHostController.navigate(Screen.RentaScreen(it))
-                            }
-                        )
-                    }
-
-                    composable<Screen.VehiculoRegistroScreen> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(12.dp)
-                        ) {
-                            VehiculoRegistroScreen(
-                                vehiculoId = id ?: 0,
-                            )
-                        }
-                    }
-                    composable<Screen.TipoVehiculoListScreen> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-
-                        val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
-                        TipoModeloListListScreen(
-                            onGoRenta = { vehiculoId ->
-                                navHostController.navigate(Screen.RentaScreen(vehiculoId))
-                            },
-                            marcaId = id,
-                            onGoEdit = {vehiculoId -> navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId)) },
-                        )
-
-                    }
-
-                    composable<Screen.RentaScreen> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        val id = it.toRoute<Screen.RentaScreen>().id
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            RentaScreen(
-                                vehiculoId = id
-                            )
-                        }
-
-                    }
-                    composable<Screen.RentaListScreen> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-
-                        RentaListSceen()
-
-                    }
-                    composable<Screen.FiltraVehiculo> {
-                        onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            FiltraVehiculo(
-                                onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
-                                onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
-                            )
-                        }
-                    }
-                    composable<Screen.Settings> {
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
-                            SettingUser(
-                                goToBack = { navHostController.popBackStack() }
-                            )
-                        }
-                    }
-                }
+            content = { innerPadding ->
+                NavHostContent(
+                    navHostController = navHostController,
+                    innerPadding = innerPadding,
+                    onEvent = onEvent,
+                    backStackEntry = backStackEntry
+                )
             }
-
-        }
+        )
     }
-    }
-
-
+}
 
 @Composable
-fun AnimatedText(text: String, modifier: Modifier = Modifier) {
-    var displayedText by remember { mutableStateOf("") }
-    LaunchedEffect(text) {
-        displayedText = ""
-        text.forEachIndexed { index, _ ->
-            displayedText = text.substring(0, index + 1)
-            delay(30)
+fun TopBar(
+    currentTitle: String,
+    showMenu: Boolean,
+    onToggleMenu: () -> Unit,
+    onSignOut: () -> Unit,
+    onNavigateSettings: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF645455),
+                        Color(0xFF4A28BA)
+                    ),
+                    start = Offset(0f, 0f),
+                    end = Offset.Infinite
+                )
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = currentTitle,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontFamily = FontFamily.Serif,
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+
+                Box{
+                    IconButton(onClick = onToggleMenu) {
+                        Icon(
+                            Icons.Filled.Person,
+                            contentDescription = "Perfil",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(top = 20.dp)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = onToggleMenu,
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Sign Out") },
+                            onClick = onSignOut
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = onNavigateSettings
+                        )
+                    }
+                }
+
+            }
         }
     }
-    Text(
-        text = displayedText,
-        style = MaterialTheme.typography.titleLarge,
-        color = MaterialTheme.colorScheme.onPrimary,
-        fontSize = 20.sp,
-        modifier = modifier,
-        fontFamily = FontFamily.Serif
-    )
 }
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+fun NavHostContent(
+    navHostController: NavHostController,
+    innerPadding: PaddingValues,
+    onEvent: (MainEvent) -> Unit,
+    backStackEntry: NavBackStackEntry?,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        NavHost(
+            navController = navHostController,
+            startDestination = Screen.Home
+        ) {
+            composable<Screen.Home> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                Home(
+                    onGoVehiculeList = {
+                        navHostController.navigate(Screen.TipoVehiculoListScreen(it))
+                    },
+                    onGoSearch = {
+                        navHostController.navigate(Screen.FiltraVehiculo)
+                    },
+                    onGoRenta = {
+                        navHostController.navigate(Screen.RentaScreen(it))
+                    }
+                )
+            }
+
+            composable<Screen.VehiculoRegistroScreen> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
+                VehiculoRegistroScreen(
+                    vehiculoId = id ?: 0,
+                )
+            }
+            composable<Screen.TipoVehiculoListScreen> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
+                TipoModeloListListScreen(
+                    onGoRenta = { vehiculoId ->
+                        navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                    },
+                    marcaId = id,
+                    onGoEdit = { vehiculoId ->
+                        navHostController.navigate(Screen.VehiculoRegistroScreen(vehiculoId))
+                    },
+                )
+            }
+            composable<Screen.RentaScreen> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                val id = it.toRoute<Screen.RentaScreen>().id
+                RentaScreen(
+                    vehiculoId = id
+                )
+            }
+            composable<Screen.RentaListScreen> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                RentaListSceen()
+            }
+            composable<Screen.FiltraVehiculo> {
+                onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
+                FiltraVehiculo(
+                    onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
+                    onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
+                )
+            }
+            composable<Screen.Settings> {
+                SettingUser(
+                    goToBack = { navHostController.popBackStack() }
+                )
+            }
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
