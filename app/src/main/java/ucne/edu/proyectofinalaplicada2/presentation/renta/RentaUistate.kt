@@ -53,3 +53,11 @@ data class RentaConVehiculo(
     val vehiculoEntity: VehiculoEntity? = null,
     val clienteEntity: ClienteEntity? = null
 )
+fun RentaUistate.toDto() = RentaDto(
+    vehiculoId = vehiculoId,
+    clienteId = clienteId,
+    fechaRenta = fechaRenta,
+    fechaEntrega = fechaEntrega,
+    total = total,
+)
+
