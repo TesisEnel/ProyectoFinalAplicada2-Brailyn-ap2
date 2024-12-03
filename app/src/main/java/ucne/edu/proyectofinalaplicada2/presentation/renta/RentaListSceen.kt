@@ -42,7 +42,7 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 @Composable
 fun RentaListSceen(
     viewModel: RentaViewModel = hiltViewModel(),
-    onGoEdit: (Int) -> Unit,
+    onGoEdit: (Int,Int) -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
 
@@ -68,7 +68,7 @@ fun RentaListSceen(
 fun RentaListBodyScreen(
     uiState: RentaUistate,
     onEvent: (RentaEvent) -> Unit = {},
-    onGoEdit: (Int) -> Unit = {},
+    onGoEdit: (Int,Int) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -108,7 +108,7 @@ fun ExpandableCard(
     uiState: RentaUistate,
     authViewModel: AuthViewModel = hiltViewModel(),
     onEvent: (RentaEvent) -> Unit = {},
-    onGoEdit: (Int) -> Unit = {},
+    onGoEdit: (Int,Int) -> Unit ,
 ) {
     val rentaUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
@@ -136,7 +136,7 @@ fun ExpandableBodyCard(
     isExpanded: Boolean,
     onCardArrowClick: () -> Unit,
     rentaConVehiculo: RentaConVehiculo,
-    onGoEdit: (Int) -> Unit = {},
+    onGoEdit: (Int,Int) -> Unit ,
 ) {
     var menuExpanded by remember { mutableStateOf(false) } // Control para el menú desplegable
     val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
@@ -193,7 +193,11 @@ fun ExpandableBodyCard(
                             DropdownMenuItem(
                                 onClick = {
                                     menuExpanded = false
-                                    onGoEdit(rentaConVehiculo.renta?.vehiculoId ?: 0)
+                                    onGoEdit(
+                                        rentaConVehiculo.renta?.vehiculoId ?: 0,
+                                        rentaConVehiculo.renta?.rentaId ?: 0
+
+                                    )
                                 },
                                 text = { Text("Editar") }
                             )
@@ -231,7 +235,9 @@ fun ExpandableBodyCard(
 private fun RentaListBodyScreenPreview() {
     ProyectoFinalAplicada2Theme {
         RentaListBodyScreen(
-            uiState = RentaUistate()
+            uiState = RentaUistate(),
+            onEvent = {},
+            onGoEdit = { _, _ -> }
         )
     }
 }
