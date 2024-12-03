@@ -81,11 +81,11 @@ class RentaViewModel @Inject constructor(
         }
     }
 
-    fun save(rentaDto: RentaDto) {
+    fun save() {
         viewModelScope.launch {
             var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
             vehiculo = vehiculo?.copy(estaRentado = true)
-            val renta = rentaRepository.addRenta(rentaDto,vehiculo)
+            val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)
             renta.collect { result ->
                 when (result) {
                     is Resource.Error -> {
@@ -252,16 +252,7 @@ class RentaViewModel @Inject constructor(
     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
-    private fun createRenta() {
-        val renta = RentaDto(
-            clienteId = uistate.value.clienteId,
-            vehiculoId = uistate.value.vehiculo?.vehiculoId,
-            fechaRenta = uistate.value.fechaRenta,
-            fechaEntrega = uistate.value.fechaEntrega,
-            total = uistate.value.total
-        )
-        save(renta)
-    }
+
     private fun onChangeClienteId(clienteId: Int) {
         _uistate.update {
             it.copy(
@@ -410,14 +401,14 @@ class RentaViewModel @Inject constructor(
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
-            is RentaEvent.Save -> save(event.renta)
+            RentaEvent.Save -> save()
             is RentaEvent.CalculeTotal -> calculateTotal(
                 event.fechaRenta,
                 event.fechaEntrega,
                 event.costoDiario
             )
             is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
-            RentaEvent.ConfirmRenta -> createRenta()
+            RentaEvent.ConfirmRenta -> save()
             RentaEvent.CloseModal -> closeModal()
             is RentaEvent.MostraDatosVehiculoByRole -> mostrarDatosVehiculoByRole(event.isAdmin)
             RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()

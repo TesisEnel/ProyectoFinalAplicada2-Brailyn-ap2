@@ -10,13 +10,11 @@ import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
-    private val rentCarRemoteDataSource: RentCarRemoteDataSource // Inyectamos el repositorio de cliente
 ) {
 
-    // Login con Flow
     fun login(email: String, password: String): Flow<Resource<AuthState>> = flow {
         if (email.isBlank() || password.isBlank()) {
-            emit(Resource.Error("Email or password can't be empty"))
+            emit(Resource.Error("Email o contraseña no pueden estar vacíos"))
             return@flow
         }
 
@@ -34,14 +32,14 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Error("User is null after successful authentication"))
             }
         } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Invalid email or password"))
+            emit(Resource.Error( "Email o contraseña incorrectos"))
         }
     }
 
-    // Signup con Flow
+
     fun signup(email: String, password: String): Flow<Resource<AuthState>> = flow {
         if (email.isBlank() || password.isBlank()) {
-            emit(Resource.Error("Email or password can't be empty"))
+            emit(Resource.Error("No pueden estar vacíos"))
             return@flow
         }
 
@@ -60,11 +58,10 @@ class AuthRepository @Inject constructor(
                 emit(Resource.Error("User is null after successful registration"))
             }
         } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Signup failed"))
+            emit(Resource.Error( "Registro fallido"))
         }
     }
 
-    // Signout
     fun signout(): Flow<Resource<AuthState>> = flow {
         emit(Resource.Loading())
         try {

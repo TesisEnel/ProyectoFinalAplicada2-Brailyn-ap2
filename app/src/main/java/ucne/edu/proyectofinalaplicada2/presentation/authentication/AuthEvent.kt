@@ -18,5 +18,6 @@ sealed interface AuthEvent {
     data class UpdateUsuario(val email: String): AuthEvent
     data object UpdateClient: AuthEvent
     data object ClearData: AuthEvent
+    data object ClearError: AuthEvent
 
 }
