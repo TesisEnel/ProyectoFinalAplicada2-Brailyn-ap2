@@ -25,5 +25,9 @@ interface ClienteDao {
     @Query("SELECT * FROM Clientes")
     suspend fun getAll(): List<ClienteEntity>
 
+    @Query("SELECT * FROM Clientes WHERE email = :email")
+    suspend fun getClienteByEmail(email: String): ClienteEntity?
+
+
 
 }
