@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
@@ -249,9 +251,17 @@ fun NavHostContent(
             composable<Screen.VehiculoRegistroScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
-                VehiculoRegistroScreen(
-                    vehiculoId = id ?: 0,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ){
+                    VehiculoRegistroScreen(
+                        vehiculoId = id ?: 0,
+                    )
+                }
+
+
             }
             composable<Screen.TipoVehiculoListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
@@ -276,7 +286,7 @@ fun NavHostContent(
             composable<Screen.RentaListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 RentaListSceen(
-                    onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
+                    onGoEdit = { navHostController.navigate(Screen.RentaScreen(it)) },
                 )
             }
             composable<Screen.FiltraVehiculo> {
