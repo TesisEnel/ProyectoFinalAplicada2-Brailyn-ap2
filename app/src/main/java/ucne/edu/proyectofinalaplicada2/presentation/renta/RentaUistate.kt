@@ -35,13 +35,14 @@ data class RentaUistate(
     val vehiculoConTipo: String? = null,
     val vehiculo: VehiculoEntity? = null,
     val cliente: ClienteDto? = null,
-    val renta: RentaDto? = null,
+    val renta: RentaEntity? = null,
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val modelos: List<ModeloDto> = emptyList(),
     val rentaConVehiculos: List<RentaConVehiculo> = emptyList(),
     val rentaConVehiculo: RentaConVehiculo? = null,
-    val showModal: Boolean = false, // Control del modal
-    val fechaValida: Boolean = false
+    val showModal: Boolean = false,
+    val fechaValida: Boolean = false,
+    val costoAdicional: Double = 0.0,
 
     )
 
@@ -52,4 +53,13 @@ data class RentaConVehiculo(
     val anio: Int? = null,
     val vehiculoEntity: VehiculoEntity? = null,
     val clienteEntity: ClienteEntity? = null
+)
+
+fun RentaUistate.toDto() = RentaDto(
+    rentaId = rentaId,
+    clienteId = clienteId,
+    vehiculoId = vehiculoId,
+    fechaRenta = fechaRenta,
+    fechaEntrega = fechaEntrega,
+    total = total
 )
