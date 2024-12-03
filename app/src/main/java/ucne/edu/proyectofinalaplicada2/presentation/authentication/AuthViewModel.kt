@@ -92,14 +92,14 @@ class AuthViewModel @Inject constructor(
                 _isRoleVerified.value = false
                 val user = googleAuthClient.signInAndGetUser()
                 handleUserSignIn(user)
-                val isAdmin =isAdminUser(user?.email ?: "")
+                val isAdmin = isAdminUser(user?.email ?: "")
                 if (user != null) {
-                    async { saveUserData(user.email?:"", isAdmin) }.await()
+                    async { saveUserData(user.email ?: "", isAdmin) }.await()
                 } else {
                     _uistate.update {
                         it.copy(
                             isLoading = false,
-                            error = "No se pudo iniciar sesión."
+                            error = "No se pudo iniciar sesión, favor verificar su conexión a internet."
                         )
                     }
                 }
@@ -541,6 +541,15 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+    private fun clearError() {
+        _uistate.update {
+            it.copy(
+                error = "",
+            )
+        }
+    }
+
+
     fun onEvent(event: AuthEvent) {
         when (event) {
             AuthEvent.Login -> login()
@@ -559,7 +568,7 @@ class AuthViewModel @Inject constructor(
             is AuthEvent.UpdateUsuario -> updateUsuario(event.email)
             is AuthEvent.UpdateClient -> uppdateClient()
             AuthEvent.ClearData -> clearDataStore()
-
+            AuthEvent.ClearError -> clearError()
         }
     }
 
