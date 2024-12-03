@@ -160,7 +160,7 @@ class RentaViewModelTest{
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Should prepare data for rent`() = runTest {
-        val emailCliente = "test@example.com"
+        val emailCliente = "braylin@gmail.com"
         val vehiculoId = 1
 
         val cliente = ClienteDto(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
