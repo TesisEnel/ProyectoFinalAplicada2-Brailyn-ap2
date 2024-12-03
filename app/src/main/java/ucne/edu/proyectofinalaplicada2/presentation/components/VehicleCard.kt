@@ -53,9 +53,6 @@ fun VehicleCard(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
 
-
-
-
     Box {
         Card(
             modifier = Modifier
@@ -126,7 +123,6 @@ fun VehicleCard(
             }
         }
 
-        // Confirm Delete Dialog
         if (showDeleteDialog) {
             ConfirmDeleteDialog(
                 onConfirm = {
@@ -135,8 +131,6 @@ fun VehicleCard(
                         showDeleteDialog = false
                     } else {
                         showErrorDialog = true
-//                        showDeleteDialog = false
-
                     }
 
                 },
