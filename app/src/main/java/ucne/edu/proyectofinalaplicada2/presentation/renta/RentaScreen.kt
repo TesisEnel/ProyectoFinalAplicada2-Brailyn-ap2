@@ -321,9 +321,17 @@ fun RentaBodyScreen(
                         },
                         enabled = rentaUiState.errorFechaRenta.isNullOrEmpty() &&
                                 rentaUiState.errorFechaEntrega.isNullOrEmpty(),
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+
                     ) {
                         Text("Rentar Ahora")
+                    }
+                    Card(
+                        modifier = Modifier
+                            .height(70.dp)
+                    ) {
+                        Text("")
                     }
                 }
             }
