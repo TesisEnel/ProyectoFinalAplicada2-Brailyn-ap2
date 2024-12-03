@@ -122,11 +122,13 @@ class RentaViewModel @Inject constructor(
                 val vehiculo = getVehiculoById(rentaEntity.vehiculoId ?: 0)
                 val marca = getMarcaById(vehiculo?.marcaId ?: 0)
                 val modelo = getModeloById(vehiculo?.modeloId ?: 0)
+                val cliente = clienteRepository.getClienteById(rentaEntity.clienteId?:0)
                 RentaConVehiculo(
                     marca = marca,
                     renta = rentaEntity,
                     nombreModelo = modelo?.modeloVehiculo,
-                    anio = vehiculo?.anio
+                    anio = vehiculo?.anio,
+                    clienteEntity = cliente.data
                 )
             }
             _uistate.update {
@@ -236,8 +238,6 @@ class RentaViewModel @Inject constructor(
     suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
-
-
 
      suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
