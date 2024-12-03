@@ -64,7 +64,6 @@ fun VehiculoUistate.toEntity()= VehiculoDto(
     anio = anio,
     imagePath = imagePath,
     proveedorId = proveedorId,
-    marca = marca,
     estaRentado = estaRentado
 
 
