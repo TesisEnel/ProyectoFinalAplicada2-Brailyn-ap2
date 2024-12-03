@@ -48,10 +48,10 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
-import ucne.edu.proyectofinalaplicada2.Converter
 import ucne.edu.proyectofinalaplicada2.presentation.components.CardInfo
 import ucne.edu.proyectofinalaplicada2.presentation.components.ConfirmRentaDialog
 import ucne.edu.proyectofinalaplicada2.presentation.components.DatePickerPopup
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -61,13 +61,10 @@ fun RentaScreen(
     rentaViewModel: RentaViewModel = hiltViewModel(),
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
     vehiculoId: Int,
+    rentaId: Int,
 ) {
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    val cliente = FirebaseAuth.getInstance().currentUser?.email
-    LaunchedEffect(Unit) {
-        rentaViewModel.onEvent(RentaEvent.PrepareRentaData(cliente,vehiculoId))
-    }
 
     if (vehiculoUiState.isLoading == true) {
         Box(
@@ -83,7 +80,8 @@ fun RentaScreen(
             rentaUiState = rentaUiState,
             vehiculoUiState = vehiculoUiState,
             vehiculoId = vehiculoId,
-            onEvent = { rentaEvent -> rentaViewModel.onEvent(rentaEvent) }
+            onEvent = { rentaEvent -> rentaViewModel.onEvent(rentaEvent) },
+            rentaId = rentaId
         )
     }
 }
@@ -94,35 +92,29 @@ fun RentaBodyScreen(
     rentaUiState: RentaUistate,
     vehiculoUiState: VehiculoUistate,
     vehiculoId: Int,
-    onEvent: (RentaEvent) -> Unit = {}
+    rentaId: Int,
+    onEvent: (RentaEvent) -> Unit = {},
 ) {
     val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
     var showDatePickerRenta by remember { mutableStateOf(false) }
     val datePickerStateRenta = rememberDatePickerState()
+    val emailCliente = FirebaseAuth.getInstance().currentUser?.email
 
-
-    LaunchedEffect(Unit) {
-        val emailCliente = FirebaseAuth.getInstance().currentUser?.email
-        onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId))
-    }
-
-
-    LaunchedEffect(datePickerStateRenta.selectedDateMillis) {
-        handleDatePickerResult(
-            datePickerStateRenta.selectedDateMillis
-        ) { selectedDate ->
-            onEvent(RentaEvent.OnchangeFechaRenta(selectedDate))
-            showDatePickerRenta = false
+    LaunchedEffect( datePickerStateEntrega.selectedDateMillis) {
+        val entregaDateMillis = datePickerStateEntrega.selectedDateMillis
+        if (entregaDateMillis != null) {
+            onEvent(RentaEvent.HandleDatePickerResult(entregaDateMillis, isStartDate = false))
+            showDatePickerEntrega = false
         }
     }
-    LaunchedEffect(datePickerStateEntrega.selectedDateMillis) {
-        handleDatePickerResult(
-            datePickerStateEntrega.selectedDateMillis
-        ) { selectedDate ->
-            onEvent(RentaEvent.OnchangeFechaEntrega(selectedDate))
-            showDatePickerEntrega = false
+    LaunchedEffect(vehiculoId) {
+        if(rentaId>0){
+            onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId,rentaId))
+        }
+        else{
+            onEvent(RentaEvent.PrepareRentaData(emailCliente, vehiculoId,0))
         }
     }
 
@@ -242,7 +234,7 @@ fun RentaBodyScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
                                 value = rentaUiState.fechaRenta,
-                                onValueChange = {},
+                                onValueChange = {onEvent(RentaEvent.OnchangeFechaRenta(it))},
                                 label = { Text("Renta") },
                                 trailingIcon = {
                                     IconButton(onClick = { showDatePickerRenta = !showDatePickerRenta }) {
@@ -252,7 +244,8 @@ fun RentaBodyScreen(
                                         )
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                readOnly = true
                             )
                             rentaUiState.errorFechaRenta?.let { error ->
                                 Text(
@@ -283,7 +276,9 @@ fun RentaBodyScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
                                 value = rentaUiState.fechaEntrega ?: "",
-                                onValueChange = { onEvent(RentaEvent.OnchangeFechaEntrega(it)) },
+                                onValueChange = {
+                                    onEvent(RentaEvent.OnchangeFechaEntrega(it))
+                                },
                                 label = { Text("Entrega") },
                                 trailingIcon = {
                                     IconButton(onClick = { showDatePickerEntrega = !showDatePickerEntrega }) {
@@ -329,7 +324,7 @@ fun RentaBodyScreen(
                             .align(Alignment.CenterHorizontally)
 
                     ) {
-                        Text("Rentar Ahora")
+                        Text(text = if(vehiculoId> 0) "Actualizar" else "Rentar")
                     }
                     Card(
                         modifier = Modifier
@@ -345,20 +340,28 @@ fun RentaBodyScreen(
                 rentaUiState = rentaUiState,
                 vehiculo = vehiculo,
                 onConfirm = {
-                    onEvent(RentaEvent.ConfirmRenta)
-                    onEvent(RentaEvent.CloseModal)
+                    if(vehiculoId > 0){
+                        onEvent(RentaEvent.UpdateRenta)
+                        onEvent(RentaEvent.CloseModal)
+
+                    }else{
+                        onEvent(RentaEvent.ConfirmRenta)
+                        onEvent(RentaEvent.CloseModal)
+                    }
+
                 },
                 onDismiss = { onEvent(RentaEvent.CloseModal) },
+                rentaId = rentaId
             )
         }
-    }
-}
-fun handleDatePickerResult(
-    selectedDateMillis: Long?,
-    onDateSelected: (String) -> Unit,
-) {
-    selectedDateMillis?.let { millis ->
-        val selectedDate = Converter().convertToDate(millis)
-        onDateSelected(selectedDate)
+        if(rentaUiState.success?.isNotEmpty() == true){
+            CustomDialog(
+                message = rentaUiState.success,
+                isError = false,
+                onDismiss = {
+                    onEvent(RentaEvent.ClearSuccess)
+                }
+            )
+        }
     }
 }
