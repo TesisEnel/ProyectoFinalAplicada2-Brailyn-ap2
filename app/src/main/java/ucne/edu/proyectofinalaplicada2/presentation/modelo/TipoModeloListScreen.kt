@@ -118,7 +118,9 @@ fun TipoModeloLazyColumn(
                 onGoRenta = onGoRenta,
                 onGoEdit = onGoEdit,
                 isAdmin = uistate.value.isAdmin,
-                onEvent = onVehiculoEvent
+                onEvent = onVehiculoEvent,
+                estado = if (modelo.vehiculo.estaRentado == true) "No disponible" else "Disponible",
+                isRentado = modelo.vehiculo.estaRentado ?: false
             )
         }
     }
