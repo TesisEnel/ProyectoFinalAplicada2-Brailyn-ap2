@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass

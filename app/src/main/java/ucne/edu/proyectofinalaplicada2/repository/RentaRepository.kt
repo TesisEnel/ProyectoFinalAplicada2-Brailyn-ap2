@@ -11,7 +11,6 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.toVehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
