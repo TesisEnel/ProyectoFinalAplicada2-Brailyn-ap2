@@ -381,6 +381,7 @@ class VehiculoViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        getVehiculos()
                     }
 
                 }
