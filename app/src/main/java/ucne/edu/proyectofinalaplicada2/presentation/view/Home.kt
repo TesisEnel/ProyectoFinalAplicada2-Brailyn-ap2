@@ -144,7 +144,7 @@ fun ListaDeVehiculos(
         modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
     ) {
         Text(
-            text = "Vehiculos",
+            text = "Vehículos",
             fontFamily = FontFamily.Serif,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
