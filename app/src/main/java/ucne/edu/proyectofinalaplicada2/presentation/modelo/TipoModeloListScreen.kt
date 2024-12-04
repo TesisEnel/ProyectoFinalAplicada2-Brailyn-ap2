@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
+import ucne.edu.proyectofinalaplicada2.presentation.components.FiltroBotones
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
@@ -28,18 +31,21 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 fun TipoModeloListListScreen(
     modeloViewModel: ModeloViewModel = hiltViewModel(),
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     onGoRenta: (Int) -> Unit,
     marcaId: Int,
     onGoEdit: (Int) -> Unit,
 ) {
     val uiState by modeloViewModel.uistate.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     TipoModeloBodyListScreen(
         modeloUistate = uiState,
         marcaId = marcaId,
         onGoRenta = onGoRenta,
         onEvent = { event -> modeloViewModel.onEvent(event) },
         onGoEdit = onGoEdit,
-        onVehiculoEvent = { event -> vehiculoViewModel.onEvent(event) }
+        onVehiculoEvent = { event -> vehiculoViewModel.onEvent(event) },
+        authUiState = authUiState
     )
 }
 
@@ -50,8 +56,17 @@ fun TipoModeloBodyListScreen(
     onGoRenta: (Int) -> Unit,
     onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
-    onVehiculoEvent: (VehiculoEvent) -> Unit
+    onVehiculoEvent: (VehiculoEvent) -> Unit,
+    authUiState: ClienteUiState
 ) {
+    if (authUiState.isDataLoaded) {
+        LaunchedEffect(authUiState.isAdmin) {
+
+            if (!modeloUistate.isDataLoaded) {
+                onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId, authUiState.isAdmin))
+            }
+        }
+    }
     if (modeloUistate.isLoading) {
         CircularProgressIndicator()
     } else {
@@ -72,13 +87,17 @@ fun TipoModeloBodyListScreen(
                 fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
+            if(authUiState.isAdmin){
+                FiltroBotones(
+                    onEvent = onEvent
+                )
+            }
             TipoModeloLazyColumn(
                 modeloUistate = modeloUistate,
                 onGoRenta = onGoRenta,
-                marcaId = marcaId,
-                onEvent = onEvent,
                 onGoEdit = onGoEdit,
-                onVehiculoEvent = onVehiculoEvent
+                onVehiculoEvent = onVehiculoEvent,
+                authUistate = authUiState
             )
         }
     }
@@ -90,16 +109,13 @@ fun TipoModeloBodyListScreen(
 fun TipoModeloLazyColumn(
     modeloUistate: ModeloUistate,
     onGoRenta: (Int) -> Unit,
-    marcaId: Int,
-    onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
-    authViewModel: AuthViewModel = hiltViewModel(),
+    authUistate: ClienteUiState,
     onVehiculoEvent: (VehiculoEvent) -> Unit
-    ) {
-    val uistate = authViewModel.uistate.collectAsStateWithLifecycle()
-    if (!modeloUistate.isDataLoaded) {
-        onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId))
-    }
+) {
+
+
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -107,7 +123,7 @@ fun TipoModeloLazyColumn(
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        items(modeloUistate.modeloConVehiculos) { modelo ->
+        items(modeloUistate.listaFiltrada) { modelo ->
             VehicleCard(
                 imageUrl = Constant.URL_BLOBSTORAGE + modelo.vehiculo.imagePath?.firstOrNull(),
                 vehicleName = modelo.nombreModelo,
@@ -115,9 +131,9 @@ fun TipoModeloLazyColumn(
                 vehiculoId = modelo.vehiculo.vehiculoId ?: 0,
                 onGoRenta = onGoRenta,
                 onGoEdit = onGoEdit,
-                isAdmin = uistate.value.isAdmin,
+                isAdmin = authUistate.isAdmin,
                 onEvent = onVehiculoEvent,
-                estado = if (modelo.vehiculo.estaRentado == true) "No disponible" else "Disponible",
+                estado = if (modelo.vehiculo.estaRentado == true) "Rentado" else "Disponible",
                 isRentado = modelo.vehiculo.estaRentado ?: false
             )
         }

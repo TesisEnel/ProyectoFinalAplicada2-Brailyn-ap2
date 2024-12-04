@@ -30,7 +30,7 @@ class MarcaRepository @Inject constructor(
         }
     }
 
-    suspend fun getMarcaById(id: Int): Resource<MarcaEntity?>{
+    suspend fun getMarcaById(id: Int?): Resource<MarcaEntity?>{
         return try {
             val marca = marcaDao.getByMarcaIdId(id)
             Resource.Success(marca)

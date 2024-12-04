@@ -65,7 +65,7 @@ class VehiculoRepository @Inject constructor(
         }
     }
 
-    fun getListVehiculosByMarcaId(marcaId: Int): Flow<Resource<List<VehiculoEntity>>> = flow {
+    fun getListVehiculosByMarcaId(marcaId: Int?): Flow<Resource<List<VehiculoEntity>>> = flow {
         try {
             emit(Resource.Loading())
             val vehiculos = vehiculoDao.getListVehiculosByMarcaId(marcaId).firstOrNull()

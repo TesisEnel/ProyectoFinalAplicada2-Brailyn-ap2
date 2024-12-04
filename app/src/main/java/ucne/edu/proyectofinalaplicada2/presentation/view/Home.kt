@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,8 +36,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.R
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.components.ImageCard
 import ucne.edu.proyectofinalaplicada2.presentation.components.TipoVehiculoList
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant
@@ -44,12 +48,14 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 @Composable
 fun Home(
     vehiculoViewModel: VehiculoViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     onGoVehiculeList:(Int)-> Unit,
     onGoSearch: () -> Unit,
     onGoRenta: (Int) -> Unit = {}
 ) {
     val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
-    if (vehiculoUistate.isLoading == true) {
+    val authUistate by authViewModel.uistate.collectAsStateWithLifecycle()
+    if (vehiculoUistate.isLoading == true || vehiculoUistate.isLoadingData == true) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -72,7 +78,9 @@ fun Home(
             item {
                 ListaDeVehiculos(
                     vehiculoUistate = vehiculoUistate,
-                    onGoRenta = onGoRenta
+                    onGoRenta = onGoRenta,
+                    authUistate = authUistate,
+                    onEvent = { vehiculoViewModel.onEvent(it) }
                 )
             }
             item {
@@ -124,7 +132,14 @@ fun FakeSearchBar(
 fun ListaDeVehiculos(
     vehiculoUistate: VehiculoUistate,
     onGoRenta: (Int) -> Unit = {},
+    authUistate: ClienteUiState,
+    onEvent: (VehiculoEvent) -> Unit = {},
 ) {
+    if (authUistate.isDataLoaded) {
+        LaunchedEffect(authUistate.isAdmin) {
+            onEvent(VehiculoEvent.GetVehiculosFiltered(vehiculoUistate.vehiculos, authUistate.isAdmin))
+        }
+    }
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
     ) {
@@ -208,6 +223,8 @@ fun TiposDeVehiculos(
         }
     }
 }
+
+
 
 
 

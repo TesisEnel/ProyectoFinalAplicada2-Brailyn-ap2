@@ -65,13 +65,10 @@ class VehiculoViewModel @Inject constructor(
                     is Resource.Success -> {
                         _uistate.update {
                             val vehiculos = result.data ?: emptyList()
-                            val vehiculoConMarcasYModelos =
-                                transformarVehiculosConMarcasYModelos(vehiculos)
+
                             it.copy(
                                 isLoading = false,
                                 vehiculos = vehiculos,
-                                vehiculoConMarcas = vehiculoConMarcasYModelos,
-                                filteredVehiculoConMarcas = vehiculoConMarcasYModelos
                             )
                         }
                     }
@@ -81,18 +78,39 @@ class VehiculoViewModel @Inject constructor(
     }
 
 
-    private suspend fun transformarVehiculosConMarcasYModelos(vehiculos: List<VehiculoEntity>): List<VehiculoConMarca> {
-        val vehiculoConMarcas = vehiculos.map { vehiculo ->
-            val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
-            val modelo = modeloRepository.getModelosById(vehiculo.modeloId ?: 0).data
-            VehiculoConMarca(
-                nombreMarca = marca?.nombreMarca,
-                nombreModelo = modelo?.modeloVehiculo,
-                vehiculo = vehiculo,
-                estaRentado = vehiculo.estaRentado
-            )
+    private fun transformarVehiculosConMarcasYModelos(vehiculos: List<VehiculoEntity>, isAdmin: Boolean) {
+        viewModelScope.launch {
+            val vehiculoConMarcas = vehiculos.map { vehiculo ->
+                val marca = marcaRepository.getMarcaById(vehiculo.marcaId ?: 0).data
+                val modelo = modeloRepository.getModelosById(vehiculo.modeloId ?: 0).data
+                VehiculoConMarca(
+                    nombreMarca = marca?.nombreMarca,
+                    nombreModelo = modelo?.modeloVehiculo,
+                    vehiculo = vehiculo,
+                    estaRentado = vehiculo.estaRentado
+                )
+            }
+            val vehiculoNoRentados = vehiculoConMarcas.filter { it.estaRentado == false || it.estaRentado == null }
+
+            if(isAdmin){
+                _uistate.update {
+                    it.copy(
+                        vehiculoConMarcas = vehiculoConMarcas,
+                        isLoadingData = false
+                    )
+                }
+
+            }
+            else{
+                _uistate.update {
+                    it.copy(
+                        vehiculoConMarcas = vehiculoNoRentados,
+                        isLoadingData = false
+                    )
+                }
+            }
+
         }
-        return vehiculoConMarcas
 
     }
 
@@ -590,6 +608,8 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.ClearImageError -> clearImageError()
             VehiculoEvent.ClearError -> clearError()
             VehiculoEvent.ClearSuccess -> clearSuccess()
+            is VehiculoEvent.GetVehiculosFiltered -> transformarVehiculosConMarcasYModelos(event.vehiculos, event.isAdmin)
+
         }
     }
 }

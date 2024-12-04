@@ -22,7 +22,9 @@ class ModeloViewModel @Inject constructor(
     private val _uistate = MutableStateFlow(ModeloUistate())
     val uistate = _uistate.asStateFlow()
 
-    private fun getListVehiculosByMarcaId(marcaId: Int) {
+    private var selectedFilter: ModeloFilter = ModeloFilter.Todos
+
+    private fun getListVehiculosByMarcaId(marcaId: Int?=null, isAdmin:Boolean ) {
         viewModelScope.launch {
             if(_uistate.value.isDataLoaded){
                 return@launch
@@ -52,7 +54,7 @@ class ModeloViewModel @Inject constructor(
                                 isDataLoaded = true
                             )
                         }
-                        getModeloConVehiculos(marcaId)
+                        getModeloConVehiculos(marcaId,isAdmin)
                     }
                 }
             }
@@ -60,7 +62,7 @@ class ModeloViewModel @Inject constructor(
 
     }
 
-    private fun getModeloConVehiculos(marcaId: Int) {
+    private fun getModeloConVehiculos(marcaId: Int?, isAdmin:Boolean) {
         viewModelScope.launch {
             val marca = marcaRepository.getMarcaById(marcaId).data
             val modeloConVehiculos = _uistate.value.vehiculos.map { vehiculoEntity ->
@@ -68,26 +70,65 @@ class ModeloViewModel @Inject constructor(
                 ModeloConVehiculo(
                     nombreModelo = modelo?.modeloVehiculo?:"",
                     vehiculo = vehiculoEntity,
-                    marca = marca
+                    marca = marca,
+                    estaRentado = vehiculoEntity.estaRentado?:false
                 )
             }
-            _uistate.update {
-                it.copy(
-                    modeloConVehiculos = modeloConVehiculos,
-                    marca = marca
-                )
+            val modelosFiltrados = modeloConVehiculos.filter { !it.estaRentado }
+            if(isAdmin){
+                _uistate.update {
+                    it.copy(
+                        modeloConVehiculos = modeloConVehiculos,
+                        listaFiltrada = filterModelos(modeloConVehiculos),
+                        marca = marca
+                    )
+                }
+            }else{
+                _uistate.update {
+                    it.copy(
+                        modeloConVehiculos = modelosFiltrados,
+                        listaFiltrada = filterModelos(modelosFiltrados),
+                        marca = marca
+                    )
+                }
             }
         }
     }
 
+    private fun filterModelos(modeloConVehiculos: List<ModeloConVehiculo>): List<ModeloConVehiculo> {
+        return when (selectedFilter) {
+            is ModeloFilter.Todos -> modeloConVehiculos
+            is ModeloFilter.Disponible -> modeloConVehiculos.filter { !it.estaRentado }
+            is ModeloFilter.NoDisponible -> modeloConVehiculos.filter { it.estaRentado }
+        }
+    }
+
+    private fun setFilter(filter: ModeloFilter) {
+        selectedFilter = filter
+        _uistate.update {
+            it.copy(
+                listaFiltrada = filterModelos(it.modeloConVehiculos)
+            )
+        }
+    }
     fun onEvent(event: ModeloEvent) {
         when (event) {
             is ModeloEvent.GetModeloConVehiculos -> {
-                getModeloConVehiculos(event.marcaId)
+                getModeloConVehiculos(event.marcaId, event.isAdmin)
             }
             is ModeloEvent.GetVehiculosByMarcaId -> {
-                getListVehiculosByMarcaId(event.marcaId)
+                getListVehiculosByMarcaId(event.marcaId, event.isAdmin)
             }
+            is ModeloEvent.SetFilter -> {
+                setFilter(event.filter)
+            }
+
         }
     }
+}
+
+sealed class ModeloFilter {
+    data object Todos : ModeloFilter()
+    data object Disponible : ModeloFilter()
+    data object NoDisponible : ModeloFilter()
 }

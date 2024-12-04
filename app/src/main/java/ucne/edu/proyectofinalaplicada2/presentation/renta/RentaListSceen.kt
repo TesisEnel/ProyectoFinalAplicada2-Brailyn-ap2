@@ -183,40 +183,43 @@ fun ExpandableBodyCard(
                             contentDescription = if (isExpanded) "Colapsar" else "Expandir"
                         )
                     }
-                    Box {
-                        IconButton(
-                            onClick = { menuExpanded = true },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "Más opciones"
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = menuExpanded,
-                            onDismissRequest = { menuExpanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    menuExpanded = false
-                                    onGoEdit(
-                                        rentaConVehiculo.renta?.vehiculoId ?: 0,
-                                        rentaConVehiculo.renta?.rentaId ?: 0
+                    if(authUiState.isAdmin){
+                        Box {
+                            IconButton(
+                                onClick = { menuExpanded = true },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Más opciones"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        menuExpanded = false
+                                        onGoEdit(
+                                            rentaConVehiculo.renta?.vehiculoId ?: 0,
+                                            rentaConVehiculo.renta?.rentaId ?: 0
 
-                                    )
-                                },
-                                text = { Text("Editar") }
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    menuExpanded = false
-                                    showDeleteDialog = true
+                                        )
+                                    },
+                                    text = { Text("Editar") }
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        menuExpanded = false
+                                        showDeleteDialog = true
 
-                                },
-                                text = { Text("Eliminar") }
-                            )
+                                    },
+                                    text = { Text("Eliminar") }
+                                )
+                            }
                         }
                     }
+
                 }
             }
             if (isExpanded) {

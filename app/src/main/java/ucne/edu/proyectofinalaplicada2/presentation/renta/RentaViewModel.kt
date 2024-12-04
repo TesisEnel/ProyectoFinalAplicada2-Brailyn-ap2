@@ -228,7 +228,7 @@ class RentaViewModel @Inject constructor(
                         rentaId = rentaId,
                         fechaEntrega = renta?.fechaEntrega,
                         total = renta?.total,
-                        fechaRenta = today,
+                        fechaRenta = renta?.fechaRenta?:"",
                         vehiculoId = renta?.vehiculoId,
                         clienteId = renta?.clienteId,
                         vehiculoNombre = uistate.value.marca?.nombreMarca,
