@@ -1,3 +1,4 @@
+
 # Rent Car App - Proyecto Final Aplicada 2
 
 **Rent Car App** es una aplicación móvil desarrollada en **Kotlin** utilizando **Jetpack Compose** para facilitar la gestión de renta de vehículos. Este proyecto está diseñado como una solución completa que incluye autenticación, persistencia local, comunicación remota y un diseño moderno.
@@ -70,3 +71,69 @@ Clona el repositorio:
 git clone https://github.com/tuusuario/tu-repo.git
 cd tu-repo
 ./gradlew build
+
+
+
+<div align="center">
+
+## 📸 **Capturas de Pantalla**
+
+</div>
+
+---
+
+### Pantallas de Inicio de Sesión y Registro
+<table>
+  <tr>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/ed7b1c31-f74e-4ae9-b2dc-de29324fd237" alt="Login" width="300"><br>
+      <b>Pantalla de Inicio de Sesión</b>
+    </td>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/34f62c94-ae44-40e8-b3ae-d010e3175862" alt="Signup" width="300"><br>
+      <b>Pantalla de Registro de Usuario</b>
+    </td>
+  </tr>
+</table>
+
+---
+
+### Gestión de Vehículos y Modelos
+<table>
+  <tr>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/d6edeea5-81b8-4006-8b67-ee09ffd12069" alt="Filtrar Vehículos" width="300"><br>
+      <b>Filtrar Vehículos</b>
+    </td>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/5c2326fa-09eb-4b59-987c-a494f7ac44d2" alt="Tipos de Modelos" width="300"><br>
+      <b>Tipos de Modelos</b>
+    </td>
+  </tr>
+</table>
+
+---
+
+### Registro y Gestión de Rentas
+<table>
+  <tr>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/439bc1c7-01ab-474c-b457-723c35c07938" alt="Registro Vehículo" width="300"><br>
+      <b>Registro de Vehículo</b>
+    </td>
+    <td align="center" style="padding: 10px;">
+      <img src="https://github.com/user-attachments/assets/4921d374-0a03-45ec-8ec9-d98694ba7ac1" alt="Rentas" width="300"><br>
+      <b>Gestión de Rentas</b>
+    </td>
+  </tr>
+</table>
+
+---
+
+<div align="center">
+
+✨ **Visualiza tus registros y gestiona tu información fácilmente** ✨
+
+</div>
+
+
