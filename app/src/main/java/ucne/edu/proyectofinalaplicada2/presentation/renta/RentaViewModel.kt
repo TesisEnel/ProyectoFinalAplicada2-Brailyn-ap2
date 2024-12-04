@@ -488,6 +488,10 @@ class RentaViewModel @Inject constructor(
     }
 
     private fun calcularCostoAdicional(fechaEntrega: String, newFecha: String,precio: Double):Double{
+        if(fechaEntrega.isBlank() || newFecha.isBlank()){
+            return 0.0
+        }
+
         val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
         val entregaDate: Date = dateFormat.parse(fechaEntrega) ?: return 0.0
@@ -532,6 +536,39 @@ class RentaViewModel @Inject constructor(
 
     }
 
+    private fun deleteRenta(vehiculoId: Int) {
+        viewModelScope.launch {
+            rentaRepository.deleteRenta(vehiculoId).collect{result->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error",
+                                isDataLoading = false
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isDataLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Renta eliminada",
+                                isDataLoading = false
+                            )
+                        }
+                        getRentas()
+                    }
+                }
+            }
+        }
+    }
+
     private fun nuevo() {
         _uistate.update {
             it.copy(
@@ -561,28 +598,35 @@ class RentaViewModel @Inject constructor(
                 success = ""
             )
         }
+    }private fun clearError() {
+        _uistate.update {
+            it.copy(
+                success = ""
+            )
+        }
     }
 
     fun onEvent(event: RentaEvent) {
         when (event) {
-            RentaEvent.ConfirmRenta -> createRenta()
+            RentaEvent.ConfirmRenta -> save()
+            RentaEvent.CloseModal -> closeModal()
             RentaEvent.CloseModal -> closeModal()
             RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()
             RentaEvent.Nuevo -> nuevo()
+            RentaEvent.UpdateRenta -> updateRenta()
+            RentaEvent.ClearSuccess -> clearSuccess()
+            RentaEvent.ClearError -> clearError()
             is RentaEvent.OnchangeClienteId -> onChangeClienteId(event.clienteId)
             is RentaEvent.OnchangeFechaEntrega -> onChangeFechaEntrega(event.fechaEntrega)
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
-            RentaEvent.Save -> save()
             is RentaEvent.CalculeTotal -> calculateTotal(
                 event.fechaRenta,
                 event.fechaEntrega,
                 event.costoDiario
             )
             is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId,event.rentaId)
-            RentaEvent.ConfirmRenta -> save()
-            RentaEvent.CloseModal -> closeModal()
             is RentaEvent.MostraDatosVehiculoByRole -> mostrarDatosVehiculoByRole(event.isAdmin)
             is RentaEvent.HandleDatePickerResult -> handleDatePickerResult(
                 event.dateMillis,
@@ -590,8 +634,8 @@ class RentaViewModel @Inject constructor(
             )
 
             is RentaEvent.SelectedRenta -> selectedRenta(event.vehiculoId)
-            RentaEvent.UpdateRenta -> updateRenta()
-            RentaEvent.ClearSuccess -> clearSuccess()
+            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId)
+
         }
     }
 }
