@@ -70,14 +70,14 @@ fun FiltraVehiculoBody(
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
     val authState by authViewModel.uistate.collectAsStateWithLifecycle()
-    if (uiState.isLoading== false) {
+    if (!uiState.isLoading) {
         LaunchedEffect(authState.isAdmin) {
             onEvent(VehiculoEvent.GetVehiculosFiltered(uiState.vehiculos, authState.isAdmin))
         }
     }
 
     when {
-        uiState.isLoading == true || uiState.isLoadingData == null ->  {
+        uiState.isLoadingData ->  {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
