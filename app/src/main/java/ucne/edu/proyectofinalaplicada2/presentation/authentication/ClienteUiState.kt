@@ -28,6 +28,7 @@ data class ClienteUiState(
     val clientebyEmail: ClienteDto? = null,
     val existCliente: Boolean = false,
     val isAdmin: Boolean = false,
+    val isDataLoaded: Boolean = false
     )
 
 fun ClienteUiState.toEntity() = ClienteDto(
