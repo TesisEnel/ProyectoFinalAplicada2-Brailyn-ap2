@@ -76,10 +76,21 @@ class RentaRepository @Inject constructor(
         }
     }
 
-    fun deleteRenta(id: Int): Flow<Resource<RentaDto>> = flow {
+    fun deleteRenta(rentaId: Int, vehiculoId: Int): Flow<Resource<RentaDto>> = flow {
         try {
             emit(Resource.Loading())
-            val renta = rentCarRemoteDataSource.deleteRenta(id)
+            val renta = rentCarRemoteDataSource.deleteRenta(rentaId)
+            val vehiculo = vehiculoDao.find(vehiculoId)
+
+            if (vehiculo != null){
+                rentCarRemoteDataSource.updateVehiculo(
+                    vehiculoId,
+                    vehiculo.toVehiculoDto().copy(
+                        estaRentado = false
+                    )
+                )
+            }
+
             rentaDao.delete(renta.toEntity())
             emit(Resource.Success(renta))
         } catch (e: HttpException) {
@@ -88,4 +99,6 @@ class RentaRepository @Inject constructor(
             emit(Resource.Error("Error, favor verificar conexión a internet ${e.message}"))
         }
     }
+
+
 }

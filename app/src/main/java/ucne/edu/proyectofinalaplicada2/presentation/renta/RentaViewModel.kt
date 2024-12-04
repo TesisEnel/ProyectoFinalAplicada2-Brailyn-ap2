@@ -534,9 +534,9 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    private fun deleteRenta(vehiculoId: Int) {
+    private fun deleteRenta(rentaId: Int, vehiculoId: Int) {
         viewModelScope.launch {
-            rentaRepository.deleteRenta(vehiculoId).collect{result->
+            rentaRepository.deleteRenta(rentaId, vehiculoId).collect{result->
                 when (result) {
                     is Resource.Error -> {
                         _uistate.update {
@@ -560,7 +560,6 @@ class RentaViewModel @Inject constructor(
                                 isDataLoading = false
                             )
                         }
-                        getRentas()
                     }
                 }
             }
@@ -631,7 +630,8 @@ class RentaViewModel @Inject constructor(
             )
 
             is RentaEvent.SelectedRenta -> selectedRenta(event.vehiculoId)
-            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId)
+            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId, event.vehiculoId)
+            is RentaEvent.GetRentas -> getRentas()
 
         }
     }
