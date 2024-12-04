@@ -1,7 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
 sealed interface RentaEvent {
-    data object Save : RentaEvent
     data class OnchangeClienteId(val clienteId: Int) : RentaEvent
     data class OnchangeVehiculoId(val vehiculoId: Int) : RentaEvent
     data class OnchangeFechaRenta(val fechaRenta: String) : RentaEvent
@@ -18,6 +17,6 @@ sealed interface RentaEvent {
     data class SelectedRenta(val vehiculoId: Int) : RentaEvent
     data object UpdateRenta : RentaEvent
     data object ClearSuccess: RentaEvent
-
-
+    data class DeleteRenta(val rentaId: Int) : RentaEvent
+    data object ClearError : RentaEvent
 }
