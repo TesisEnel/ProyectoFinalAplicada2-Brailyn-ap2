@@ -37,6 +37,8 @@ interface RentCarApi {
     suspend fun addRenta(@Body rentaDto: RentaDto): RentaDto
     @PUT("api/Rentas/{id}")
     suspend fun updateRenta(@Path ("id") id: Int ,@Body rentaDto: RentaDto): RentaDto
+    @DELETE("api/Rentas/{id}")
+    suspend fun deleteRenta(@Path("id") id: Int): RentaDto
 
     // vehiculos
     @GET("api/Vehiculos")
