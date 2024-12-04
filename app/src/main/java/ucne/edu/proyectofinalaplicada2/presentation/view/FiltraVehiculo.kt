@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.components.ListIsEmpty
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -80,15 +81,8 @@ fun FiltraVehiculoBody(
                 CircularProgressIndicator()
             }
         }
-        uiState.filteredListIsEmpty-> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
-            )
-            {
-                Text(text = "No se encontraron vehiculos")
-            }
+        uiState.vehiculoConMarcas.isEmpty()-> {
+            ListIsEmpty()
         }
 
         else -> {
