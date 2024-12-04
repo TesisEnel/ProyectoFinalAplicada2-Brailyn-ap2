@@ -271,11 +271,11 @@ class VehiculoViewModel @Inject constructor(
             _uistate.update { it.copy(modeloError = "") }
         }
 
-        if (_uistate.value.precio == null || _uistate.value.precio!! < 1000 || _uistate.value.precio!! > 100000) {
+        if (_uistate.value.precio == null || _uistate.value.precio!! < 1000 || _uistate.value.precio!! > 4000) {
             isValid = false
             _uistate.update {
                 it.copy(
-                    precioError = "Ingrese un precio válido (>= 1000)"
+                    precioError = "Ingrese un precio válido entre 1,000 y 40,000"
                 )
             }
         } else {
@@ -293,22 +293,22 @@ class VehiculoViewModel @Inject constructor(
             _uistate.update { it.copy(descripcionError = "") }
         }
 
-        if (_uistate.value.anio == null || _uistate.value.anio!! < 2010) {
+        if (_uistate.value.anio == null || _uistate.value.anio!! < 2010 || _uistate.value.anio!! > 2025) {
             isValid = false
             _uistate.update {
                 it.copy(
-                    anioError = "Ingrese un año válido (>= 2010)"
+                    anioError = "Ingrese un año válido mayor a 2010"
                 )
             }
         } else {
             _uistate.update { it.copy(anioError = "") }
         }
 
-        if (_uistate.value.imagePath.isEmpty()) {
+        if (_uistate.value.imagePath.isEmpty() || _uistate.value.imagePath.size > 10) {
             isValid = false
             _uistate.update {
                 it.copy(
-                    imageError = "Seleccione una imagen"
+                    imageError = "Debe contener al menos una imagen y maximo 10"
                 )
             }
         } else {
@@ -587,6 +587,33 @@ class VehiculoViewModel @Inject constructor(
             it.copy(success = "")
         }
     }
+
+    private fun nuevo(){
+        _uistate.update {
+            it.copy(
+                marcas = emptyList(),
+                tipoCombustibles = emptyList(),
+                tipoVehiculos = emptyList(),
+                modelos = emptyList(),
+                proveedores = emptyList(),
+                vehiculos = emptyList(),
+                vehiculoConMarcas = emptyList(),
+                isLoadingData = true,
+                isLoading = true,
+                error = "",
+                success = "",
+                marcaId = 0,
+                precio = null,
+                tipoVehiculoId = null,
+                descripcion = "",
+                tipoCombustibleId = null,
+                modeloId = 0,
+                proveedorId = null,
+                anio = null,
+                imagePath = emptyList(),
+            )
+        }
+    }
     fun onEvent(event: VehiculoEvent) {
         when (event) {
             is VehiculoEvent.OnChangeDescripcion -> onChangeDescripcion(event.descripcion)
@@ -609,7 +636,7 @@ class VehiculoViewModel @Inject constructor(
             VehiculoEvent.ClearError -> clearError()
             VehiculoEvent.ClearSuccess -> clearSuccess()
             is VehiculoEvent.GetVehiculosFiltered -> transformarVehiculosConMarcasYModelos(event.vehiculos, event.isAdmin)
-
+            is VehiculoEvent.Nuevo -> nuevo()
         }
     }
 }
