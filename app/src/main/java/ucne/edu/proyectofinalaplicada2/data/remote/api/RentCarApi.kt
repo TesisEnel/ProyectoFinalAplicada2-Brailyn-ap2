@@ -88,9 +88,13 @@ interface RentCarApi {
     @GET("api/TipoVehiculoes")
     suspend fun getTipoVehiculos(): List<TipoVehiculoDto>
 
+
     // Proveedores
     @GET("api/Proveedores")
     suspend fun getProveedores(): List<ProveedorDto>
+    @POST("api/Proveedores")
+    suspend fun addProveedor(@Body proveedorDto: ProveedorDto): ProveedorDto
+
 
     //Modelos
     @GET("api/Modelos/{id}")
