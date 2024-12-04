@@ -44,7 +44,6 @@ class RentaViewModel @Inject constructor(
     init {
         getRentas()
     }
-
     fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
