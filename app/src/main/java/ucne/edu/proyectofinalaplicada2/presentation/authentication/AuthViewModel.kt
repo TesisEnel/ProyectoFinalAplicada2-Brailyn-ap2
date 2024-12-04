@@ -71,8 +71,9 @@ class AuthViewModel @Inject constructor(
     private fun loadUserRole() {
         viewModelScope.launch {
             val (_, role) = getUserData()
-            _uistate.update { it.copy(isAdmin = role ?: false) }
+            _uistate.update { it.copy(isDataLoaded = true, isAdmin = role ?: false) }
             _isRoleVerified.value = true
+
         }
     }
     private suspend fun getUserData(): Pair<String?, Boolean?> {
