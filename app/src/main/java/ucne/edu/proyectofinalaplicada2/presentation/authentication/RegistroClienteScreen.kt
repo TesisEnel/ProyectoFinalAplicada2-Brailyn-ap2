@@ -110,6 +110,7 @@ fun RegistroClienteBodyScreen(
                     onValueChange = { onEvent(AuthEvent.OnchangeNombre(it)) },
                     label = { Text("Nombre", color = Color.White) },
                     modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
 
                 )
                 OutlinedTextField(
@@ -117,6 +118,7 @@ fun RegistroClienteBodyScreen(
                     onValueChange = { onEvent(AuthEvent.OnchangeApellidos(it)) },
                     label = { Text("Apellidos", color = Color.White) },
                     modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
 
                 )
             }
@@ -146,6 +148,7 @@ fun RegistroClienteBodyScreen(
                 onValueChange = { onEvent(AuthEvent.OnChangeEmail(it)) },
                 label = { Text("Email", color = Color.White) },
                 modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
 
             )
             ErrorText(uiState.errorEmail)
@@ -167,6 +170,7 @@ fun RegistroClienteBodyScreen(
                     onValueChange = { onEvent(AuthEvent.OnchangeDireccion(it)) },
                     label = { Text("Direccion", color = Color.White) },
                     modifier = Modifier.weight(1f),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
 
                 )
             }
@@ -189,6 +193,7 @@ fun RegistroClienteBodyScreen(
                 label = { Text("Contraseña", color = Color.White) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
 
             )
             ErrorText(uiState.errorPassword)
@@ -199,10 +204,12 @@ fun RegistroClienteBodyScreen(
             OutlinedButton(
                 onClick = { onEvent(AuthEvent.Signup) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Registrar")
                 Text(text = "Registrar", modifier = Modifier.padding(start = 8.dp))
+
             }
         }
 
@@ -255,7 +262,32 @@ fun PhoneInputField(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+    )
+}
+
+@Composable
+fun PhoneInputField2(
+    phone: String,
+    onPhoneChange: (String) -> Unit,
+) {
+    OutlinedTextField(
+        value = phone,
+        onValueChange = {
+            val onlyDigits = it.filter { char -> char.isDigit() }
+            if (onlyDigits.length <= 10) {
+                onPhoneChange(onlyDigits)
+            }
+        },
+        visualTransformation = PhoneNumberVisualTransformation(),
+        label = { Text("Número de Teléfono") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
     )
 }
 
@@ -279,6 +311,7 @@ fun CedulaInputField(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
         ),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
     )
 }
