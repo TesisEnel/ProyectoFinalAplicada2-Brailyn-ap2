@@ -20,7 +20,7 @@ data class VehiculoUistate(
     val anio: Int? = 0,
     val imagePath: List<String?> = emptyList(),
     var isLoading: Boolean = false,
-    var isLoadingData: Boolean = false,
+    var isLoadingData: Boolean = true,
     val error: String = "",
     val success: String = "",
     val marcas: List<MarcaEntity> = emptyList(),
