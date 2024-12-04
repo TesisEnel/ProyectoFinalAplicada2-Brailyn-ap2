@@ -2,6 +2,7 @@ package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
 import android.content.Context
 import android.net.Uri
+import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import java.io.File
 
 sealed interface VehiculoEvent {
@@ -21,8 +22,10 @@ sealed interface VehiculoEvent {
     data object UpdateVehiculo : VehiculoEvent
     data class OnImagesSelected(val uris: List<Uri>, val context: Context) : VehiculoEvent
     data class DeleteVehiculo(val id: Int): VehiculoEvent
+    data class GetVehiculosFiltered(val vehiculos: List<VehiculoEntity>, val isAdmin: Boolean): VehiculoEvent
     data object ClearImageError: VehiculoEvent
     data object ClearError: VehiculoEvent
     data object ClearSuccess: VehiculoEvent
+
 
 }
