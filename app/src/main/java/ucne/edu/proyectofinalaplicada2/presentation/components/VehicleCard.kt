@@ -113,7 +113,7 @@ fun VehicleCard(
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = vehicleDetails)
-                    Text(text = "Estado: $estado")
+                    Text(text = estado)
                 }
             }
         }
