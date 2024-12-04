@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import android.app.Application
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,7 @@ class RentaViewModel @Inject constructor(
     private val modeloRepository: ModeloRepository,
     private val tipoCombustibleRepository: TipoCombustibleRepository,
     private val tipoVehiculoRepository: TipoVehiculoRepository,
+    private val application: Application,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
@@ -44,6 +46,7 @@ class RentaViewModel @Inject constructor(
     init {
         getRentas()
     }
+
     fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
@@ -83,6 +86,19 @@ class RentaViewModel @Inject constructor(
         viewModelScope.launch {
             var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
             vehiculo = vehiculo?.copy(estaRentado = true)
+            scheduleRentalNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaEntrega = uistate.value.fechaEntrega ?: "",
+            )
+            schedulePickupNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaRenta = uistate.value.fechaRenta ?: "",
+            )
+
             val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)
             renta.collect { result ->
                 when (result) {
@@ -250,14 +266,11 @@ class RentaViewModel @Inject constructor(
                     )
                 }
             }
-
         }
     }
-
     suspend fun getVehiculoById(id: Int): VehiculoEntity? {
         return vehiculoRepository.getVehiculoById(id).data
     }
-
     suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
@@ -265,15 +278,12 @@ class RentaViewModel @Inject constructor(
     suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
-
     suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
-
     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
-
     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
@@ -342,7 +352,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeVehiculoId(vehiculoId: Int) {
         _uistate.update {
             it.copy(
@@ -350,7 +359,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeFechaRenta(fechaRenta: String) {
         _uistate.update {
             it.copy(
@@ -359,7 +367,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeFechaEntrega(fechaEntrega: String) {
         _uistate.update {
             it.copy(
@@ -368,7 +375,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeTotal(total: Double) {
         _uistate.update {
             it.copy(
@@ -379,6 +385,7 @@ class RentaViewModel @Inject constructor(
 
     private fun calculateTotal(fechaRenta: String?, fechaEntrega: String?, costoDiario: Int) {
         val today = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date())
+
         if (fechaRenta.isNullOrBlank()) {
             _uistate.update {
                 it.copy(
@@ -460,7 +467,6 @@ class RentaViewModel @Inject constructor(
                 return
             }
             val total = diffInDays * costoDiario
-
             _uistate.update {
                 it.copy(
                     total = total.toDouble(),
