@@ -50,8 +50,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.auth.FirebaseAuth
 import ucne.edu.proyectofinalaplicada2.presentation.components.CardInfo
 import ucne.edu.proyectofinalaplicada2.presentation.components.ConfirmRentaDialog
+import ucne.edu.proyectofinalaplicada2.presentation.components.CustomDialog
 import ucne.edu.proyectofinalaplicada2.presentation.components.DatePickerPopup
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoViewModel
 import ucne.edu.proyectofinalaplicada2.utils.Constant

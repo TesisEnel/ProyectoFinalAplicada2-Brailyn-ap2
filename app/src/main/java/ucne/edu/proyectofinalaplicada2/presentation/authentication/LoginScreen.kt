@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import ucne.edu.proyectofinalaplicada2.R
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
+import ucne.edu.proyectofinalaplicada2.presentation.components.CustomDialog
 import ucne.edu.proyectofinalaplicada2.ui.theme.Gradiend
 
 @Composable

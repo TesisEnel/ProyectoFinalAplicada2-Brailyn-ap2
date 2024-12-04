@@ -37,7 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.components.ConfirmDeleteDialog
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
+import ucne.edu.proyectofinalaplicada2.presentation.components.CustomDialog
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable

@@ -95,8 +95,6 @@ fun TipoModeloLazyColumn(
     onGoEdit: (Int) -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     onVehiculoEvent: (VehiculoEvent) -> Unit
-
-
     ) {
     val uistate = authViewModel.uistate.collectAsStateWithLifecycle()
     if (!modeloUistate.isDataLoaded) {
