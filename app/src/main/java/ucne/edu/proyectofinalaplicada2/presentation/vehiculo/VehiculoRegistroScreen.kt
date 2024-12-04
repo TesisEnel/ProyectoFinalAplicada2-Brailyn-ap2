@@ -1,10 +1,7 @@
 package ucne.edu.proyectofinalaplicada2.presentation.vehiculo
 
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,13 +39,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
-import coil3.compose.rememberAsyncImagePainter
 import ucne.edu.proyectofinalaplicada2.presentation.components.CustomDialog
 import ucne.edu.proyectofinalaplicada2.presentation.components.InputSelect
 import ucne.edu.proyectofinalaplicada2.presentation.permisos.PermisoGallery
@@ -80,11 +75,10 @@ fun VehiculoBodyRegistroScreen(
     var showDialog by remember { mutableStateOf(false) }
     LaunchedEffect(key1 = vehiculoId) {
         if (vehiculoId > 0) {
-
             onVehiculoEnvent(VehiculoEvent.SelectedVehiculo(vehiculoId))
         }
     }
-    if (vehiculoUiState.isLoadingData == true && vehiculoId > 0) {
+    if (vehiculoUiState.isLoadingData && vehiculoId > 0) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -316,6 +310,7 @@ fun VehiculoBodyRegistroScreen(
                         isError = vehiculoUiState.success.isEmpty(),
                         onDismiss = {
                             onVehiculoEnvent(VehiculoEvent.ClearSuccess)
+                            onVehiculoEnvent(VehiculoEvent.Nuevo)
                             showDialog = false
                         }
                     )
@@ -336,51 +331,11 @@ fun VehiculoBodyRegistroScreen(
         }
 
     }
-
 }
 
 
 
-@Composable
-fun SelectMultipleImages() {
-    val viewModel: VehiculoViewModel = hiltViewModel()
-    val context = LocalContext.current
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetMultipleContents()
-    ) { uris ->
-        if (uris.isNotEmpty()) {
-            viewModel.onEvent(VehiculoEvent.OnImagesSelected(uris, context))
-        }
-    }
-
-    OutlinedButton(onClick = {
-        imagePickerLauncher.launch("image/*")
-    }) {
-        Text(text = "Seleccionar Imágenes")
-    }
-
-    val uiState by viewModel.uistate.collectAsStateWithLifecycle()
-
-    if (uiState.imagePath.isNotEmpty()) {
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(uiState.imagePath) { imagePath ->
-                Image(
-                    painter = rememberAsyncImagePainter(imagePath),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(8.dp)
-                )
-            }
-        }
-    }
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

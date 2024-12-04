@@ -77,12 +77,12 @@ fun HomeBody(
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
 
-    if (vehiculoUistate.isLoading== false) {
+    if (!vehiculoUistate.isLoading) {
         LaunchedEffect(authUistate.isAdmin) {
             onEvent(VehiculoEvent.GetVehiculosFiltered(vehiculoUistate.vehiculos, authUistate.isAdmin))
         }
     }
-    if (vehiculoUistate.isLoading == true || vehiculoUistate.isLoadingData == null) {
+    if (vehiculoUistate.isLoadingData ) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -113,8 +113,6 @@ fun HomeBody(
                     ListaDeVehiculos(
                         vehiculoUistate = vehiculoUistate,
                         onGoRenta = onGoRenta,
-                        authUistate = authUistate,
-
                     )
                 }
                 item {
@@ -169,15 +167,13 @@ fun FakeSearchBar(
 fun ListaDeVehiculos(
     vehiculoUistate: VehiculoUistate,
     onGoRenta: (Int) -> Unit = {},
-    authUistate: ClienteUiState,
-    onEvent: (VehiculoEvent) -> Unit = {},
 ) {
 
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
     ) {
         Text(
-            text = "Vehiculos",
+            text = "Vehículos",
             fontFamily = FontFamily.Serif,
             fontSize = 18.sp,
             fontWeight = FontWeight.W700,
@@ -243,7 +239,6 @@ fun TiposDeVehiculos(
                     val painter = rememberAsyncImagePainter(
                         Constant.URL_BLOBSTORAGE + vehiculoConMarca.vehiculo.imagePath?.firstOrNull()
                     )
-
                     TipoVehiculoList(
                         painter = painter,
                         marca = vehiculoConMarca.nombreMarca ?: "",

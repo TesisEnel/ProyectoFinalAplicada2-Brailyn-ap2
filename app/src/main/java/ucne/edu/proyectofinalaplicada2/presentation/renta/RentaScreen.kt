@@ -66,7 +66,7 @@ fun RentaScreen(
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
 
-    if (vehiculoUiState.isLoading == true) {
+    if (vehiculoUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -97,9 +97,7 @@ fun RentaBodyScreen(
 ) {
     val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
-    var showDatePickerRena by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
-    val datePickerStateRenta = rememberDatePickerState()
     val emailCliente = FirebaseAuth.getInstance().currentUser?.email
 
     LaunchedEffect( datePickerStateEntrega.selectedDateMillis) {
@@ -107,14 +105,6 @@ fun RentaBodyScreen(
         if (entregaDateMillis != null) {
             onEvent(RentaEvent.HandleDatePickerResult(entregaDateMillis, isStartDate = false))
             showDatePickerEntrega = false
-        }
-    }
-
-    LaunchedEffect( datePickerStateRenta.selectedDateMillis) {
-        val rentaDateMillis = datePickerStateRenta.selectedDateMillis
-        if (rentaDateMillis != null) {
-            onEvent(RentaEvent.HandleDatePickerResult(rentaDateMillis, isStartDate = true))
-            showDatePickerRena = false
         }
     }
     LaunchedEffect(vehiculoId) {
@@ -245,7 +235,7 @@ fun RentaBodyScreen(
                                 onValueChange = {onEvent(RentaEvent.OnchangeFechaRenta(it))},
                                 label = { Text("Renta") },
                                 trailingIcon = {
-                                    IconButton(onClick = {  showDatePickerRena = !showDatePickerRena  }) {
+                                    IconButton(onClick = {  }) {
                                         Icon(
                                             Icons.Default.DateRange,
                                             contentDescription = "Select date"
@@ -253,7 +243,7 @@ fun RentaBodyScreen(
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-
+                                readOnly = true
                             )
                             rentaUiState.errorFechaRenta?.let { error ->
                                 Text(
@@ -269,12 +259,6 @@ fun RentaBodyScreen(
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                                )
-                            }
-                            if (showDatePickerRena) {
-                                DatePickerPopup(
-                                    onDismissRequest = { showDatePickerRena = false },
-                                    state = datePickerStateRenta
                                 )
                             }
 
@@ -296,7 +280,7 @@ fun RentaBodyScreen(
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                readOnly = rentaId > 0
+                                readOnly = true
                             )
                             rentaUiState.errorFechaEntrega?.let { error ->
                                 Text(
@@ -374,7 +358,7 @@ fun RentaBodyScreen(
         if(rentaUiState.error?.isNotEmpty() == true){
             CustomDialog(
                 message = rentaUiState.error,
-                isError = true,
+                isError = false,
                 onDismiss = {
                     onEvent(RentaEvent.ClearError)
                 }

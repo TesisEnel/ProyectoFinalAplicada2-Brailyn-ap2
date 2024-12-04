@@ -43,7 +43,7 @@ data class RentaUistate(
     val showModal: Boolean = false,
     val fechaValida: Boolean = false,
     val costoAdicional: Double = 0.0,
-    val isDataLoading : Boolean = false,
+    val isDataLoading : Boolean = true,
 
     )
 
