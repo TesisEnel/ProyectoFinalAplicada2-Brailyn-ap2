@@ -324,7 +324,7 @@ fun RentaBodyScreen(
                             .align(Alignment.CenterHorizontally)
 
                     ) {
-                        Text(text = if(vehiculoId> 0) "Actualizar" else "Rentar")
+                        Text(text = if(rentaId> 0) "Actualizar" else "Rentar")
                     }
                     Card(
                         modifier = Modifier
@@ -340,7 +340,7 @@ fun RentaBodyScreen(
                 rentaUiState = rentaUiState,
                 vehiculo = vehiculo,
                 onConfirm = {
-                    if(vehiculoId > 0){
+                    if(rentaId > 0){
                         onEvent(RentaEvent.UpdateRenta)
                         onEvent(RentaEvent.CloseModal)
 
@@ -360,6 +360,15 @@ fun RentaBodyScreen(
                 isError = false,
                 onDismiss = {
                     onEvent(RentaEvent.ClearSuccess)
+                }
+            )
+        }
+        if(rentaUiState.error?.isNotEmpty() == true){
+            CustomDialog(
+                message = rentaUiState.error,
+                isError = false,
+                onDismiss = {
+                    onEvent(RentaEvent.ClearError)
                 }
             )
         }
