@@ -15,7 +15,6 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -609,7 +608,6 @@ class RentaViewModel @Inject constructor(
     fun onEvent(event: RentaEvent) {
         when (event) {
             RentaEvent.ConfirmRenta -> save()
-            RentaEvent.CloseModal -> closeModal()
             RentaEvent.CloseModal -> closeModal()
             RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()
             RentaEvent.Nuevo -> nuevo()
