@@ -43,19 +43,34 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 fun FiltraVehiculo(
     viewModel: VehiculoViewModel = hiltViewModel(),
     onGoRenta: (Int) -> Unit,
-    onGoEdit: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
+    FiltraBodyVehiculo(
+        vehiculoUistate = uiState,
+        onEvent = {event -> viewModel.onEvent(event)},
+        onGoRenta = onGoRenta,
+        onGoEdit = onGoEdit
+    )
+}
+
+@Composable
+fun FiltraBodyVehiculo(
+    vehiculoUistate: VehiculoUistate,
+    onEvent: (VehiculoEvent) -> Unit = {},
+    onGoRenta: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit,
+) {
     Column {
         SearchBar(
-            searchQuery = uiState.searchQuery,
-            onEvent = {event -> viewModel.onEvent(event)}
+            searchQuery = vehiculoUistate.searchQuery,
+            onEvent = onEvent
         )
         FiltraVehiculoBody(
-            uiState = uiState,
+            uiState = vehiculoUistate,
             onGoRenta = onGoRenta,
             onGoEdit = onGoEdit,
-            onEvent = {event -> viewModel.onEvent(event)}
+            onEvent = onEvent
         )
     }
 
