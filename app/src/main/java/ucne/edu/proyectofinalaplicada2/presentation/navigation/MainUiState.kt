@@ -4,4 +4,5 @@ data class MainUiState(
     val currentTitle: String = "BravquezRentcar",
     val userDisplayName: String? = null,
     val userPhotoUrl: String? = null,
+    val showBackButton: Boolean = true
 )
