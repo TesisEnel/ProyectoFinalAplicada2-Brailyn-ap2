@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.components.ListIsEmpty
 import ucne.edu.proyectofinalaplicada2.presentation.components.VehicleCard
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -68,10 +69,15 @@ fun FiltraVehiculoBody(
     authViewModel: AuthViewModel = hiltViewModel(),
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
-    val authState = authViewModel.uistate.collectAsStateWithLifecycle()
+    val authState by authViewModel.uistate.collectAsStateWithLifecycle()
+    if (uiState.isLoading== false) {
+        LaunchedEffect(authState.isAdmin) {
+            onEvent(VehiculoEvent.GetVehiculosFiltered(uiState.vehiculos, authState.isAdmin))
+        }
+    }
 
     when {
-        uiState.isLoading == true -> {
+        uiState.isLoading == true || uiState.isLoadingData == null ->  {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -80,17 +86,9 @@ fun FiltraVehiculoBody(
                 CircularProgressIndicator()
             }
         }
-        uiState.filteredListIsEmpty-> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
-            )
-            {
-                Text(text = "No se encontraron vehiculos")
-            }
+        uiState.vehiculoConMarcas.isEmpty()-> {
+            ListIsEmpty()
         }
-
         else -> {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -108,7 +106,7 @@ fun FiltraVehiculoBody(
                         vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
                         onGoRenta = onGoRenta,
                         onGoEdit = onGoEdit,
-                        isAdmin = authState.value.isAdmin,
+                        isAdmin = authState.isAdmin,
                         onEvent = { event -> onEvent(event)},
                         estado = if (vehiculoConMarca.vehiculo.estaRentado == true) "Rentado" else "Disponible",
                         isRentado = vehiculoConMarca.vehiculo.estaRentado ?: false
