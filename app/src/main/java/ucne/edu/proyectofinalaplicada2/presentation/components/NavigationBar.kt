@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Approval
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Approval
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
@@ -67,8 +69,8 @@ fun NavigationBar(
             ),
             BottomNavigationItem(
                 title = "Proveedor",
-                selectedIcon = Icons.Filled.Settings,
-                unSelectedIcon = Icons.Outlined.Settings,
+                selectedIcon = Icons.Filled.Approval,
+                unSelectedIcon = Icons.Outlined.Approval,
                 screen = Screen.ProveedorRegistroScreen
             )
         )

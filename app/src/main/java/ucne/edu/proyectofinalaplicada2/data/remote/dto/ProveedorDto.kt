@@ -3,7 +3,7 @@ package ucne.edu.proyectofinalaplicada2.data.remote.dto
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ProveedorEntity
 
 data class ProveedorDto(
-    val proveedorId: Int,
+    val proveedorId: Int?,
     val nombre: String,
     val celular: String,
 )

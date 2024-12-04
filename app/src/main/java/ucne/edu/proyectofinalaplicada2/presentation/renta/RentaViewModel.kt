@@ -16,6 +16,8 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
+import ucne.edu.proyectofinalaplicada2.notificaciones.schedulePickupNotification
+import ucne.edu.proyectofinalaplicada2.notificaciones.scheduleRentalNotification
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -96,7 +98,7 @@ class RentaViewModel @Inject constructor(
                 context = application,
                 vehiculoId = uistate.value.vehiculoId ?: 0,
                 vehiculoName = uistate.value.vehiculoNombre ?: "",
-                fechaRenta = uistate.value.fechaRenta ?: "",
+                fechaRenta = uistate.value.fechaRenta,
             )
 
             val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)

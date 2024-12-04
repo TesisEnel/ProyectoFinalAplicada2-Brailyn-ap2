@@ -20,7 +20,6 @@ class NavHostViewModel @Inject constructor(
 
 
     private fun updateCurrentRoute(backStackEntryRoute: NavBackStackEntry) {
-        val user = firebaseAuth.currentUser
 
         val currentRoute = Screen.fromRoute(
             route = backStackEntryRoute.destination.route ?: "",
@@ -34,7 +33,7 @@ class NavHostViewModel @Inject constructor(
             is Screen.AuthScreen -> "Autenticación" to false
             is Screen.RegistroClienteScreen -> "Registro de Cliente" to false
             null -> "BravquezRentcar" to false
-            is Screen.Home -> "Bienvenido, ${user?.displayName}" to false
+            is Screen.Home -> "Bienvenido" to false
             Screen.RentaListScreen -> "Rentas" to false
             Screen.FiltraVehiculo -> "Puedes buscar tu vehículo" to true
             Screen.Settings -> "Configura tu perfil" to false
