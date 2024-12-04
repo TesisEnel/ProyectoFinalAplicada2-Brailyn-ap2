@@ -66,6 +66,8 @@ dependencies {
 
     //optional
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation ("androidx.work:work-runtime-ktx:2.8.0")
+    implementation ("androidx.core:core-ktx:1.10.1")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.51")
