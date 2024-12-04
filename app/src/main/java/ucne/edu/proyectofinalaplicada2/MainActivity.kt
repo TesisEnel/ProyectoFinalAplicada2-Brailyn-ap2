@@ -13,13 +13,14 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import ucne.edu.proyectofinalaplicada2.notificaciones.createNotificationChannel
 import ucne.edu.proyectofinalaplicada2.notificaciones.showNotification
 import ucne.edu.proyectofinalaplicada2.presentation.navigation.RentCarNavHost
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val channelId = "rental_reminders"
+    private val channelId = "rental_reminders"
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
             ProyectoFinalAplicada2Theme {
                 val navController = rememberNavController()
                 RentCarNavHost(navController)
-                createNotificationChannel()
+                createNotificationChannel( applicationContext, channelId)
                 if (ActivityCompat.checkSelfPermission(
                         applicationContext,
                         android.Manifest.permission.POST_NOTIFICATIONS
@@ -52,22 +53,6 @@ class MainActivity : ComponentActivity() {
 
         } else {
             Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val descriptionText = "RentCar"
-            val channel = NotificationChannel(
-                channelId,
-                "RentCar",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = descriptionText
-            }
-            val notificationManager: NotificationManager =
-                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
         }
     }
 }
