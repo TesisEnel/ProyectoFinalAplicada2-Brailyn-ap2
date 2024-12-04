@@ -28,7 +28,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ucne.edu.proyectofinalaplicada2.mainViewModel.MainViewModel
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.SelectMultipleImages
+import ucne.edu.proyectofinalaplicada2.presentation.components.SelectMultipleImages
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -46,7 +46,6 @@ fun PermisoGallery() {
     val dialogQueue = viewModel.visiblePermissionDialogQueue
 
 
-    // Launchers for requesting permissions
     val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -65,7 +64,7 @@ fun PermisoGallery() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        if (!granted.value) { // Solo muestra el botón si el permiso no ha sido concedido
+        if (!granted.value) {
             OutlinedButton(onClick = {
                 cameraPermissionResultLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
             }) {
