@@ -26,6 +26,7 @@ import ucne.edu.proyectofinalaplicada2.repository.TipoCombustibleRepository
 import ucne.edu.proyectofinalaplicada2.repository.TipoVehiculoRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -264,7 +265,7 @@ class RentaViewModel @Inject constructor(
                         vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
                         vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
                         vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo,
-                        fechaRenta = today
+                        fechaRenta = uistate.value.fechaRenta
                     )
                 }
             }
@@ -428,22 +429,30 @@ class RentaViewModel @Inject constructor(
             }
             return
         }
-        if (fechaRenta < today) {
-            _uistate.update {
-                it.copy(
-                    total = null,
-                    errorFechaRenta = "La fecha de renta no puede ser anterior a hoy",
-                    showModal = false
-                )
-            }
-            return
-        }
+
         try {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
             val rentaDate: Date =
                 dateFormat.parse(fechaRenta) ?: throw Exception("Fecha de renta inválida")
             val entregaDate: Date =
                 dateFormat.parse(fechaEntrega) ?: throw Exception("Fecha de entrega inválida")
+
+
+            val calendar = Calendar.getInstance()
+            calendar.time = rentaDate
+            calendar.add(Calendar.MONTH, 2)
+            val maxEntregaDate = calendar.time
+
+            if (entregaDate.after(maxEntregaDate)) {
+                _uistate.update {
+                    it.copy(
+                        total = null,
+                        error = "La fecha de entrega no puede ser mayor a dos meses después de la fecha de renta",
+                        showModal = false
+                    )
+                }
+                return
+            }
 
             if (entregaDate.before(rentaDate)) {
                 _uistate.update {
@@ -455,9 +464,15 @@ class RentaViewModel @Inject constructor(
                 }
                 return
             }
+
             val diffInMillis = entregaDate.time - rentaDate.time
             val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
-            val costoAdicional = calcularCostoAdicional(uistate.value.renta?.fechaEntrega?:"", uistate.value.fechaEntrega?:"", costoDiario.toDouble())
+            val costoAdicional = calcularCostoAdicional(
+                uistate.value.renta?.fechaEntrega ?: "",
+                uistate.value.fechaEntrega ?: "",
+                costoDiario.toDouble()
+            )
+
             if (diffInDays < 3) {
                 _uistate.update {
                     it.copy(
@@ -468,6 +483,7 @@ class RentaViewModel @Inject constructor(
                 }
                 return
             }
+
             val total = diffInDays * costoDiario
             _uistate.update {
                 it.copy(
@@ -478,7 +494,6 @@ class RentaViewModel @Inject constructor(
                     errorFechaRenta = null,
                     errorFechaEntrega = null,
                     showModal = true
-
                 )
             }
         } catch (e: Exception) {
