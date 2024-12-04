@@ -69,10 +69,15 @@ fun FiltraVehiculoBody(
     authViewModel: AuthViewModel = hiltViewModel(),
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
-    val authState = authViewModel.uistate.collectAsStateWithLifecycle()
+    val authState by authViewModel.uistate.collectAsStateWithLifecycle()
+    if (uiState.isLoading== false) {
+        LaunchedEffect(authState.isAdmin) {
+            onEvent(VehiculoEvent.GetVehiculosFiltered(uiState.vehiculos, authState.isAdmin))
+        }
+    }
 
     when {
-        uiState.isLoading == true -> {
+        uiState.isLoading == true || uiState.isLoadingData == null ->  {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -84,7 +89,6 @@ fun FiltraVehiculoBody(
         uiState.vehiculoConMarcas.isEmpty()-> {
             ListIsEmpty()
         }
-
         else -> {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -102,7 +106,7 @@ fun FiltraVehiculoBody(
                         vehiculoId = vehiculoConMarca.vehiculo.vehiculoId?:0,
                         onGoRenta = onGoRenta,
                         onGoEdit = onGoEdit,
-                        isAdmin = authState.value.isAdmin,
+                        isAdmin = authState.isAdmin,
                         onEvent = { event -> onEvent(event)},
                         estado = if (vehiculoConMarca.vehiculo.estaRentado == true) "Rentado" else "Disponible",
                         isRentado = vehiculoConMarca.vehiculo.estaRentado ?: false
