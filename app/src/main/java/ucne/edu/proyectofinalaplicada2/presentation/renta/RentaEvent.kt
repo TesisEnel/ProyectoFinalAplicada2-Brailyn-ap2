@@ -17,6 +17,7 @@ sealed interface RentaEvent {
     data class SelectedRenta(val vehiculoId: Int) : RentaEvent
     data object UpdateRenta : RentaEvent
     data object ClearSuccess: RentaEvent
-    data class DeleteRenta(val rentaId: Int) : RentaEvent
+    data class DeleteRenta(val rentaId: Int, val vehiculoId: Int) : RentaEvent
     data object ClearError : RentaEvent
+    data object GetRentas: RentaEvent
 }

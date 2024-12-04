@@ -87,10 +87,10 @@ class VehiculoViewModel @Inject constructor(
                     nombreMarca = marca?.nombreMarca,
                     nombreModelo = modelo?.modeloVehiculo,
                     vehiculo = vehiculo,
-                    estaRentado = vehiculo.estaRentado
+                    estaRentado = vehiculo.estaRentado?:false
                 )
             }
-            val vehiculoNoRentados = vehiculoConMarcas.filter { it.estaRentado == false || it.estaRentado == null }
+            val vehiculoNoRentados = vehiculoConMarcas.filter { !it.estaRentado  }
 
             if(isAdmin){
                 _uistate.update {
@@ -440,7 +440,7 @@ class VehiculoViewModel @Inject constructor(
                 nombreModelo = modelo?.modeloVehiculo,
                 nombreMarca = marca?.nombreMarca,
                 vehiculo = vehiculo,
-                estaRentado = vehiculo.estaRentado
+                estaRentado = vehiculo.estaRentado?:false
             )
         }
         _uistate.update {
