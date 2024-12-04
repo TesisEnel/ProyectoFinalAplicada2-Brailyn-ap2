@@ -245,6 +245,22 @@ fun RentaBodyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 readOnly = true
                             )
+                            rentaUiState.errorFechaRenta?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                                )
+                            }
+                            rentaUiState.error?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                                )
+                            }
 
                         }
 
@@ -266,7 +282,14 @@ fun RentaBodyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 readOnly = true
                             )
-
+                            rentaUiState.errorFechaEntrega?.let { error ->
+                                Text(
+                                    text = error,
+                                    color = MaterialTheme.colorScheme.error,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                                )
+                            }
                         }
 
                         if (showDatePickerEntrega) {
@@ -287,7 +310,8 @@ fun RentaBodyScreen(
                                 )
                             )
                         },
-                        enabled = rentaUiState.fechaEntrega?.isNotBlank() == true,
+                        enabled = rentaUiState.errorFechaRenta.isNullOrEmpty() &&
+                                rentaUiState.errorFechaEntrega.isNullOrEmpty(),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
 

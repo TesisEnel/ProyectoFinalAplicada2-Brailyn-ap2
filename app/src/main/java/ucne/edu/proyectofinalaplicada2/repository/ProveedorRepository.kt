@@ -1,10 +1,13 @@
 package ucne.edu.proyectofinalaplicada2.repository
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import ucne.edu.proyectofinalaplicada2.data.local.dao.ProveedorDao
 import ucne.edu.proyectofinalaplicada2.data.local.entities.ProveedorEntity
 import ucne.edu.proyectofinalaplicada2.data.remote.RentCarRemoteDataSource
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.toEntity
 import ucne.edu.proyectofinalaplicada2.utils.Resource
 import javax.inject.Inject
@@ -24,6 +27,20 @@ class ProveedorRepository @Inject constructor(
         } catch (e: Exception) {
            val proveedoresLocal = proveedorDao.getAll().firstOrNull()
             Resource.Success(proveedoresLocal?: emptyList())
+        }
+    }
+
+     fun addProveedor(proveedorDto: ProveedorDto): Flow<Resource<ProveedorEntity>> = flow {
+        try {
+            emit(Resource.Loading())
+            val proveedor = rentCarRemoteDataSource.addProveedor(proveedorDto)
+            val localProveedor =  proveedor.toEntity()
+            proveedorDao.save(localProveedor)
+            emit(Resource.Success(localProveedor))
+        } catch (e: HttpException) {
+            emit(Resource.Error("Error de internet ${e.message}"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
 }

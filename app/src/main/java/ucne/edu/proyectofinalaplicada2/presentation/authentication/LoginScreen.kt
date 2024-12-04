@@ -103,7 +103,9 @@ fun LoginScreen(
                         tint = Gradiend
                     )
                 },
-                label = { Text("Email", color = Gradiend) }
+                label = { Text("Email", color = Gradiend) },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+
             )
 
 
@@ -230,7 +232,8 @@ fun PasswordTextField(
         label = { Text("Password", color = Gradiend) },
         leadingIcon = { PasswordLeadingIcon() },
         trailingIcon = { PasswordTrailingIcon(passwordVisibility, onTogglePasswordVisibility) },
-        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
+        visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
     )
 }
 

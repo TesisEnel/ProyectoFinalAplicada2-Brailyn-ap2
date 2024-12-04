@@ -271,7 +271,7 @@ class VehiculoViewModel @Inject constructor(
             _uistate.update { it.copy(modeloError = "") }
         }
 
-        if (_uistate.value.precio == null || _uistate.value.precio!! < 1000 || _uistate.value.precio!! > 4000) {
+        if (_uistate.value.precio == null || _uistate.value.precio!! < 1000 || _uistate.value.precio!! > 100000) {
             isValid = false
             _uistate.update {
                 it.copy(

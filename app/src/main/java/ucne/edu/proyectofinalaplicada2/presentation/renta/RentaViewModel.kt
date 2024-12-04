@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import android.app.Application
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,8 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
+import ucne.edu.proyectofinalaplicada2.notificaciones.schedulePickupNotification
+import ucne.edu.proyectofinalaplicada2.notificaciones.scheduleRentalNotification
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -23,6 +26,7 @@ import ucne.edu.proyectofinalaplicada2.repository.TipoCombustibleRepository
 import ucne.edu.proyectofinalaplicada2.repository.TipoVehiculoRepository
 import ucne.edu.proyectofinalaplicada2.repository.VehiculoRepository
 import ucne.edu.proyectofinalaplicada2.utils.Resource
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -37,6 +41,7 @@ class RentaViewModel @Inject constructor(
     private val modeloRepository: ModeloRepository,
     private val tipoCombustibleRepository: TipoCombustibleRepository,
     private val tipoVehiculoRepository: TipoVehiculoRepository,
+    private val application: Application,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
@@ -44,6 +49,7 @@ class RentaViewModel @Inject constructor(
     init {
         getRentas()
     }
+
     fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
@@ -83,6 +89,19 @@ class RentaViewModel @Inject constructor(
         viewModelScope.launch {
             var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
             vehiculo = vehiculo?.copy(estaRentado = true)
+            scheduleRentalNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaEntrega = uistate.value.fechaEntrega ?: "",
+            )
+            schedulePickupNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaRenta = uistate.value.fechaRenta,
+            )
+
             val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)
             renta.collect { result ->
                 when (result) {
@@ -248,18 +267,15 @@ class RentaViewModel @Inject constructor(
                         vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
                         vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
                         vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo,
-                        fechaRenta = today
+                        fechaRenta = uistate.value.fechaRenta
                     )
                 }
             }
-
         }
     }
-
     suspend fun getVehiculoById(id: Int): VehiculoEntity? {
         return vehiculoRepository.getVehiculoById(id).data
     }
-
     suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
@@ -267,15 +283,12 @@ class RentaViewModel @Inject constructor(
     suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
-
     suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
-
     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
-
     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
     }
@@ -344,7 +357,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeVehiculoId(vehiculoId: Int) {
         _uistate.update {
             it.copy(
@@ -352,7 +364,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeFechaRenta(fechaRenta: String) {
         _uistate.update {
             it.copy(
@@ -361,7 +372,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeFechaEntrega(fechaEntrega: String) {
         _uistate.update {
             it.copy(
@@ -370,7 +380,6 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
-
     private fun onChangeTotal(total: Double) {
         _uistate.update {
             it.copy(
@@ -381,6 +390,7 @@ class RentaViewModel @Inject constructor(
 
     private fun calculateTotal(fechaRenta: String?, fechaEntrega: String?, costoDiario: Int) {
         val today = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date())
+
         if (fechaRenta.isNullOrBlank()) {
             _uistate.update {
                 it.copy(
@@ -421,22 +431,30 @@ class RentaViewModel @Inject constructor(
             }
             return
         }
-        if (fechaRenta < today) {
-            _uistate.update {
-                it.copy(
-                    total = null,
-                    errorFechaRenta = "La fecha de renta no puede ser anterior a hoy",
-                    showModal = false
-                )
-            }
-            return
-        }
+
         try {
             val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
             val rentaDate: Date =
                 dateFormat.parse(fechaRenta) ?: throw Exception("Fecha de renta inválida")
             val entregaDate: Date =
                 dateFormat.parse(fechaEntrega) ?: throw Exception("Fecha de entrega inválida")
+
+
+            val calendar = Calendar.getInstance()
+            calendar.time = rentaDate
+            calendar.add(Calendar.MONTH, 2)
+            val maxEntregaDate = calendar.time
+
+            if (entregaDate.after(maxEntregaDate)) {
+                _uistate.update {
+                    it.copy(
+                        total = null,
+                        error = "La fecha de entrega no puede ser mayor a dos meses después de la fecha de renta",
+                        showModal = false
+                    )
+                }
+                return
+            }
 
             if (entregaDate.before(rentaDate)) {
                 _uistate.update {
@@ -448,9 +466,15 @@ class RentaViewModel @Inject constructor(
                 }
                 return
             }
+
             val diffInMillis = entregaDate.time - rentaDate.time
             val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
-            val costoAdicional = calcularCostoAdicional(uistate.value.renta?.fechaEntrega?:"", uistate.value.fechaEntrega?:"", costoDiario.toDouble())
+            val costoAdicional = calcularCostoAdicional(
+                uistate.value.renta?.fechaEntrega ?: "",
+                uistate.value.fechaEntrega ?: "",
+                costoDiario.toDouble()
+            )
+
             if (diffInDays < 3) {
                 _uistate.update {
                     it.copy(
@@ -461,8 +485,8 @@ class RentaViewModel @Inject constructor(
                 }
                 return
             }
-            val total = diffInDays * costoDiario
 
+            val total = diffInDays * costoDiario
             _uistate.update {
                 it.copy(
                     total = total.toDouble(),
@@ -472,7 +496,6 @@ class RentaViewModel @Inject constructor(
                     errorFechaRenta = null,
                     errorFechaEntrega = null,
                     showModal = true
-
                 )
             }
         } catch (e: Exception) {

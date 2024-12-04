@@ -56,14 +56,15 @@ class RentaViewModelTest{
 
 
           viewModel = RentaViewModel(
-            rentaRepository,
-            vehiculoRepository,
-            clienteRepository,
-            marcaRepository,
-            modeloRepository,
-            tipoCombustibleRepository,
-            tipoVehiculoRepository
-        )
+              rentaRepository,
+              vehiculoRepository,
+              clienteRepository,
+              marcaRepository,
+              modeloRepository,
+              tipoCombustibleRepository,
+              tipoVehiculoRepository,
+              application = TODO(),
+          )
     }
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
