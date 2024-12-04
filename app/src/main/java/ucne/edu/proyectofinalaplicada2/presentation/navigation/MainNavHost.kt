@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -57,6 +60,7 @@ import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.SettingUser
 import ucne.edu.proyectofinalaplicada2.presentation.components.NavigationBar
 import ucne.edu.proyectofinalaplicada2.presentation.modelo.TipoModeloListListScreen
+import ucne.edu.proyectofinalaplicada2.presentation.proveedor.ProveedorRegistroScreen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaListSceen
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaScreen
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoRegistroScreen
@@ -126,7 +130,9 @@ fun MainBodyNavHost(
                         onAuthEvent(AuthEvent.ClearData)
                         FirebaseAuth.getInstance().signOut()
                     },
-                    onNavigateSettings = { navHostController.navigate(Screen.Settings) }
+                    onNavigateSettings = { navHostController.navigate(Screen.Settings) },
+                    onBack = { navHostController.popBackStack() },
+                    showBackButton = uiState.showBackButton // Pasa el valor aquí
                 )
             },
             content = { innerPadding ->
@@ -148,12 +154,13 @@ fun TopBar(
     onToggleMenu: () -> Unit,
     onSignOut: () -> Unit,
     onNavigateSettings: () -> Unit,
+    onBack: () -> Unit = {},
+    showBackButton: Boolean
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
-
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
@@ -177,16 +184,26 @@ fun TopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
+                if (showBackButton) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            contentDescription = "back",
+                            tint = Color.White,
+                            modifier = Modifier.padding(top = 20.dp)
+                        )
+                    }
+                } else {
+                    Spacer(modifier = Modifier.width(48.dp))
+                }
                 Text(
                     text = currentTitle,
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontFamily = FontFamily.Serif,
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier.padding(top = 24.dp)
                 )
-
-                Box{
+                Box {
                     IconButton(onClick = onToggleMenu) {
                         Icon(
                             Icons.Filled.Person,
@@ -210,7 +227,6 @@ fun TopBar(
                         )
                     }
                 }
-
             }
         }
     }
@@ -260,8 +276,6 @@ fun NavHostContent(
                         vehiculoId = id ?: 0,
                     )
                 }
-
-
             }
             composable<Screen.TipoVehiculoListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
@@ -301,6 +315,10 @@ fun NavHostContent(
             composable<Screen.Settings> {
                 SettingUser(
                     goToBack = { navHostController.popBackStack() }
+                )
+            }
+            composable<Screen.ProveedorRegistroScreen> {
+                ProveedorRegistroScreen(
                 )
             }
         }
