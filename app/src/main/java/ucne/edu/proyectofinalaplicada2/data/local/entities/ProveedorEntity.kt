@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "Proveedores")
 class ProveedorEntity(
     @PrimaryKey
-    val proveedorId: Int,
-    val nombre: String,
-    val celular: String,
+    val proveedorId: Int?,
+    val nombre: String?,
+    val celular: String?,
 )
