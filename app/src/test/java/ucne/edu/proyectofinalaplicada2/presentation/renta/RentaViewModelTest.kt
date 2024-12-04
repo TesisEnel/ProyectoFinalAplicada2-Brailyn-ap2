@@ -139,44 +139,4 @@ class RentaViewModelTest{
 
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `Should prepare data for rent`() = runTest {
-        val emailCliente = "braylin@gmail.com"
-        val vehiculoId = 1
-        val rentaId = 1
-
-        val cliente = ClienteEntity(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
-        val vehiculo = VehiculoEntity(vehiculoId, 1, 1, 1, 1, 2000, "Vehículo Test", 2022, emptyList(), 1, false)
-        val marca = MarcaEntity(1, "Toyota")
-        val modelo = ModeloEntity(1, 1,"Corolla")
-        val tipoCombustible = TipoCombustibleEntity(1, "Gasolina")
-        val tipoVehiculo = TipoVehiculoEntity(1, "Sedán")
-        val renta = RentaEntity(rentaId, vehiculoId, cliente.clienteId, "12/2/2024", "12/2/2024", 2000.0)
-
-        coEvery { clienteRepository.getClienteByEmail(emailCliente) } returns Resource.Success(cliente)
-        coEvery { vehiculoRepository.getVehiculoById(vehiculoId) } returns Resource.Success(vehiculo)
-        coEvery { marcaRepository.getMarcaById(1) } returns Resource.Success(marca)
-        coEvery { modeloRepository.getModelosById(1) } returns Resource.Success(modelo)
-        coEvery { tipoCombustibleRepository.getTipoCombustibleById(1) } returns Resource.Success(tipoCombustible)
-        coEvery { tipoVehiculoRepository.getTipoVehiculoById(1) } returns Resource.Success(tipoVehiculo)
-
-        viewModel.prepareRentaData(emailCliente, vehiculoId, rentaId )
-        advanceUntilIdle()
-
-        val uiState = viewModel.uistate.value
-        assertEquals(cliente.clienteId, uiState.clienteId)
-        assertEquals(vehiculo, uiState.vehiculo)
-        assertEquals(marca, uiState.marca)
-        assertEquals(modelo, uiState.modelo)
-        assertEquals(tipoCombustible, uiState.tipoCombustibleEntity)
-        assertEquals(tipoVehiculo, uiState.tipoVehiculoEntity)
-        assertEquals(marca.nombreMarca, uiState.vehiculoNombre)
-        assertEquals(modelo.modeloVehiculo, uiState.vehiculoModelo)
-        assertEquals(tipoCombustible.nombreTipoCombustible, uiState.vehiculoConCombustible)
-        assertEquals(tipoVehiculo.nombreTipoVehiculo, uiState.vehiculoConTipo)
-        assertEquals(renta, uiState.renta)
-
-    }
-
 }

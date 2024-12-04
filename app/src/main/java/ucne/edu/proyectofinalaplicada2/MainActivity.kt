@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             ProyectoFinalAplicada2Theme {

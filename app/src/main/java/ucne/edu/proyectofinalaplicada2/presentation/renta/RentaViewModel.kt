@@ -132,7 +132,8 @@ class RentaViewModel @Inject constructor(
             }
             _uistate.update {
                 it.copy(
-                    rentaConVehiculos = rentaConVehiculo
+                    rentaConVehiculos = rentaConVehiculo,
+                    isDataLoading = false
                 )
             }
 
@@ -160,7 +161,8 @@ class RentaViewModel @Inject constructor(
 
                 _uistate.update {
                     it.copy(
-                        rentaConVehiculos = rentaConVehiculo
+                        rentaConVehiculos = rentaConVehiculo,
+                        isDataLoading = false
                     )
                 }
             }
@@ -168,7 +170,7 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    fun prepareRentaData(emailCliente: String?, vehiculoId: Int, rentaId: Int) {
+    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int, rentaId: Int) {
         viewModelScope.launch {
 
             val cliente = getClienteByEmail(emailCliente ?: "")
@@ -534,9 +536,9 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    private fun deleteRenta(vehiculoId: Int) {
+    private fun deleteRenta(rentaId: Int, vehiculoId: Int) {
         viewModelScope.launch {
-            rentaRepository.deleteRenta(vehiculoId).collect{result->
+            rentaRepository.deleteRenta(rentaId, vehiculoId).collect{result->
                 when (result) {
                     is Resource.Error -> {
                         _uistate.update {
@@ -560,7 +562,6 @@ class RentaViewModel @Inject constructor(
                                 isDataLoading = false
                             )
                         }
-                        getRentas()
                     }
                 }
             }
@@ -599,7 +600,7 @@ class RentaViewModel @Inject constructor(
     }private fun clearError() {
         _uistate.update {
             it.copy(
-                success = ""
+                error = ""
             )
         }
     }
@@ -631,7 +632,8 @@ class RentaViewModel @Inject constructor(
             )
 
             is RentaEvent.SelectedRenta -> selectedRenta(event.vehiculoId)
-            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId)
+            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId, event.vehiculoId)
+            is RentaEvent.GetRentas -> getRentas()
 
         }
     }

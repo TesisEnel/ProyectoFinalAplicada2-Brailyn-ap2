@@ -66,7 +66,7 @@ fun RentaScreen(
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
 
-    if (vehiculoUiState.isLoading == true) {
+    if (vehiculoUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -245,22 +245,6 @@ fun RentaBodyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 readOnly = true
                             )
-                            rentaUiState.errorFechaRenta?.let { error ->
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                                )
-                            }
-                            rentaUiState.error?.let { error ->
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                                )
-                            }
 
                         }
 
@@ -282,14 +266,7 @@ fun RentaBodyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 readOnly = true
                             )
-                            rentaUiState.errorFechaEntrega?.let { error ->
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-                                )
-                            }
+
                         }
 
                         if (showDatePickerEntrega) {
@@ -310,8 +287,7 @@ fun RentaBodyScreen(
                                 )
                             )
                         },
-                        enabled = rentaUiState.errorFechaRenta.isNullOrEmpty() &&
-                                rentaUiState.errorFechaEntrega.isNullOrEmpty(),
+                        enabled = rentaUiState.fechaEntrega?.isNotBlank() == true,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
 

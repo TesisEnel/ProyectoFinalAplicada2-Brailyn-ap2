@@ -32,18 +32,17 @@ class VehiculoRepository @Inject constructor(
             val localIds = localVehiculos.map { it.vehiculoId }
             val deleteIds = localIds.filterNot { remotIds.contains(it) }
 
-            if(deleteIds.isNotEmpty()){
+            if (deleteIds.isNotEmpty()) {
                 val vehiculosToDelete = localVehiculos.filter { deleteIds.contains(it.vehiculoId) }
-                vehiculosToDelete.forEach { vehiculoDao.delete(it) }
+                vehiculosToDelete.map { vehiculoDao.delete(it) }
             }
             vehiculos.forEach { vehiculo ->
                 vehiculoDao.save(
                     vehiculo.copy(imagePath = vehiculo.imagePath ?: emptyList()).toEntity()
                 )
             }
-            val updatedLocalVehiculos = vehiculoDao.getAll()
-
-            emit(Resource.Success(updatedLocalVehiculos))
+            val updatedLocalVehiculos = syncVehiculos(vehiculos.map { it.toEntity() }).data
+            emit(Resource.Success(updatedLocalVehiculos ?: emptyList()))
 
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
@@ -142,20 +141,29 @@ class VehiculoRepository @Inject constructor(
             emit(Resource.Error("Error desconocido ${e.message}"))
         }
     }
+
     fun deleteVehiculo(vehiculoId: Int): Flow<Resource<VehiculoDto>> = flow {
         try {
             emit(Resource.Loading())
             val vehiculoDeleted = rentCarRemoteDataSource.deleteVehiculo(vehiculoId)
             vehiculoDao.delete(vehiculoDeleted.toEntity())
             emit(Resource.Success(vehiculoDeleted))
-        }
-        catch (e: HttpException) {
+        } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             emit(Resource.Error("Error, no tienes conexión a internet para realizar esta operación"))
         }
     }
 
+    private suspend fun syncVehiculos(vehiculosActualizados: List<VehiculoEntity>): Resource<List<VehiculoEntity>> {
+        return try {
+            vehiculoDao.insertAll(vehiculosActualizados)
+            Resource.Success(vehiculosActualizados)
+        } catch (e: HttpException) {
+            Resource.Error("Error al sincronizar vehículos: ${e.message}")
+        } catch (e: Exception) {
+            Resource.Error("Error desconocido al sincronizar vehículos: ${e.message}")
+        }
+    }
 
 }

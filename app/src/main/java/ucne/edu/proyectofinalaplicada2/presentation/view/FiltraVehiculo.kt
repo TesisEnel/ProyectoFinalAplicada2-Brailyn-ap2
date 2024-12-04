@@ -43,19 +43,34 @@ import ucne.edu.proyectofinalaplicada2.utils.Constant
 fun FiltraVehiculo(
     viewModel: VehiculoViewModel = hiltViewModel(),
     onGoRenta: (Int) -> Unit,
-    onGoEdit: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
+    FiltraBodyVehiculo(
+        vehiculoUistate = uiState,
+        onEvent = {event -> viewModel.onEvent(event)},
+        onGoRenta = onGoRenta,
+        onGoEdit = onGoEdit
+    )
+}
+
+@Composable
+fun FiltraBodyVehiculo(
+    vehiculoUistate: VehiculoUistate,
+    onEvent: (VehiculoEvent) -> Unit = {},
+    onGoRenta: (Int) -> Unit,
+    onGoEdit: (Int) -> Unit,
+) {
     Column {
         SearchBar(
-            searchQuery = uiState.searchQuery,
-            onEvent = {event -> viewModel.onEvent(event)}
+            searchQuery = vehiculoUistate.searchQuery,
+            onEvent = onEvent
         )
         FiltraVehiculoBody(
-            uiState = uiState,
+            uiState = vehiculoUistate,
             onGoRenta = onGoRenta,
             onGoEdit = onGoEdit,
-            onEvent = {event -> viewModel.onEvent(event)}
+            onEvent = onEvent
         )
     }
 
@@ -70,14 +85,14 @@ fun FiltraVehiculoBody(
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
     val authState by authViewModel.uistate.collectAsStateWithLifecycle()
-    if (uiState.isLoading== false) {
+    if (!uiState.isLoading) {
         LaunchedEffect(authState.isAdmin) {
             onEvent(VehiculoEvent.GetVehiculosFiltered(uiState.vehiculos, authState.isAdmin))
         }
     }
 
     when {
-        uiState.isLoading == true || uiState.isLoadingData == null ->  {
+        uiState.isLoadingData ->  {
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
