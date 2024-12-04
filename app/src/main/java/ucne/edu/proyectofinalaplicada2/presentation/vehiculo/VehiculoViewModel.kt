@@ -90,7 +90,7 @@ class VehiculoViewModel @Inject constructor(
                     estaRentado = vehiculo.estaRentado
                 )
             }
-            val vehiculoNoRentados = vehiculoConMarcas.filter { it.estaRentado == false }
+            val vehiculoNoRentados = vehiculoConMarcas.filter { it.estaRentado == false || it.estaRentado == null }
 
             if(isAdmin){
                 _uistate.update {

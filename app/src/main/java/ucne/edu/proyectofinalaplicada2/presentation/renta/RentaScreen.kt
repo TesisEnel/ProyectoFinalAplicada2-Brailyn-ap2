@@ -98,8 +98,6 @@ fun RentaBodyScreen(
     val vehiculo = vehiculoUiState.vehiculos.find { it.vehiculoId == vehiculoId }
     var showDatePickerEntrega by remember { mutableStateOf(false) }
     val datePickerStateEntrega = rememberDatePickerState()
-    var showDatePickerRenta by remember { mutableStateOf(false) }
-    val datePickerStateRenta = rememberDatePickerState()
     val emailCliente = FirebaseAuth.getInstance().currentUser?.email
 
     LaunchedEffect( datePickerStateEntrega.selectedDateMillis) {
@@ -237,7 +235,7 @@ fun RentaBodyScreen(
                                 onValueChange = {onEvent(RentaEvent.OnchangeFechaRenta(it))},
                                 label = { Text("Renta") },
                                 trailingIcon = {
-                                    IconButton(onClick = { showDatePickerRenta = !showDatePickerRenta }) {
+                                    IconButton(onClick = {  }) {
                                         Icon(
                                             Icons.Default.DateRange,
                                             contentDescription = "Select date"
@@ -266,13 +264,6 @@ fun RentaBodyScreen(
 
                         }
 
-                        if (showDatePickerRenta) {
-                            DatePickerPopup(
-                                onDismissRequest = { showDatePickerRenta = false },
-                                state = datePickerStateRenta
-                            )
-                        }
-
                         Column(modifier = Modifier.weight(1f)) {
                             OutlinedTextField(
                                 value = rentaUiState.fechaEntrega ?: "",
@@ -288,7 +279,8 @@ fun RentaBodyScreen(
                                         )
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                readOnly = true
                             )
                             rentaUiState.errorFechaEntrega?.let { error ->
                                 Text(
