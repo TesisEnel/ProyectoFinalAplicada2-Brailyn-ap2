@@ -293,11 +293,11 @@ class VehiculoViewModel @Inject constructor(
             _uistate.update { it.copy(descripcionError = "") }
         }
 
-        if (_uistate.value.anio == null || _uistate.value.anio!! < 2010) {
+        if (_uistate.value.anio == null || _uistate.value.anio!! < 2010 || _uistate.value.anio!! > 2026) {
             isValid = false
             _uistate.update {
                 it.copy(
-                    anioError = "Ingrese un año válido (>= 2010)"
+                    anioError = "Ingrese un año válido (>= 2010 O <=2025)"
                 )
             }
         } else {
