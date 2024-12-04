@@ -10,15 +10,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -190,9 +200,9 @@ fun VehiculoBodyRegistroScreen(
                     options = vehiculoUiState.proveedores ?: emptyList(),
                     selectedOption = vehiculoUiState.proveedores?.firstOrNull { it.proveedorId == vehiculoUiState.proveedorId },
                     onOptionSelected = {
-                        onVehiculoEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId))
+                        onVehiculoEnvent(VehiculoEvent.OnChangeProveedorId(it.proveedorId?:0))
                     },
-                    labelSelector = { it.nombre },
+                    labelSelector = { it.nombre?:"" },
                     errorMessage = vehiculoUiState.proveedorError
                 )
                 if (vehiculoUiState.proveedorError != "") {
@@ -229,32 +239,14 @@ fun VehiculoBodyRegistroScreen(
                         modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                     )
                 }
-                OutlinedTextField(
-                    value = vehiculoUiState.anio?.toString() ?: "",
-                    onValueChange = {
-                        onVehiculoEnvent(
-                            VehiculoEvent.OnChangeAnio(
-                                it.toIntOrNull() ?: 0
-                            )
-                        )
+                AnioInputDropdown(
+                    selectedYear = vehiculoUiState.anio,
+                    onYearChange = { selectedYear ->
+                        onVehiculoEnvent(VehiculoEvent.OnChangeAnio(selectedYear))
                     },
-                    label = { Text(text = "Año") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
                     isError = vehiculoUiState.anioError.isNotEmpty()
-
                 )
-                if (vehiculoUiState.anioError != "") {
-                    Text(
-                        text = vehiculoUiState.anioError,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
+
 
                 OutlinedTextField(
                     value = vehiculoUiState.descripcion,
@@ -391,4 +383,57 @@ fun SelectMultipleImages() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnioInputDropdown(
+    selectedYear: Int?,
+    onYearChange: (Int) -> Unit,
+    isError: Boolean = false
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val years = (2025 downTo 2010).toList()
+    val selectedYearText = selectedYear?.toString() ?: ""
 
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedYearText,
+            onValueChange = { },
+            label = { Text("Año") },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+                .height(60.dp),
+            readOnly = true,
+            trailingIcon = {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                        contentDescription = "Abrir/Cerrar menú"
+                    )
+
+            },
+            isError = isError,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.heightIn(max = 200.dp)
+        ) {
+            years.forEach { year ->
+                DropdownMenuItem(
+                    text = { Text(text = year.toString(), style = MaterialTheme.typography.bodyMedium) },
+                    onClick = {
+                        onYearChange(year)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
