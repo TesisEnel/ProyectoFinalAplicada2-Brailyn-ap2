@@ -39,6 +39,7 @@ import ucne.edu.proyectofinalaplicada2.R
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.components.ImageCard
+import ucne.edu.proyectofinalaplicada2.presentation.components.ListIsEmpty
 import ucne.edu.proyectofinalaplicada2.presentation.components.TipoVehiculoList
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoUistate
@@ -55,7 +56,33 @@ fun Home(
 ) {
     val vehiculoUistate by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
     val authUistate by authViewModel.uistate.collectAsStateWithLifecycle()
-    if (vehiculoUistate.isLoading == true || vehiculoUistate.isLoadingData == true) {
+    HomeBody(
+        onGoVehiculeList = onGoVehiculeList,
+        onGoSearch = onGoSearch,
+        onGoRenta = onGoRenta,
+        vehiculoUistate = vehiculoUistate,
+        authUistate = authUistate,
+        onEvent = {event -> vehiculoViewModel.onEvent(event)}
+
+    )
+}
+
+@Composable
+fun HomeBody(
+    vehiculoUistate: VehiculoUistate,
+    authUistate: ClienteUiState,
+    onGoVehiculeList:(Int)-> Unit,
+    onGoSearch: () -> Unit,
+    onGoRenta: (Int) -> Unit = {},
+    onEvent: (VehiculoEvent) -> Unit = {},
+) {
+
+    if (vehiculoUistate.isLoading== false) {
+        LaunchedEffect(authUistate.isAdmin) {
+            onEvent(VehiculoEvent.GetVehiculosFiltered(vehiculoUistate.vehiculos, authUistate.isAdmin))
+        }
+    }
+    if (vehiculoUistate.isLoading == true || vehiculoUistate.isLoadingData == null) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -63,7 +90,9 @@ fun Home(
         ) {
             CircularProgressIndicator()
         }
-    } else {
+    }
+    else {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,20 +104,28 @@ fun Home(
                     onGoSearch = onGoSearch
                 )
             }
-            item {
-                ListaDeVehiculos(
-                    vehiculoUistate = vehiculoUistate,
-                    onGoRenta = onGoRenta,
-                    authUistate = authUistate,
-                    onEvent = { vehiculoViewModel.onEvent(it) }
-                )
+            if(vehiculoUistate.vehiculoConMarcas.isEmpty()){
+                item{
+                   ListIsEmpty()
+                }
+            }else{
+                item {
+                    ListaDeVehiculos(
+                        vehiculoUistate = vehiculoUistate,
+                        onGoRenta = onGoRenta,
+                        authUistate = authUistate,
+
+                    )
+                }
+                item {
+                    TiposDeVehiculos(
+                        vehiculoUiState = vehiculoUistate,
+                        onGoVehiculeList = onGoVehiculeList,
+                    )
+                }
             }
-            item {
-                TiposDeVehiculos(
-                    vehiculoUiState = vehiculoUistate,
-                    onGoVehiculeList = onGoVehiculeList,
-                )
-            }
+
+
         }
     }
 }
@@ -101,7 +138,7 @@ fun FakeSearchBar(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(max = 80.dp)
-            .padding(15.dp)
+            .padding(horizontal = 15.dp, vertical = 10.dp)
             .clickable(onClick = onGoSearch),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -135,11 +172,7 @@ fun ListaDeVehiculos(
     authUistate: ClienteUiState,
     onEvent: (VehiculoEvent) -> Unit = {},
 ) {
-    if (authUistate.isDataLoaded) {
-        LaunchedEffect(authUistate.isAdmin) {
-            onEvent(VehiculoEvent.GetVehiculosFiltered(vehiculoUistate.vehiculos, authUistate.isAdmin))
-        }
-    }
+
     Column(
         modifier = Modifier.padding(bottom = 5.dp, top = 6.dp),
     ) {

@@ -59,6 +59,14 @@ fun TipoModeloBodyListScreen(
     onVehiculoEvent: (VehiculoEvent) -> Unit,
     authUiState: ClienteUiState
 ) {
+    if (authUiState.isDataLoaded) {
+        LaunchedEffect(authUiState.isAdmin) {
+
+            if (!modeloUistate.isDataLoaded) {
+                onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId, authUiState.isAdmin))
+            }
+        }
+    }
     if (modeloUistate.isLoading) {
         CircularProgressIndicator()
     } else {
@@ -79,14 +87,14 @@ fun TipoModeloBodyListScreen(
                 fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 15.dp)
             )
-            FiltroBotones(
-                onEvent = onEvent
-            )
+            if(authUiState.isAdmin){
+                FiltroBotones(
+                    onEvent = onEvent
+                )
+            }
             TipoModeloLazyColumn(
                 modeloUistate = modeloUistate,
                 onGoRenta = onGoRenta,
-                marcaId = marcaId,
-                onEvent = onEvent,
                 onGoEdit = onGoEdit,
                 onVehiculoEvent = onVehiculoEvent,
                 authUistate = authUiState
@@ -101,21 +109,12 @@ fun TipoModeloBodyListScreen(
 fun TipoModeloLazyColumn(
     modeloUistate: ModeloUistate,
     onGoRenta: (Int) -> Unit,
-    marcaId: Int,
-    onEvent: (ModeloEvent) -> Unit = {},
     onGoEdit: (Int) -> Unit,
     authUistate: ClienteUiState,
     onVehiculoEvent: (VehiculoEvent) -> Unit
 ) {
 
-    if (authUistate.isDataLoaded) {
-        LaunchedEffect(authUistate.isAdmin) {
 
-            if (!modeloUistate.isDataLoaded) {
-                onEvent(ModeloEvent.GetVehiculosByMarcaId(marcaId, authUistate.isAdmin))
-            }
-        }
-    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),

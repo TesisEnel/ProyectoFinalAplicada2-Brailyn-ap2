@@ -7,9 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,8 +18,6 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -148,6 +144,7 @@ class RentaViewModelTest{
     fun `Should prepare data for rent`() = runTest {
         val emailCliente = "braylin@gmail.com"
         val vehiculoId = 1
+        val rentaId = 1
 
         val cliente = ClienteEntity(1, "12122", "John", "Doe", "Calle Falsa", "8091234567", emailCliente, false)
         val vehiculo = VehiculoEntity(vehiculoId, 1, 1, 1, 1, 2000, "Vehículo Test", 2022, emptyList(), 1, false)
@@ -155,6 +152,7 @@ class RentaViewModelTest{
         val modelo = ModeloEntity(1, 1,"Corolla")
         val tipoCombustible = TipoCombustibleEntity(1, "Gasolina")
         val tipoVehiculo = TipoVehiculoEntity(1, "Sedán")
+        val renta = RentaEntity(rentaId, vehiculoId, cliente.clienteId, "12/2/2024", "12/2/2024", 2000.0)
 
         coEvery { clienteRepository.getClienteByEmail(emailCliente) } returns Resource.Success(cliente)
         coEvery { vehiculoRepository.getVehiculoById(vehiculoId) } returns Resource.Success(vehiculo)
@@ -163,7 +161,7 @@ class RentaViewModelTest{
         coEvery { tipoCombustibleRepository.getTipoCombustibleById(1) } returns Resource.Success(tipoCombustible)
         coEvery { tipoVehiculoRepository.getTipoVehiculoById(1) } returns Resource.Success(tipoVehiculo)
 
-        viewModel.prepareRentaData(emailCliente, vehiculoId)
+        viewModel.prepareRentaData(emailCliente, vehiculoId, rentaId )
         advanceUntilIdle()
 
         val uiState = viewModel.uistate.value
@@ -177,6 +175,8 @@ class RentaViewModelTest{
         assertEquals(modelo.modeloVehiculo, uiState.vehiculoModelo)
         assertEquals(tipoCombustible.nombreTipoCombustible, uiState.vehiculoConCombustible)
         assertEquals(tipoVehiculo.nombreTipoVehiculo, uiState.vehiculoConTipo)
+        assertEquals(renta, uiState.renta)
+
     }
 
 }
