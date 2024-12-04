@@ -1,5 +1,5 @@
 
-# Rent Car App - Proyecto Final Aplicada 2
+# BravquezRentCar
 
 **Rent Car App** es una aplicación móvil desarrollada en **Kotlin** utilizando **Jetpack Compose** para facilitar la gestión de renta de vehículos. Este proyecto está diseñado como una solución completa que incluye autenticación, persistencia local, comunicación remota y un diseño moderno.
 
