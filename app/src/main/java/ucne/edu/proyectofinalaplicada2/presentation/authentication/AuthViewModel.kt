@@ -54,6 +54,7 @@ class AuthViewModel @Inject constructor(
     }
 
     private suspend fun saveUserData(email: String, role: Boolean) {
+        _isRoleVerified.value = false
         dataStore.edit { preferences ->
             preferences[PreferenceKeys.currentUser] = email
             preferences[PreferenceKeys.role] = role
@@ -266,8 +267,10 @@ class AuthViewModel @Inject constructor(
 
     private fun login() {
         viewModelScope.launch {
-            authRepository.login(uistate.value.email, uistate.value.password)
-                .collect { result ->
+            val user =authRepository.login(uistate.value.email, uistate.value.password)
+            val isAdmin = isAdminUser(uistate.value.email )
+            saveUserData(uistate.value.email, isAdmin)
+                user.collect { result ->
                     when (result) {
                         is Resource.Loading -> {
                             _uistate.update {
@@ -277,6 +280,9 @@ class AuthViewModel @Inject constructor(
 
                         is Resource.Success -> {
                             _uistate.update {
+                                _isRoleVerified.value = false
+
+                                loadUserRole()
 
                                 it.copy(isLoading = false, error = null)
                             }
@@ -309,7 +315,6 @@ class AuthViewModel @Inject constructor(
                         is Resource.Success -> {
                             saveCliente()
                             _uistate.update { it.copy(isLoading = false, error = null) }
-                            nuevo()
                         }
 
                         is Resource.Error -> {
@@ -516,31 +521,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun nuevo() {
-        _uistate.update {
-            it.copy(
-                clienteId = null,
-                cedula = "",
-                nombre = "",
-                apellidos = "",
-                direccion = "",
-                celular = "",
-                success = "",
-                error = "",
-                isLoading = false,
-                email = "",
-                password = "", errorEmail = null,
-                errorPassword = null,
-                errorCelular = "",
-                errorCedula = "",
-                errorNombre = "",
-                errorApellidos = "",
-                errorDireccion = ""
-
-
-            )
-        }
-    }
 
     private fun clearError() {
         _uistate.update {
