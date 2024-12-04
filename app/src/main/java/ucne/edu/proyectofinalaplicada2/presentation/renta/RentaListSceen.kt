@@ -238,22 +238,37 @@ fun ExpandableBodyCard(
                 }
             }
 
-            if(rentaUistate.success?.isNotEmpty()== true || rentaUistate.error?.isNotEmpty() == true){
+            if(rentaUistate.success?.isNotEmpty()== true ){
                 CustomDialog(
-                    message = rentaUistate.success?:"",
+                    message = rentaUistate.success,
                     onDismiss = {
                         onRentaEvent(RentaEvent.ClearSuccess)
+                        onRentaEvent(RentaEvent.GetRentas)
                         onRentaEvent(RentaEvent.ClearError)
                         showDeleteDialog = false
                     },
                     isError = rentaUistate.error?.isEmpty() == true
                 )
             }
+            if( rentaUistate.error?.isNotEmpty() == true ){
+                CustomDialog(
+                    message = rentaUistate.error,
+                    onDismiss = {
+                        onRentaEvent(RentaEvent.ClearSuccess)
+                        onRentaEvent(RentaEvent.ClearError)
+                        showDeleteDialog = false
+                    },
+                    isError = rentaUistate.error.isEmpty()
+                )
+            }
 
             if(showDeleteDialog){
                 ConfirmDeleteDialog(
                     onConfirm = {
-                        onRentaEvent(RentaEvent.DeleteRenta(rentaConVehiculo.renta?.rentaId ?: 0))
+                        onRentaEvent(RentaEvent.DeleteRenta(
+                            rentaConVehiculo.renta?.rentaId ?: 0,
+                            rentaConVehiculo.renta?.vehiculoId?:0)
+                        )
                     },
                     onDismiss = { showDeleteDialog = false }
                 )
