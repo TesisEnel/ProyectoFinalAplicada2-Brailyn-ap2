@@ -66,7 +66,7 @@ fun RentaScreen(
     val rentaUiState by rentaViewModel.uistate.collectAsStateWithLifecycle()
     val vehiculoUiState by vehiculoViewModel.uistate.collectAsStateWithLifecycle()
 
-    if (vehiculoUiState.isLoading == true) {
+    if (vehiculoUiState.isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
