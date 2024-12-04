@@ -19,8 +19,8 @@ data class VehiculoUistate(
     val descripcion: String = "",
     val anio: Int? = 0,
     val imagePath: List<String?> = emptyList(),
-    var isLoading: Boolean? = null,
-    var isLoadingData: Boolean? = null,
+    var isLoading: Boolean = false,
+    var isLoadingData: Boolean = false,
     val error: String = "",
     val success: String = "",
     val marcas: List<MarcaEntity> = emptyList(),
@@ -50,7 +50,7 @@ data class VehiculoConMarca(
     val vehiculo: VehiculoEntity,
     val nombreMarca: String?,
     val nombreModelo: String? = null,
-    val estaRentado: Boolean? = null
+    val estaRentado: Boolean = false
 )
 
 fun VehiculoUistate.toEntity()= VehiculoDto(
