@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.components.ConfirmDeleteDialog
+import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable
@@ -124,7 +126,9 @@ fun ExpandableCard(
             isExpanded = isExpanded == index,
             onCardArrowClick = { isExpanded = if (isExpanded == index) null else index },
             rentaConVehiculo = renta,
-            onGoEdit = onGoEdit
+            onGoEdit = onGoEdit,
+            onRentaEvent = onEvent,
+            rentaUistate = uiState
         )
     }
 }
@@ -136,9 +140,12 @@ fun ExpandableBodyCard(
     onCardArrowClick: () -> Unit,
     rentaConVehiculo: RentaConVehiculo,
     onGoEdit: (Int,Int) -> Unit ,
+    onRentaEvent: (RentaEvent) -> Unit = {},
+    rentaUistate: RentaUistate
 ) {
     var menuExpanded by remember { mutableStateOf(false) } // Control para el menú desplegable
     val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -203,6 +210,7 @@ fun ExpandableBodyCard(
                             DropdownMenuItem(
                                 onClick = {
                                     menuExpanded = false
+                                    showDeleteDialog = true
 
                                 },
                                 text = { Text("Eliminar") }
@@ -225,6 +233,27 @@ fun ExpandableBodyCard(
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
+            }
+
+            if(rentaUistate.success?.isNotEmpty()== true || rentaUistate.error?.isNotEmpty() == true){
+                CustomDialog(
+                    message = rentaUistate.success?:"",
+                    onDismiss = {
+                        onRentaEvent(RentaEvent.ClearSuccess)
+                        onRentaEvent(RentaEvent.ClearError)
+                        showDeleteDialog = false
+                    },
+                    isError = rentaUistate.error?.isEmpty() == true
+                )
+            }
+
+            if(showDeleteDialog){
+                ConfirmDeleteDialog(
+                    onConfirm = {
+                        onRentaEvent(RentaEvent.DeleteRenta(rentaConVehiculo.renta?.rentaId ?: 0))
+                    },
+                    onDismiss = { showDeleteDialog = false }
+                )
             }
         }
     }
