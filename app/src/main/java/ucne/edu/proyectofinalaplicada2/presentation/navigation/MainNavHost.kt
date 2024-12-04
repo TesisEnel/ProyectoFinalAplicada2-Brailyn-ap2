@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
@@ -66,7 +68,7 @@ import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 fun MainNavHost(
     navHostController: NavHostController,
     mainViewModel: NavHostViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val roleFlow = authViewModel.roleFlow
@@ -106,7 +108,7 @@ fun MainBodyNavHost(
         }
     } else {
         Scaffold(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background), // Fondo general
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
             bottomBar = {
                 NavigationBar(
                     navHostController = navHostController,
@@ -179,7 +181,7 @@ fun TopBar(
                 Text(
                     text = currentTitle,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontFamily = FontFamily.Serif,
                     modifier = Modifier.padding(top = 20.dp)
                 )
@@ -189,7 +191,7 @@ fun TopBar(
                         Icon(
                             Icons.Filled.Person,
                             contentDescription = "Perfil",
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = Color.White,
                             modifier = Modifier.padding(top = 20.dp)
                         )
                     }
@@ -241,7 +243,7 @@ fun NavHostContent(
                         navHostController.navigate(Screen.FiltraVehiculo)
                     },
                     onGoRenta = {
-                        navHostController.navigate(Screen.RentaScreen(it))
+                        navHostController.navigate(Screen.RentaScreen(it,0))
                     }
                 )
             }
@@ -249,16 +251,24 @@ fun NavHostContent(
             composable<Screen.VehiculoRegistroScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 val id = it.toRoute<Screen.VehiculoRegistroScreen>().id
-                VehiculoRegistroScreen(
-                    vehiculoId = id ?: 0,
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ){
+                    VehiculoRegistroScreen(
+                        vehiculoId = id ?: 0,
+                    )
+                }
+
+
             }
             composable<Screen.TipoVehiculoListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 val id = it.toRoute<Screen.TipoVehiculoListScreen>().id
                 TipoModeloListListScreen(
                     onGoRenta = { vehiculoId ->
-                        navHostController.navigate(Screen.RentaScreen(vehiculoId))
+                        navHostController.navigate(Screen.RentaScreen(vehiculoId,0))
                     },
                     marcaId = id,
                     onGoEdit = { vehiculoId ->
@@ -268,19 +278,23 @@ fun NavHostContent(
             }
             composable<Screen.RentaScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                val id = it.toRoute<Screen.RentaScreen>().id
+                val (vehiculoId, rentaId) = it.toRoute<Screen.RentaScreen>()
+
                 RentaScreen(
-                    vehiculoId = id
+                    vehiculoId = vehiculoId,
+                    rentaId = rentaId,
                 )
             }
             composable<Screen.RentaListScreen> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
-                RentaListSceen()
+                RentaListSceen(
+                    onGoEdit = {vehiculoId, rentaId -> navHostController.navigate(Screen.RentaScreen(vehiculoId, rentaId)) },
+                )
             }
             composable<Screen.FiltraVehiculo> {
                 onEvent(MainEvent.UpdateCurrentRoute(backStackEntry ?: return@composable))
                 FiltraVehiculo(
-                    onGoRenta = { navHostController.navigate(Screen.RentaScreen(it)) },
+                    onGoRenta = { navHostController.navigate(Screen.RentaScreen(it, 0)) },
                     onGoEdit = { navHostController.navigate(Screen.VehiculoRegistroScreen(it)) },
                 )
             }

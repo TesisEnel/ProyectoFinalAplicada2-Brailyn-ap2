@@ -3,6 +3,7 @@ package ucne.edu.proyectofinalaplicada2.data.local.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
@@ -11,6 +12,9 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.RentaEntity
 interface RentaDao {
     @Upsert
     suspend fun save(renta: RentaEntity)
+
+    @Update
+    suspend fun update(renta: RentaEntity)
 
     @Query(
         """select * from Rentas where rentaId=:id

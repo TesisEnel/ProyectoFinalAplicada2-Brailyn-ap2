@@ -1,6 +1,5 @@
 package ucne.edu.proyectofinalaplicada2.presentation.navigation
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
@@ -15,7 +14,7 @@ sealed class Screen {
     @Serializable
     data object AuthScreen: Screen()
     @Serializable
-    data class RentaScreen(val id: Int): Screen()
+    data class RentaScreen(val vehiculoId: Int, val rentaId: Int): Screen()
     @Serializable
     data class TipoVehiculoListScreen(val id: Int): Screen()
     @Serializable

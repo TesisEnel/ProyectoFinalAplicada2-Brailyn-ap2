@@ -22,10 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
 import ucne.edu.proyectofinalaplicada2.presentation.renta.RentaUistate
+import java.util.Locale
 
 @Composable
 fun ConfirmRentaDialog(
     rentaUiState: RentaUistate,
+    rentaId: Int,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     vehiculo: VehiculoEntity?,
@@ -60,7 +62,25 @@ fun ConfirmRentaDialog(
 
                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
 
-
+                    if(rentaId > 0){
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Costo Add:",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "${rentaUiState.costoAdicional} DOP",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -79,6 +99,8 @@ fun ConfirmRentaDialog(
                         )
                     }
 
+
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -90,7 +112,7 @@ fun ConfirmRentaDialog(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "${rentaUiState.total?.div(60) ?: "N/A"} USD",
+                            text = "${String.format(Locale.getDefault(), "%.2f", rentaUiState.total?.div(60) ?: 0.0)} USD",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground

@@ -26,6 +26,16 @@ class VehiculoRepository @Inject constructor(
         try {
             emit(Resource.Loading())
             val vehiculos = rentCarRemoteDataSource.getVehiculos()
+            val localVehiculos = vehiculoDao.getAll()
+
+            val remotIds = vehiculos.map { it.vehiculoId }
+            val localIds = localVehiculos.map { it.vehiculoId }
+            val deleteIds = localIds.filterNot { remotIds.contains(it) }
+
+            if(deleteIds.isNotEmpty()){
+                val vehiculosToDelete = localVehiculos.filter { deleteIds.contains(it.vehiculoId) }
+                vehiculosToDelete.forEach { vehiculoDao.delete(it) }
+            }
             vehiculos.forEach { vehiculo ->
                 vehiculoDao.save(
                     vehiculo.copy(imagePath = vehiculo.imagePath ?: emptyList()).toEntity()

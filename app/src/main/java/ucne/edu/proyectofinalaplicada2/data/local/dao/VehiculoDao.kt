@@ -24,6 +24,11 @@ interface VehiculoDao {
     @Delete
     suspend fun delete(vehiculo: VehiculoEntity)
 
+    @Query(
+        """DELETE FROM Vehiculos WHERE vehiculoId IN (:ids)"""
+    )
+    fun deleteByIds(ids: List<Int>)
+
     @Query("SELECT * FROM Vehiculos")
     suspend fun getAll(): List<VehiculoEntity>
 

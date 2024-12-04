@@ -15,7 +15,6 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -45,7 +44,6 @@ class RentaViewModel @Inject constructor(
     init {
         getRentas()
     }
-
     fun getRentas() {
         viewModelScope.launch {
             rentaRepository.getRentas().collect { result ->
@@ -170,7 +168,7 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    fun prepareRentaData(emailCliente: String?, vehiculoId: Int) {
+    fun prepareRentaData(emailCliente: String?, vehiculoId: Int, rentaId: Int) {
         viewModelScope.launch {
 
             val cliente = getClienteByEmail(emailCliente ?: "")
@@ -222,20 +220,44 @@ class RentaViewModel @Inject constructor(
                     )
                 }
             }
-            _uistate.update {
-                it.copy(
-                    vehiculoNombre = uistate.value.marca?.nombreMarca,
-                    vehiculoId = uistate.value.vehiculo?.vehiculoId,
-                    vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
-                    vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
-                    vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo
-                )
+            val today = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date())
+            val renta = _uistate.value.rentas.find { it.rentaId == rentaId }
+            if(rentaId>0){
+                _uistate.update {
+                    it.copy(
+                        rentaId = rentaId,
+                        fechaEntrega = renta?.fechaEntrega,
+                        total = renta?.total,
+                        fechaRenta = today,
+                        vehiculoId = renta?.vehiculoId,
+                        clienteId = renta?.clienteId,
+                        vehiculoNombre = uistate.value.marca?.nombreMarca,
+                        vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
+                        vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
+                        vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo,
+                        renta = renta
+                    )
+                }
+            }else{
+                _uistate.update {
+                    it.copy(
+                        vehiculoNombre = uistate.value.marca?.nombreMarca,
+                        vehiculoId = uistate.value.vehiculo?.vehiculoId,
+                        vehiculoModelo = uistate.value.modelo?.modeloVehiculo,
+                        vehiculoConCombustible = uistate.value.tipoCombustibleEntity?.nombreTipoCombustible,
+                        vehiculoConTipo = uistate.value.tipoVehiculoEntity?.nombreTipoVehiculo,
+                        fechaRenta = today
+                    )
+                }
             }
+
         }
     }
+
     suspend fun getVehiculoById(id: Int): VehiculoEntity? {
         return vehiculoRepository.getVehiculoById(id).data
     }
+
     suspend fun getClienteByEmail(email: String): ClienteEntity? {
         return clienteRepository.getClienteByEmail(email).data
     }
@@ -243,14 +265,74 @@ class RentaViewModel @Inject constructor(
     suspend fun getMarcaById(id: Int): MarcaEntity? {
         return marcaRepository.getMarcaById(id).data
     }
+
     suspend fun getModeloById(id: Int): ModeloEntity? {
         return modeloRepository.getModelosById(id).data
     }
+
     suspend fun getCombustibleById(id: Int): TipoCombustibleEntity? {
         return tipoCombustibleRepository.getTipoCombustibleById(id).data
     }
+
     suspend fun getTipoVehiculoById(id: Int): TipoVehiculoEntity? {
         return tipoVehiculoRepository.getTipoVehiculoById(id).data
+    }
+
+
+    private fun updateRenta() {
+        viewModelScope.launch {
+            rentaRepository.updateRenta(uistate.value.toDto()).collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Renta actualizada",
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error",
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleDatePickerResult(dateMillis: Long?, isStartDate: Boolean) {
+        dateMillis?.let { millis ->
+            val selectedDate =
+                SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date(millis))
+            if (isStartDate) {
+                _uistate.update {
+                    it.copy(
+                        fechaRenta = selectedDate,
+                        errorFechaRenta = null
+                    )
+                }
+            } else {
+                _uistate.update {
+                    it.copy(
+                        fechaEntrega = selectedDate,
+                        errorFechaEntrega = null
+                    )
+                }
+            }
+        }
     }
 
     private fun onChangeClienteId(clienteId: Int) {
@@ -260,6 +342,7 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeVehiculoId(vehiculoId: Int) {
         _uistate.update {
             it.copy(
@@ -267,6 +350,7 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeFechaRenta(fechaRenta: String) {
         _uistate.update {
             it.copy(
@@ -275,6 +359,7 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeFechaEntrega(fechaEntrega: String) {
         _uistate.update {
             it.copy(
@@ -283,6 +368,7 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
+
     private fun onChangeTotal(total: Double) {
         _uistate.update {
             it.copy(
@@ -293,7 +379,6 @@ class RentaViewModel @Inject constructor(
 
     private fun calculateTotal(fechaRenta: String?, fechaEntrega: String?, costoDiario: Int) {
         val today = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date())
-
         if (fechaRenta.isNullOrBlank()) {
             _uistate.update {
                 it.copy(
@@ -363,15 +448,29 @@ class RentaViewModel @Inject constructor(
             }
             val diffInMillis = entregaDate.time - rentaDate.time
             val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt() + 1
+            val costoAdicional = calcularCostoAdicional(uistate.value.renta?.fechaEntrega?:"", uistate.value.fechaEntrega?:"", costoDiario.toDouble())
+            if (diffInDays < 3) {
+                _uistate.update {
+                    it.copy(
+                        total = null,
+                        error = "El periodo de renta debe ser de al menos 3 días",
+                        showModal = false,
+                    )
+                }
+                return
+            }
             val total = diffInDays * costoDiario
+
             _uistate.update {
                 it.copy(
                     total = total.toDouble(),
                     cantidadDias = diffInDays,
+                    costoAdicional = costoAdicional,
                     error = null,
                     errorFechaRenta = null,
                     errorFechaEntrega = null,
                     showModal = true
+
                 )
             }
         } catch (e: Exception) {
@@ -386,6 +485,104 @@ class RentaViewModel @Inject constructor(
         }
     }
 
+    private fun calcularCostoAdicional(fechaEntrega: String, newFecha: String,precio: Double):Double{
+        if(fechaEntrega.isBlank() || newFecha.isBlank()){
+            return 0.0
+        }
+
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+        val entregaDate: Date = dateFormat.parse(fechaEntrega) ?: return 0.0
+        val newDate: Date = dateFormat.parse(newFecha) ?: return 0.0
+
+        val diffInMillis = newDate.time - entregaDate.time
+
+        val diffInDays = TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt()
+
+        return if (diffInDays > 0) {
+            diffInDays * precio
+        } else {
+            0.0
+        }
+    }
+
+    private fun selectedRenta(vehiculoId: Int) {
+        viewModelScope.launch {
+            val renta = _uistate.value.rentas.find { it.vehiculoId == vehiculoId }
+            val vehiculo = getVehiculoById(vehiculoId)
+            val marca = getMarcaById(vehiculo?.marcaId ?: 0)
+            val tipoCombustible = getCombustibleById(vehiculo?.tipoCombustibleId ?: 0)
+            val tipoVehiculo = getTipoVehiculoById(vehiculo?.tipoVehiculoId ?: 0)
+            val modelo = getModeloById(vehiculo?.modeloId ?: 0)
+            val today = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(Date())
+            _uistate.update {
+                it.copy(
+                    fechaRenta = today,
+                    fechaEntrega = renta?.fechaEntrega,
+                    total = renta?.total,
+                    rentaId = renta?.rentaId,
+                    vehiculoNombre = uistate.value.vehiculoNombre,
+                    vehiculoModelo = uistate.value.vehiculoModelo,
+                    vehiculoId = vehiculo?.vehiculoId,
+                    marca = marca,
+                    modelo = modelo,
+                    vehiculoConCombustible = tipoCombustible?.nombreTipoCombustible,
+                    vehiculoConTipo = tipoVehiculo?.nombreTipoVehiculo,
+                )
+            }
+        }
+
+    }
+
+    private fun deleteRenta(vehiculoId: Int) {
+        viewModelScope.launch {
+            rentaRepository.deleteRenta(vehiculoId).collect{result->
+                when (result) {
+                    is Resource.Error -> {
+                        _uistate.update {
+                            it.copy(
+                                error = result.message ?: "Error",
+                                isDataLoading = false
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _uistate.update {
+                            it.copy(
+                                isDataLoading = true
+                            )
+                        }
+                    }
+                    is Resource.Success -> {
+                        _uistate.update {
+                            it.copy(
+                                success = "Renta eliminada",
+                                isDataLoading = false
+                            )
+                        }
+                        getRentas()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun nuevo() {
+        _uistate.update {
+            it.copy(
+                rentaId = null,
+                clienteId = null,
+                vehiculoId = null,
+                fechaRenta = "",
+                fechaEntrega = "",
+                total = null,
+                error = null,
+                errorFechaRenta = null,
+                errorFechaEntrega = null,
+            )
+        }
+    }
+
     private fun closeModal() {
         _uistate.update {
             it.copy(
@@ -393,25 +590,49 @@ class RentaViewModel @Inject constructor(
             )
         }
     }
+    private fun clearSuccess() {
+        _uistate.update {
+            it.copy(
+                success = ""
+            )
+        }
+    }private fun clearError() {
+        _uistate.update {
+            it.copy(
+                success = ""
+            )
+        }
+    }
 
     fun onEvent(event: RentaEvent) {
         when (event) {
+            RentaEvent.ConfirmRenta -> save()
+            RentaEvent.CloseModal -> closeModal()
+            RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()
+            RentaEvent.Nuevo -> nuevo()
+            RentaEvent.UpdateRenta -> updateRenta()
+            RentaEvent.ClearSuccess -> clearSuccess()
+            RentaEvent.ClearError -> clearError()
             is RentaEvent.OnchangeClienteId -> onChangeClienteId(event.clienteId)
             is RentaEvent.OnchangeFechaEntrega -> onChangeFechaEntrega(event.fechaEntrega)
             is RentaEvent.OnchangeFechaRenta -> onChangeFechaRenta(event.fechaRenta)
             is RentaEvent.OnchangeTotal -> onChangeTotal(event.total)
             is RentaEvent.OnchangeVehiculoId -> onChangeVehiculoId(event.vehiculoId)
-            RentaEvent.Save -> save()
             is RentaEvent.CalculeTotal -> calculateTotal(
                 event.fechaRenta,
                 event.fechaEntrega,
                 event.costoDiario
             )
-            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId)
-            RentaEvent.ConfirmRenta -> save()
-            RentaEvent.CloseModal -> closeModal()
+            is RentaEvent.PrepareRentaData -> prepareRentaData(event.emailCliente, event.vehiculoId,event.rentaId)
             is RentaEvent.MostraDatosVehiculoByRole -> mostrarDatosVehiculoByRole(event.isAdmin)
-            RentaEvent.MostraDatosVehiculo -> mostrarDatosVehiculo()
+            is RentaEvent.HandleDatePickerResult -> handleDatePickerResult(
+                event.dateMillis,
+                event.isStartDate
+            )
+
+            is RentaEvent.SelectedRenta -> selectedRenta(event.vehiculoId)
+            is RentaEvent.DeleteRenta -> deleteRenta(event.rentaId)
+
         }
     }
 }

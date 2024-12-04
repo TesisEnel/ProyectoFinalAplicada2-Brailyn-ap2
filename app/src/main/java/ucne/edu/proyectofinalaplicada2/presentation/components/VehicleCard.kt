@@ -17,23 +17,18 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.CustomDialog
 import ucne.edu.proyectofinalaplicada2.presentation.vehiculo.VehiculoEvent
 
 @Composable
@@ -52,9 +47,6 @@ fun VehicleCard(
     var expanded by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
-
-
-
 
     Box {
         Card(
@@ -126,7 +118,6 @@ fun VehicleCard(
             }
         }
 
-        // Confirm Delete Dialog
         if (showDeleteDialog) {
             ConfirmDeleteDialog(
                 onConfirm = {
@@ -135,8 +126,6 @@ fun VehicleCard(
                         showDeleteDialog = false
                     } else {
                         showErrorDialog = true
-//                        showDeleteDialog = false
-
                     }
 
                 },
