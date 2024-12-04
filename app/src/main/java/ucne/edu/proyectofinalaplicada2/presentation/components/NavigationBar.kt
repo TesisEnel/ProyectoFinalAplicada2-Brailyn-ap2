@@ -64,6 +64,12 @@ fun NavigationBar(
                 selectedIcon = Icons.Filled.Settings,
                 unSelectedIcon = Icons.Outlined.Settings,
                 screen = Screen.RentaListScreen
+            ),
+            BottomNavigationItem(
+                title = "Proveedor",
+                selectedIcon = Icons.Filled.Settings,
+                unSelectedIcon = Icons.Outlined.Settings,
+                screen = Screen.ProveedorRegistroScreen
             )
         )
     } else {
