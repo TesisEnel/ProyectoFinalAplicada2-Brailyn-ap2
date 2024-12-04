@@ -1,5 +1,6 @@
 package ucne.edu.proyectofinalaplicada2.presentation.renta
 
+import android.app.Application
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +16,8 @@ import ucne.edu.proyectofinalaplicada2.data.local.entities.ModeloEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoCombustibleEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.TipoVehiculoEntity
 import ucne.edu.proyectofinalaplicada2.data.local.entities.VehiculoEntity
-import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
+import ucne.edu.proyectofinalaplicada2.notificaciones.schedulePickupNotification
+import ucne.edu.proyectofinalaplicada2.notificaciones.scheduleRentalNotification
 import ucne.edu.proyectofinalaplicada2.repository.ClienteRepository
 import ucne.edu.proyectofinalaplicada2.repository.MarcaRepository
 import ucne.edu.proyectofinalaplicada2.repository.ModeloRepository
@@ -38,6 +40,7 @@ class RentaViewModel @Inject constructor(
     private val modeloRepository: ModeloRepository,
     private val tipoCombustibleRepository: TipoCombustibleRepository,
     private val tipoVehiculoRepository: TipoVehiculoRepository,
+    private val application: Application,
 ) : ViewModel() {
     private val _uistate = MutableStateFlow(RentaUistate())
     val uistate = _uistate.asStateFlow()
@@ -85,6 +88,19 @@ class RentaViewModel @Inject constructor(
         viewModelScope.launch {
             var vehiculo = getVehiculoById(uistate.value.vehiculoId ?: 0)
             vehiculo = vehiculo?.copy(estaRentado = true)
+            scheduleRentalNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaEntrega = uistate.value.fechaEntrega ?: "",
+            )
+            schedulePickupNotification(
+                context = application,
+                vehiculoId = uistate.value.vehiculoId ?: 0,
+                vehiculoName = uistate.value.vehiculoNombre ?: "",
+                fechaRenta = uistate.value.fechaRenta ?: "",
+            )
+
             val renta = rentaRepository.addRenta(_uistate.value.toDto(),vehiculo)
             renta.collect { result ->
                 when (result) {
