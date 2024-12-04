@@ -96,7 +96,7 @@ class RentaRepository @Inject constructor(
         } catch (e: HttpException) {
             emit(Resource.Error("Error de internet ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("Error, favor verificar conexión a internet ${e.message}"))
+            emit(Resource.Error("Error, favor verificar conexión a internet"))
         }
     }
 

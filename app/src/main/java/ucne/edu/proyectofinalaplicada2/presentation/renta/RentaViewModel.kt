@@ -132,7 +132,8 @@ class RentaViewModel @Inject constructor(
             }
             _uistate.update {
                 it.copy(
-                    rentaConVehiculos = rentaConVehiculo
+                    rentaConVehiculos = rentaConVehiculo,
+                    isDataLoading = false
                 )
             }
 
@@ -160,7 +161,8 @@ class RentaViewModel @Inject constructor(
 
                 _uistate.update {
                     it.copy(
-                        rentaConVehiculos = rentaConVehiculo
+                        rentaConVehiculos = rentaConVehiculo,
+                        isDataLoading = false
                     )
                 }
             }
@@ -168,7 +170,7 @@ class RentaViewModel @Inject constructor(
 
     }
 
-    fun prepareRentaData(emailCliente: String?, vehiculoId: Int, rentaId: Int) {
+    private fun prepareRentaData(emailCliente: String?, vehiculoId: Int, rentaId: Int) {
         viewModelScope.launch {
 
             val cliente = getClienteByEmail(emailCliente ?: "")
@@ -598,7 +600,7 @@ class RentaViewModel @Inject constructor(
     }private fun clearError() {
         _uistate.update {
             it.copy(
-                success = ""
+                error = ""
             )
         }
     }

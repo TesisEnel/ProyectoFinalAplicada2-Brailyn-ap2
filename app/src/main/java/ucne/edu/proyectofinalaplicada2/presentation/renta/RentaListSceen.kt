@@ -36,18 +36,52 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ucne.edu.proyectofinalaplicada2.presentation.authentication.AuthViewModel
+import ucne.edu.proyectofinalaplicada2.presentation.authentication.ClienteUiState
 import ucne.edu.proyectofinalaplicada2.presentation.components.ConfirmDeleteDialog
 import ucne.edu.proyectofinalaplicada2.presentation.components.CustomDialog
+import ucne.edu.proyectofinalaplicada2.presentation.components.ListIsEmpty
 import ucne.edu.proyectofinalaplicada2.ui.theme.ProyectoFinalAplicada2Theme
 
 @Composable
 fun RentaListSceen(
     viewModel: RentaViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     onGoEdit: (Int,Int) -> Unit,
 ) {
     val uiState by viewModel.uistate.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
+    val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
+    RentaListBodySceen(
+        authUiState = authUiState,
+        uiState = uiState,
+        onEvent = { event -> viewModel.onEvent(event) },
+        onGoEdit = onGoEdit,
+        isRoleVerified = isRoleVerified
+    )
+}
 
-    if (uiState.isLoading) {
+@Composable
+fun RentaListBodySceen(
+    authUiState: ClienteUiState,
+    uiState: RentaUistate = RentaUistate(),
+    onEvent: (RentaEvent) -> Unit = {},
+    onGoEdit: (Int,Int) -> Unit ,
+    isRoleVerified: Boolean = false,
+
+) {
+    if(!uiState.isLoading){
+
+        LaunchedEffect(isRoleVerified) {
+
+            if (!authUiState.isAdmin) {
+                onEvent(RentaEvent.MostraDatosVehiculoByRole(false))
+            } else {
+                onEvent(RentaEvent.MostraDatosVehiculo)
+            }
+        }
+    }
+
+    if (uiState.isDataLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -55,10 +89,19 @@ fun RentaListSceen(
         ) {
             CircularProgressIndicator()
         }
-    } else {
+    }else if(uiState.rentaConVehiculos.isEmpty()){
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            ListIsEmpty()
+        }
+    }
+    else {
         RentaListBodyScreen(
             uiState = uiState,
-            onEvent = { event -> viewModel.onEvent(event) },
+            onEvent = onEvent,
             onGoEdit = onGoEdit
 
         )
@@ -112,15 +155,8 @@ fun ExpandableCard(
     onGoEdit: (Int,Int) -> Unit ,
 ) {
     val rentaUiState by authViewModel.uistate.collectAsStateWithLifecycle()
-    val isRoleVerified by authViewModel.isRoleVerified.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf<Int?>(null) }
-    LaunchedEffect(isRoleVerified) {
-        if (!rentaUiState.isAdmin) {
-            onEvent(RentaEvent.MostraDatosVehiculoByRole(false))
-        } else {
-            onEvent(RentaEvent.MostraDatosVehiculo)
-        }
-    }
+
     uiState.rentaConVehiculos.forEachIndexed { index, renta ->
         ExpandableBodyCard(
             isExpanded = isExpanded == index,
@@ -128,14 +164,16 @@ fun ExpandableCard(
             rentaConVehiculo = renta,
             onGoEdit = onGoEdit,
             onRentaEvent = onEvent,
-            rentaUistate = uiState
+            rentaUistate = uiState,
+            authUiState = rentaUiState
         )
     }
 }
 
 @Composable
 fun ExpandableBodyCard(
-    authViewModel: AuthViewModel = hiltViewModel(),
+    authUiState: ClienteUiState,
+
     isExpanded: Boolean,
     onCardArrowClick: () -> Unit,
     rentaConVehiculo: RentaConVehiculo,
@@ -144,7 +182,6 @@ fun ExpandableBodyCard(
     rentaUistate: RentaUistate
 ) {
     var menuExpanded by remember { mutableStateOf(false) } // Control para el menú desplegable
-    val authUiState by authViewModel.uistate.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     ElevatedCard(
@@ -243,22 +280,23 @@ fun ExpandableBodyCard(
                     message = rentaUistate.success,
                     onDismiss = {
                         onRentaEvent(RentaEvent.ClearSuccess)
-                        onRentaEvent(RentaEvent.GetRentas)
                         onRentaEvent(RentaEvent.ClearError)
+                        onRentaEvent(RentaEvent.GetRentas)
                         showDeleteDialog = false
                     },
                     isError = rentaUistate.error?.isEmpty() == true
                 )
             }
-            if( rentaUistate.error?.isNotEmpty() == true ){
+            if (rentaUistate.error?.isNotEmpty() == true) {
                 CustomDialog(
                     message = rentaUistate.error,
                     onDismiss = {
-                        onRentaEvent(RentaEvent.ClearSuccess)
-                        onRentaEvent(RentaEvent.ClearError)
                         showDeleteDialog = false
+                        onRentaEvent(RentaEvent.ClearError)
+
+                        onRentaEvent(RentaEvent.ClearSuccess)
                     },
-                    isError = rentaUistate.error.isEmpty()
+                    isError = true
                 )
             }
 
