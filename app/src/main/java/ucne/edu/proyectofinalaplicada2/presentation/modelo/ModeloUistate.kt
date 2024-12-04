@@ -13,11 +13,13 @@ data class ModeloUistate(
     val vehiculos: List<VehiculoEntity> = emptyList(),
     val modeloConVehiculos: List<ModeloConVehiculo> = emptyList(),
     val isDataLoaded: Boolean = false,
-    val marca: MarcaEntity? = null
+    val marca: MarcaEntity? = null,
+    val listaFiltrada: List<ModeloConVehiculo> = emptyList()
 )
 
 data class ModeloConVehiculo(
     val nombreModelo: String,
     val vehiculo: VehiculoEntity,
-    val marca: MarcaEntity?
+    val marca: MarcaEntity?,
+    val estaRentado: Boolean = false
 )
