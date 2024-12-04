@@ -4,6 +4,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import ucne.edu.proyectofinalaplicada2.data.remote.api.RentCarApi
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.ClienteDto
+import ucne.edu.proyectofinalaplicada2.data.remote.dto.ProveedorDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.RentaDto
 import ucne.edu.proyectofinalaplicada2.data.remote.dto.VehiculoDto
 import javax.inject.Inject
@@ -65,6 +66,8 @@ class RentCarRemoteDataSource @Inject constructor(
 
     //Proveedor
     suspend fun getProveedores() = rentCarApi.getProveedores()
+    suspend fun addProveedor(proveedorDto: ProveedorDto) = rentCarApi.addProveedor(proveedorDto)
+
 
     //Modelo
     suspend fun getModelosById(id: Int) = rentCarApi.getModelosById(id)
