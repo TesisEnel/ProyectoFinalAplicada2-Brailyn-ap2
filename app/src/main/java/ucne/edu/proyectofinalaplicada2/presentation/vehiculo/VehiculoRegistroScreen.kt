@@ -329,6 +329,7 @@ fun VehiculoBodyRegistroScreen(
                         message = vehiculoUiState.success,
                         isError = vehiculoUiState.success.isEmpty(),
                         onDismiss = {
+                            onVehiculoEnvent(VehiculoEvent.ClearSuccess)
                             showDialog = false
                         }
                     )
