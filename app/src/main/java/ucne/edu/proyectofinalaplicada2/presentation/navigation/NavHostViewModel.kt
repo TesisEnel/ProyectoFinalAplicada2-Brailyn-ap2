@@ -27,22 +27,24 @@ class NavHostViewModel @Inject constructor(
             args = backStackEntryRoute.arguments
         )
 
-        val title = when (currentRoute) {
-            is Screen.VehiculoRegistroScreen -> "Registro de Vehículo"
-            is Screen.RentaScreen -> "Renta de Vehículo"
-            is Screen.TipoVehiculoListScreen -> "Puedes elegir tu vehículo"
-            is Screen.AuthScreen -> "Autenticación"
-            is Screen.RegistroClienteScreen -> "Registro de Cliente"
-            null -> "BravquezRentcar"
-            is Screen.Home -> "Bienvenido, ${user?.displayName}"
-            Screen.RentaListScreen -> "Rentas"
-            Screen.FiltraVehiculo -> "Puedes buscar tu vehículo"
-            Screen.Settings -> "Configura tu perfil"
+        val (title, showBackButton) = when (currentRoute) {
+            is Screen.VehiculoRegistroScreen -> "Registro de Vehículo" to false
+            is Screen.RentaScreen -> "Renta de Vehículo" to true
+            is Screen.TipoVehiculoListScreen -> "Puedes elegir tu vehículo" to true
+            is Screen.AuthScreen -> "Autenticación" to false
+            is Screen.RegistroClienteScreen -> "Registro de Cliente" to false
+            null -> "BravquezRentcar" to false
+            is Screen.Home -> "Bienvenido, ${user?.displayName}" to false
+            Screen.RentaListScreen -> "Rentas" to false
+            Screen.FiltraVehiculo -> "Puedes buscar tu vehículo" to true
+            Screen.Settings -> "Configura tu perfil" to false
+            Screen.ProveedorRegistroScreen -> "Agregar Proveedor" to false
         }
 
         _uiState.update {
             it.copy(
                 currentTitle = title,
+                showBackButton = showBackButton,
                 userDisplayName = firebaseAuth.currentUser?.displayName,
                 userPhotoUrl = firebaseAuth.currentUser?.photoUrl.toString()
             )
